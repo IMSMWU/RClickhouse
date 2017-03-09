@@ -1,0 +1,10 @@
+Package: clckhs
+Type: Package
+Title: Dplyr Backend for Clickhouse
+Version: 0.1.0
+Author: Christian Hotz-Behofsits
+Maintainer: Christian Hotz-Behofsits <christian.hotz-behofsits@wu.ac.at>
+Description: This is just a prototype 
+License: MIT
+Encoding: UTF-8
+LazyData: true
