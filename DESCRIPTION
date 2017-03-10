@@ -2,9 +2,21 @@ Package: clckhs
 Type: Package
 Title: Dplyr Backend for Clickhouse
 Version: 0.1.0
+Encoding: UTF-8
 Author: Christian Hotz-Behofsits
 Maintainer: Christian Hotz-Behofsits <christian.hotz-behofsits@wu.ac.at>
 Description: This is just a prototype 
 License: MIT
+Imports:
+    dplyr,
+    methods,
+    DBI (>= 0.3.1.9007)
 Encoding: UTF-8
 LazyData: true
+RoxygenNote: 6.0.1
+Collate:
+  'clckhs.R'
+  'ClickhouseConnection.R'
+  'ClickhouseDriver.R'
+  'ClickhouseResult.R'
+  'dplyr.R'
