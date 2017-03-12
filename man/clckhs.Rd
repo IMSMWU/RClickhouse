@@ -3,6 +3,7 @@
 \docType{package}
 \name{clckhs}
 \alias{clckhs}
+\alias{clickhouse}
 \alias{clckhs-package}
 \title{clckhs}
 \description{

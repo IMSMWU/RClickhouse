@@ -12,11 +12,13 @@ src_clickhouse <- function(dbname = "default", host = "localhost", port = 8123L,
 }
 
 #' @export
+#' @importFrom dplyr tbl
 tbl.src_clickhouse <- function(src, from, ...) {
   dplyr::tbl_sql("clickhouse", src = src, from = from, ...)
 }
 
 #' @export
+#' @importFrom dplyr src_desc
 src_desc.src_clickhouse <- function(con) {
   paste0("clickhouse ","[", con$con@url, "]")
 }
