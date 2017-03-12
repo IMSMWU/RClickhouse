@@ -8,9 +8,9 @@ Maintainer: Christian Hotz-Behofsits <christian.hotz-behofsits@wu.ac.at>
 Description: This is just a prototype 
 License: MIT
 Imports:
-    dplyr (>= 0.5.0.9000),
+    dplyr (>= 0.5.0),
     methods (>= 3.3.2),
-    DBI (>= 0.3.1.9007),
+    DBI (>= 0.3.1),
     data.table (>= 1.10.4)
 Encoding: UTF-8
 LazyData: true
@@ -18,9 +18,10 @@ RoxygenNote: 6.0.1
 Depends:
     R (>= 3.3.2)
 Collate:
-  'ClickhouseConnection.R'
+  'clckhs.R'
   'ClickhouseDriver.R'
+  'ClickhouseConnection.R'
   'ClickhouseResult.R'
   'dplyr.R'
-  'clckhs.R'
-  
+URL: https://github.com/inkrement/clckhs
+BugReports: https://github.com/inkrement/clckhs/issues

@@ -4,5 +4,5 @@
 #'
 #' @name clckhs
 #' @docType package
-#' @import methods DBI
+#' @aliases clickhouse
 NULL

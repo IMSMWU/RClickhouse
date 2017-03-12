@@ -13,8 +13,8 @@ setClass("ClickhouseDriver",
 #' @import methods DBI
 #' @examples
 #' library(DBI)
-#' clckhs::Clickhouse()
-Clickhouse <- function() {
+#' clckhs::clickhouse()
+clickhouse <- function() {
   new("ClickhouseDriver")
 }
 
