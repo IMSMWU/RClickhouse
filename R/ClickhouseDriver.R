@@ -41,9 +41,3 @@ setMethod("dbConnect", "ClickhouseDriver",
     con
   }
 )
-
-#' @rdname ClickhouseDriver-class
-#' @export
-setMethod("dbIsValid", "ClickhouseDriver", function(dbObj, ...) {
-  dbObj@env$success && dbObj@env$open
-})

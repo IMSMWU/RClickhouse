@@ -7,6 +7,7 @@
 \alias{dbGetRowsAffected,ClickhouseResult-method}
 \alias{dbClearResult,ClickhouseResult-method}
 \alias{dbHasCompleted,ClickhouseResult-method}
+\alias{dbIsValid,ClickhouseResult-method}
 \title{Class ClickhouseResult}
 \usage{
 \S4method{fetch}{ClickhouseResult,numeric}(res, n = -1, ...)
@@ -16,6 +17,8 @@
 \S4method{dbClearResult}{ClickhouseResult}(res, ...)
 
 \S4method{dbHasCompleted}{ClickhouseResult}(res, ...)
+
+\S4method{dbIsValid}{ClickhouseResult}(dbObj, ...)
 }
 \description{
 Clickhouse's query results class.  This classes encapsulates the result of an SQL

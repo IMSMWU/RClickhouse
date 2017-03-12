@@ -18,9 +18,9 @@ RoxygenNote: 6.0.1
 Depends:
     R (>= 3.3.2)
 Collate:
-  'clckhs.R'
   'ClickhouseConnection.R'
   'ClickhouseDriver.R'
   'ClickhouseResult.R'
   'dplyr.R'
+  'clckhs.R'
   

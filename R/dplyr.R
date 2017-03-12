@@ -1,34 +1,38 @@
 #' @import methods
-#' @import assertthat
 #' @importFrom dplyr src_sql
 #' @importFrom DBI dbConnect
 #' @export
 src_clickhouse <- function(dbname = "default", host = "localhost", port = 8123L, user = "default",
                            password = "", ...) {
-  if (!requireNamespace("dplyr", quietly = TRUE)) {
-    stop("dplyr is required to use src_clickhouse", call. = FALSE)
-  }
 
-  con <- DBI::dbConnect(clckhs::Clickhouse(), host = host, dbname = dbname,
+  con <- DBI::dbConnect(clckhs::clickhouse(), host = host, dbname = dbname,
                         user = user, password = password, port = port, ...)
-  src_dbi(con)
+
+  dplyr::src_sql("clickhouse", con)
 }
 
+#' @export
+tbl.src_clickhouse <- function(src, from, ...) {
+  dplyr::tbl_sql("clickhouse", src = src, from = from, ...)
+}
 
 #' @export
-#' @importFrom dplyr src_desc
 src_desc.src_clickhouse <- function(con) {
   paste0("clickhouse ","[", con$con@url, "]")
 }
 
 #' @export
+#' @importFrom dplyr sql_quote
+#' @importFrom dplyr sql_escape_string
 sql_escape_string.src_clickhouse <- function(con, x) {
-  sql_quote(x, "'")
+  dplyr::sql_quote(x, "'")
 }
 
 #' @export
+#' @importFrom dplyr sql_quote
+#' @importFrom dplyr sql_escape_ident
 sql_escape_ident.src_clickhouse <- function(con, x) {
-  sql_quote(x, "`")
+  dplyr::sql_quote(x, "`")
 }
 
 db_create_table.src_clickhouse <- function(con, table, types,
@@ -44,20 +48,16 @@ db_create_table.src_clickhouse <- function(con, table, types,
 
 # No transactions supported so
 # we have torewrite copy_to
-#importFrom dplyr copy_to
-#export
-#return a \code{tbl} object in the remote source
-#seealso \code{\link[dplyr]{copy_to}}
-#copy_to.src_clickhouse <- function(dest, df, name = deparse(substitute(df)),
-#                                   overwrite = FALSE, ...) {
-#  dbWriteTable(dest$con, name, df, overwrite=overwrite)
-#
-#  #dplyr:::db_create_indexes(con, name, indexes)
-#  #if (analyze)
-#  #  db_analyze(con, name)
-#
-#  tbl(dest, name)
-#}
+#' @importFrom dplyr copy_to
+#' @export
+#' @return a \code{tbl} object in the remote source
+#' @seealso \code{\link[dplyr]{copy_to}}
+copy_to.src_clickhouse <- function(dest, df, name = deparse(substitute(df)),
+                                   overwrite = FALSE, ...) {
+  DBI::dbWriteTable(dest$con, name, df, overwrite=overwrite)
+
+  dplyr::tbl(dest, name)
+}
 
 
 #' @export

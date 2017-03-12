@@ -59,3 +59,10 @@ setMethod("dbClearResult", "ClickhouseResult", definition = function(res, ...) {
 setMethod("dbHasCompleted", "ClickhouseResult", definition = function(res, ...) {
   res@env$delivered >= res@env$rows
 })
+
+
+#' @rdname ClickhouseResult-class
+#' @export
+setMethod("dbIsValid", "ClickhouseResult", function(dbObj, ...) {
+  dbObj@env$success && dbObj@env$open
+})

@@ -6,7 +6,6 @@
 \alias{dbIsValid,ClickhouseDriver-method}
 \alias{dbUnloadDriver,ClickhouseDriver-method}
 \alias{dbConnect,ClickhouseDriver-method}
-\alias{dbIsValid,ClickhouseDriver-method}
 \title{Class ClickhouseDriver}
 \usage{
 \S4method{dbIsValid}{ClickhouseDriver}(dbObj, ...)
@@ -15,8 +14,6 @@
 
 \S4method{dbConnect}{ClickhouseDriver}(drv, host = "localhost",
   port = 8123L, user = "default", password = "", ...)
-
-\S4method{dbIsValid}{ClickhouseDriver}(dbObj, ...)
 }
 \description{
 This driver never needs to be unloaded and hence \code{dbUnload()} is a
