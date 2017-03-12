@@ -1,8 +1,8 @@
 # Clckhs (Prototype)
 
-This is my first R-package, so be warned!  
+**This is my first R-package, so be warned!**
 
-It is a basic dplyr SQL-backend for the clickhouse database.
+It is a basic dplyr SQL-backend for the clickhouse database. The DBI interface is based on Hannes Mühleisen's (clickhouse-r package)[https://github.com/hannesmuehleisen/clickhouse-r].
 
 ## Dev Info
  * Build and Reload Package:  `Ctrl + Shift + B`
