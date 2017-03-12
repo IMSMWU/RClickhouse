@@ -65,6 +65,7 @@ setMethod("dbRemoveTable", "ClickhouseConnection", function(conn, name, ...) {
   invisible(TRUE)
 })
 
+#' @importFrom data.table fread
 setMethod("dbSendQuery", "ClickhouseConnection", function(conn, statement, use = c("memory", "temp"), ...) {
   # with use = "temp" we try to avoid exception with long vectors conversion in rawToChar
   # <simpleError in rawToChar(req$content): long vectors are not supported yet: raw.c:68>
