@@ -17,3 +17,5 @@ To use latest dplyr-package: ` devtools::install_github("hadley/dplyr")`
  * https://github.com/snowflakedb/dplyr-snowflakedb
  * https://gist.github.com/piccolbo/3d8ac40291f4eaee644b
  
+## Acknowledgements
+Big thanks to krlmlr (Kirill Müller), Maxwell Peterson and hannesmuehleisen (Hannes Mühleisen).
