@@ -4,6 +4,13 @@
 
 It is a basic dplyr SQL-backend for the clickhouse database. The DBI interface is based on Hannes Mühleisen's [clickhouse-r package](https://github.com/hannesmuehleisen/clickhouse-r).
 
+## Next Steps
+
+ - Replace HTTP interface with TCP C++ connection
+ - enhance dplyr support
+ - add usage information
+
+
 ## Dev Info
  * Build and Reload Package:  `Ctrl + Shift + B`
  * Check Package:             `Ctrl + Shift + E`
