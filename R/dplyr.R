@@ -26,14 +26,14 @@ src_desc.src_clickhouse <- function(con) {
 #' @export
 #' @importFrom dplyr sql_quote
 #' @importFrom dplyr sql_escape_string
-sql_escape_string.src_clickhouse <- function(con, x) {
+sql_escape_string.ClickhouseConnection <- function(con, x) {
   dplyr::sql_quote(x, "'")
 }
 
 #' @export
 #' @importFrom dplyr sql_quote
 #' @importFrom dplyr sql_escape_ident
-sql_escape_ident.src_clickhouse <- function(con, x) {
+sql_escape_ident.ClickhouseConnection <- function(con, x) {
   dplyr::sql_quote(x, "`")
 }
 
@@ -48,12 +48,12 @@ db_create_table.src_clickhouse <- function(con, table, types,
   }
 }
 
-# No transactions supported so
-# we have torewrite copy_to
 #' @importFrom dplyr copy_to
 #' @export
 #' @return a \code{tbl} object in the remote source
 #' @seealso \code{\link[dplyr]{copy_to}}
+#' No transactions supported so
+#' we have torewrite copy_to
 copy_to.src_clickhouse <- function(dest, df, name = deparse(substitute(df)),
                                    overwrite = FALSE, ...) {
   DBI::dbWriteTable(dest$con, name, df, overwrite=overwrite)
