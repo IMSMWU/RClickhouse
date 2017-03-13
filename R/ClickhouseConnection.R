@@ -81,7 +81,7 @@ setMethod("dbSendQuery", "ClickhouseConnection", function(conn, statement, use =
     q <- paste0(q ," FORMAT TabSeparatedWithNames")
   }
 
-  h <- curl::new_handle()
+  h <- curl::new_handle(CONNECTTIMEOUT = 60)
   curl::handle_setopt(h, copypostfields = q)
 
   if (use == "memory") {
