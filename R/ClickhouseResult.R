@@ -66,3 +66,19 @@ setMethod("dbHasCompleted", "ClickhouseResult", definition = function(res, ...) 
 setMethod("dbIsValid", "ClickhouseResult", function(dbObj, ...) {
   dbObj@env$success && dbObj@env$open
 })
+
+#' @rdname DBI
+#' @inheritParams DBI::dbGetStatement
+#' @export
+setMethod("dbGetStatement", "ClickhouseResult", function(res, ...) {
+  dbIsValid(res)
+  res@sql
+})
+
+#' @rdname DBI
+#' @inheritParams DBI::dbGetRowCount
+#' @export
+setMethod("dbGetRowCount", "ClickhouseResult", function(res, ...) {
+  dbIsValid(res)
+  nrow(res@env$data)
+})
