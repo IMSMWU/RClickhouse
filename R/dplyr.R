@@ -105,12 +105,6 @@ sql_translate_env.ClickhouseConnection <- function(x) {
     dplyr::sql_translator(.parent = dplyr::base_agg,
       "%||%" = dplyr::sql_prefix("concat")
     ),
-    dplyr::sql_translator(.parent = dplyr::base_win,
-      mean  = function(...) stop("window functions are not supported by clickhouse"),
-      sum   = function(...) stop("window functions are not supported by clickhouse"),
-      min   = function(...) stop("window functions are not supported by clickhouse"),
-      max   = function(...) stop("window functions are not supported by clickhouse"),
-      n     = function(...) stop("window functions are not supported by clickhouse")
-    )
+    dplyr::base_no_win
   )
 }
