@@ -8,6 +8,8 @@
 \alias{dbClearResult,ClickhouseResult-method}
 \alias{dbHasCompleted,ClickhouseResult-method}
 \alias{dbIsValid,ClickhouseResult-method}
+\alias{dbGetStatement,ClickhouseResult-method}
+\alias{dbGetRowCount,ClickhouseResult-method}
 \title{Class ClickhouseResult}
 \usage{
 \S4method{fetch}{ClickhouseResult,numeric}(res, n = -1, ...)
@@ -19,6 +21,15 @@
 \S4method{dbHasCompleted}{ClickhouseResult}(res, ...)
 
 \S4method{dbIsValid}{ClickhouseResult}(dbObj, ...)
+
+\S4method{dbGetStatement}{ClickhouseResult}(res, ...)
+
+\S4method{dbGetRowCount}{ClickhouseResult}(res, ...)
+}
+\arguments{
+\item{res}{An object inheriting from \linkS4class{DBIResult}.}
+
+\item{...}{Other arguments passed on to methods.}
 }
 \description{
 Clickhouse's query results class.  This classes encapsulates the result of an SQL
