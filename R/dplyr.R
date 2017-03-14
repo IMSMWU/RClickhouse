@@ -1,5 +1,4 @@
 #' @import methods
-#' @importFrom dplyr src_sql
 #' @importFrom DBI dbConnect
 #' @export
 src_clickhouse <- function(dbname = "default", host = "localhost", port = 8123L, user = "default",
@@ -8,19 +7,7 @@ src_clickhouse <- function(dbname = "default", host = "localhost", port = 8123L,
   con <- DBI::dbConnect(clckhs::clickhouse(), host = host, dbname = dbname,
                         user = user, password = password, port = port, ...)
 
-  dplyr::src_sql("clickhouse", con)
-}
-
-#' @export
-#' @importFrom dplyr tbl
-tbl.src_clickhouse <- function(src, from, ...) {
-  dplyr::tbl_sql("clickhouse", src = src, from = from, ...)
-}
-
-#' @export
-#' @importFrom dplyr src_desc
-src_desc.src_clickhouse <- function(con) {
-  paste0("clickhouse ","[", con$con@url, "]")
+  dplyr::src_dbi(con)
 }
 
 db_create_table.src_clickhouse <- function(con, table, types,
@@ -49,6 +36,14 @@ copy_to.src_clickhouse <- function(dest, df, name = deparse(substitute(df)),
 }
 
 
+#' @export
+#' @importFrom dplyr src_desc
+src_desc.ClickhouseConnection <- function(con) {
+  info <- dbGetInfo(con)
+
+  paste0("clickhouse ", info$db.version, "uptime: ", info$uptime, " [", info$username, "@",
+         info$host, ":", info$port, "/", info$dbname, "]")
+}
 
 #' @export
 #' @importFrom dplyr sql_quote
@@ -80,13 +75,11 @@ db_analyze.ClickhouseConnection <- function(con, sql, ...) {
 #' @export
 #' @importFrom dplyr db_query_fields
 db_query_fields.ClickhouseConnection <- function(con, sql, ...) {
-  fields <- dplyr::build_sql(
-    "SELECT * FROM ", dplyr::sql_subquery(con, sql), " LIMIT 0",
-    con = con
-  )
+  fields <- dplyr::build_sql("SELECT * FROM ", sql , " LIMIT 1", con = con)
+
   result <- dbSendQuery(con, fields)
   on.exit(dbClearResult(result))
-  dbGetInfo(result)$fields$name
+  colnames(result@env$data)
 }
 
 # SQL translation
