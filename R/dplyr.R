@@ -41,8 +41,10 @@ copy_to.src_clickhouse <- function(dest, df, name = deparse(substitute(df)),
 src_desc.ClickhouseConnection <- function(con) {
   info <- dbGetInfo(con)
 
-  paste0("clickhouse ", info$db.version, "uptime: ", info$uptime, " [", info$username, "@",
-         info$host, ":", info$port, "/", info$dbname, "]")
+  uptime_days <- round(info$uptime/60/60/24, digits = 2)
+
+  paste0("clickhouse ", info$db.version, " [", info$username, "@",
+         info$host, ":", info$port, "/", info$dbname, "; uptime: ",uptime_days ," days ]")
 }
 
 #' @export

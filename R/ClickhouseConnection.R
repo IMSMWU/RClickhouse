@@ -15,9 +15,12 @@ setClass("ClickhouseConnection",
 
 #' @export
 #' @rdname ClickhouseConnection-class
+#' @importFrom httr parse_url
 setMethod("dbGetInfo", "ClickhouseConnection", def=function(dbObj, ...) {
   envdata <- dbGetQuery(dbObj, "SELECT version() as version, uptime() as uptime,
                         currentDatabase() as database")
+
+  urlparts <- httr::parse_url(dbObj@url)
 
   list(
     name = "ClickhouseConnection",
@@ -25,9 +28,9 @@ setMethod("dbGetInfo", "ClickhouseConnection", def=function(dbObj, ...) {
     uptime = envdata$uptime,
     url = dbObj@url,
     dbname = envdata$database,
-    username = NA,
-    host = NA,
-    port = NA)
+    username = urlparts$username,
+    host = urlparts$hostname,
+    port = urlparts$port)
 })
 
 
