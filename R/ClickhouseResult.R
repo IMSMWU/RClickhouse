@@ -67,7 +67,7 @@ setMethod("dbIsValid", "ClickhouseResult", function(dbObj, ...) {
   dbObj@env$success && dbObj@env$open
 })
 
-#' @rdname DBI
+#' @rdname ClickhouseResult-class
 #' @inheritParams DBI::dbGetStatement
 #' @export
 setMethod("dbGetStatement", "ClickhouseResult", function(res, ...) {
@@ -75,7 +75,7 @@ setMethod("dbGetStatement", "ClickhouseResult", function(res, ...) {
   res@sql
 })
 
-#' @rdname DBI
+#' @rdname ClickhouseResult-class
 #' @inheritParams DBI::dbGetRowCount
 #' @export
 setMethod("dbGetRowCount", "ClickhouseResult", function(res, ...) {
