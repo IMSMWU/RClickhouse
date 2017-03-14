@@ -38,8 +38,9 @@ db_create_table.src_clickhouse <- function(con, table, types,
 #' @export
 #' @return a \code{tbl} object in the remote source
 #' @seealso \code{\link[dplyr]{copy_to}}
-#' No transactions supported so
-#' we have torewrite copy_to
+#' @rdname clckhs
+# No transactions supported so
+# we have torewrite copy_to
 copy_to.src_clickhouse <- function(dest, df, name = deparse(substitute(df)),
                                    overwrite = FALSE, ...) {
   DBI::dbWriteTable(dest$con, name, df, overwrite=overwrite)
@@ -109,7 +110,6 @@ sql_translate_env.ClickhouseConnection <- function(x) {
       Sys.time = dplyr::sql_prefix("now")
     ),
     dplyr::sql_translator(.parent = dplyr::base_agg,
-      n = function() dplyr::sql("count(*)"),
       "%||%" = dplyr::sql_prefix("concat")
     ),
     dplyr::sql_translator(.parent = dplyr::base_win,
