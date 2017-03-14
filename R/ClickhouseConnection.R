@@ -19,16 +19,15 @@ setMethod("dbGetInfo", "ClickhouseConnection", def=function(dbObj, ...) {
   envdata <- dbGetQuery(dbObj, "SELECT version() as version, uptime() as uptime,
                         currentDatabase() as database")
 
-  ll$name <- "ClickhouseConnection"
-  ll$db.version <- envdata$version
-  ll$uptime <- envdata$uptime
-  ll$url <- dbObj@url
-  ll$dbname <- envdata$database
-  ll$username <- NA
-  ll$host <- NA
-  ll$port <- NA
-
-  ll
+  list(
+    name = "ClickhouseConnection",
+    db.version = envdata$version,
+    uptime = envdata$uptime,
+    url = dbObj@url,
+    dbname = envdata$database,
+    username = NA,
+    host = NA,
+    port = NA)
 })
 
 
