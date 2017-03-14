@@ -80,5 +80,5 @@ setMethod("dbGetStatement", "ClickhouseResult", function(res, ...) {
 #' @export
 setMethod("dbGetRowCount", "ClickhouseResult", function(res, ...) {
   dbIsValid(res)
-  nrow(res@env$data)
+  res@env$rows
 })
