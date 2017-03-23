@@ -6,7 +6,7 @@ Encoding: UTF-8
 Author: Christian Hotz-Behofsits
 Maintainer: Christian Hotz-Behofsits <christian.hotz-behofsits@wu.ac.at>
 Description: This is just a prototype 
-License: MIT
+License: GPL-3
 Imports:
     dplyr (>= 0.5.0),
     methods (>= 3.3.2),
