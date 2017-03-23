@@ -5,4 +5,6 @@
 #' @name clckhs
 #' @docType package
 #' @aliases clickhouse
+#' @importFrom Rcpp evalCpp
+#' @useDynLib clckhs
 NULL
