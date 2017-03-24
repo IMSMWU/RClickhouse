@@ -1,2 +1,7 @@
 # combine with standard arguments for R
-PKG_CPPFLAGS = -I../inst/include/ -std=c++11
+PKG_CPPFLAGS = -I. -I./vendor/clickhouse-cpp -std=c++11
+
+PKG_LIBS = vendor/clickhouse-cpp/clickhouse/CMakeFiles/clickhouse-cpp-lib.dir/block.cpp.o vendor/clickhouse-cpp/clickhouse/CMakeFiles/clickhouse-cpp-lib.dir/client.cpp.o
+
+$(SHLIB): ${PKG_LIBS}
+

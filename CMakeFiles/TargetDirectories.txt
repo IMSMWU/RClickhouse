@@ -1,0 +1,2 @@
+/home/chris/clckhs/CMakeFiles/Rinstall.dir
+/home/chris/clckhs/CMakeFiles/clckhs.dir

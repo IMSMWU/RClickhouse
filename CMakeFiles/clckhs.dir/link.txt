@@ -1,0 +1,2 @@
+/usr/bin/ar cr libclckhs.a  CMakeFiles/clckhs.dir/src/RcppExports.o CMakeFiles/clckhs.dir/src/connection.o
+/usr/bin/ranlib libclckhs.a

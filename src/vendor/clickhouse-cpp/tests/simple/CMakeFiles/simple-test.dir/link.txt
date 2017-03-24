@@ -1,0 +1,1 @@
+/usr/bin/c++   -pthread -Wall -Wextra -Werror    CMakeFiles/simple-test.dir/main.cpp.o  -o simple-test -rdynamic ../../clickhouse/libclickhouse-cpp-lib.a 

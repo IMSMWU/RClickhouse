@@ -1,0 +1,1 @@
+/usr/bin/c++   -pthread -Wall -Wextra -Werror    CMakeFiles/clickhouse-cpp-ut.dir/main.cpp.o CMakeFiles/clickhouse-cpp-ut.dir/columns_ut.cpp.o CMakeFiles/clickhouse-cpp-ut.dir/types_ut.cpp.o CMakeFiles/clickhouse-cpp-ut.dir/type_parser_ut.cpp.o  -o clickhouse-cpp-ut -rdynamic ../clickhouse/libclickhouse-cpp-lib.a ../contrib/gtest/libgtest-lib.a 
