@@ -2,3 +2,5 @@ packrat/lib*/
 .Rproj.user
 .RData
 .Rhistory
+*.o
+*.so
