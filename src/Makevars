@@ -1,7 +1,22 @@
 # combine with standard arguments for R
 PKG_CPPFLAGS = -I. -I./vendor/clickhouse-cpp -std=c++11
 
-PKG_LIBS = vendor/clickhouse-cpp/clickhouse/CMakeFiles/clickhouse-cpp-lib.dir/block.cpp.o vendor/clickhouse-cpp/clickhouse/CMakeFiles/clickhouse-cpp-lib.dir/client.cpp.o
+PKG_LIBS = \
+vendor/clickhouse-cpp/clickhouse/columns/string.o \
+vendor/clickhouse-cpp/clickhouse/columns/date.o \
+vendor/clickhouse-cpp/clickhouse/columns/numeric.o \
+vendor/clickhouse-cpp/clickhouse/columns/tuple.o \
+vendor/clickhouse-cpp/clickhouse/columns/array.o \
+vendor/clickhouse-cpp/clickhouse/columns/factory.o \
+vendor/clickhouse-cpp/clickhouse/query.o \
+vendor/clickhouse-cpp/clickhouse/base/platform.o \
+vendor/clickhouse-cpp/clickhouse/base/socket.o \
+vendor/clickhouse-cpp/clickhouse/base/input.o \
+vendor/clickhouse-cpp/clickhouse/base/output.o \
+vendor/clickhouse-cpp/clickhouse/base/coded.o \
+vendor/clickhouse-cpp/clickhouse/client.o \
+vendor/clickhouse-cpp/clickhouse/types/types.o \
+vendor/clickhouse-cpp/clickhouse/types/type_parser.o \
+vendor/clickhouse-cpp/clickhouse/block.o
 
-$(SHLIB): ${PKG_LIBS}
-
+$(SHLIB): $(PKG_LIBS)
