@@ -19,5 +19,4 @@ vendor/clickhouse-cpp/clickhouse/types/types.o \
 vendor/clickhouse-cpp/clickhouse/types/type_parser.o \
 vendor/clickhouse-cpp/clickhouse/block.o
 
-$(SHLIB): ${PKG_LIBS}
-
+$(SHLIB): $(PKG_LIBS)
