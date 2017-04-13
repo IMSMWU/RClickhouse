@@ -15,7 +15,7 @@
 
 \S4method{dbUnloadDriver}{ClickhouseDriver}(drv, ...)
 
-\S4method{dbConnect}{ClickhouseDriver}(drv, host, port = 9000,
+\S4method{dbConnect}{ClickhouseDriver}(drv, host = "localhost", port = 9000,
   db = "default", user = "default", password = "", ...)
 }
 \arguments{
@@ -38,6 +38,6 @@ null-op.
 Connect to a ClickHouse database.
 }
 \examples{
-conn <- dbConnect(clckhs::clckhs("localhost", db = "mydb", user = "me")
+conn <- dbConnect(clckhs::clickhouse(), host="localhost")
 }
 \keyword{internal}
