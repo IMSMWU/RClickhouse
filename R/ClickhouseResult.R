@@ -17,7 +17,7 @@ setClass("ClickhouseResult",
 
 #' @rdname ClickhouseResult-class
 #' @export
-setMethod("fetch", signature(res = "ClickhouseResult", n = "numeric"), definition = function(res, n, ...) {
+setMethod("dbFetch", signature(res = "ClickhouseResult", n = "numeric"), definition = function(res, n, ...) {
   return(clckhs::fetch(res@ptr, n))
 })
 
