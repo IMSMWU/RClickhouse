@@ -30,11 +30,11 @@ bool hasCompleted(XPtr<Result> res) {
 // [[Rcpp::export]]
 XPtr<Client> connect(String host, int port, String db, String user, String password) {
   Client *client = new Client(ClientOptions()
-            .SetHost("localhost")
+            .SetHost(host)
             .SetPort(port)
-            .SetDefaultDatabase("default")
-            .SetUser("default")
-            .SetPassword("")
+            .SetDefaultDatabase(db)
+            .SetUser(user)
+            .SetPassword(password)
             // (re)throw exceptions, which are then handled automatically by Rcpp
             .SetRethrowException(true));
   XPtr<Client> p(client, true);
