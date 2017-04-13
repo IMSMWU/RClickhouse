@@ -45,8 +45,9 @@ setMethod("dbUnloadDriver", "ClickhouseDriver", function(drv, ...) {
 #' @param db name of the default database.
 #' @param user name of the user to connect as.
 #' @param password the user's password.
-#' @value A database connection.
+#' @return A database connection.
 #' @examples
+
 #' conn <- dbConnect(clckhs::clickhouse(), host="localhost")
 setMethod("dbConnect", "ClickhouseDriver", function(drv, host="localhost", port = 9000, db = "default", user = "default", password = "", ...) {
   new("ClickhouseConnection", ptr = clckhs::connect(host, port, db, user, password))
