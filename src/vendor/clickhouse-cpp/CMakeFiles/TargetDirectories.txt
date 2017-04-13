@@ -1,4 +1,0 @@
-/home/chris/clckhs/src/vendor/clickhouse-cpp/clickhouse/CMakeFiles/clickhouse-cpp-lib.dir
-/home/chris/clckhs/src/vendor/clickhouse-cpp/ut/CMakeFiles/clickhouse-cpp-ut.dir
-/home/chris/clckhs/src/vendor/clickhouse-cpp/contrib/gtest/CMakeFiles/gtest-lib.dir
-/home/chris/clckhs/src/vendor/clickhouse-cpp/tests/simple/CMakeFiles/simple-test.dir

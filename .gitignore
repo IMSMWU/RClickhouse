@@ -4,3 +4,5 @@ packrat/lib*/
 .Rhistory
 *.o
 *.so
+CMakeFiles/
+CMakeCache.txt
