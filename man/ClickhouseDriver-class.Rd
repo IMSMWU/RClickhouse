@@ -31,6 +31,9 @@
 
 \item{password}{the user's password.}
 }
+\value{
+A database connection.
+}
 \description{
 This driver never needs to be unloaded and hence \code{dbUnload()} is a
 null-op.
