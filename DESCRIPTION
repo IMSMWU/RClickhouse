@@ -3,6 +3,10 @@ Type: Package
 Title: Dplyr Backend for Clickhouse
 Version: 0.1.0
 Encoding: UTF-8
+Authors@R: c(
+    person("Christian", "Hotz-Behofsits", email = "christian.hotz-behofsits@wu.ac.at", role = c("aut", "cre")),
+    person("Clemens", "Danninger", role = c("aut"))
+    )
 Author: Christian Hotz-Behofsits
 Maintainer: Christian Hotz-Behofsits <christian.hotz-behofsits@wu.ac.at>
 Description: This is just a prototype 
