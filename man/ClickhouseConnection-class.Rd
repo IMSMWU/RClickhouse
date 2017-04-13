@@ -4,12 +4,17 @@
 \name{ClickhouseConnection-class}
 \alias{ClickhouseConnection-class}
 \alias{dbGetInfo,ClickhouseConnection-method}
+\alias{dbDisconnect,ClickhouseConnection-method}
 \title{Class ClickhouseConnection}
 \usage{
 \S4method{dbGetInfo}{ClickhouseConnection}(dbObj, ...)
+
+\S4method{dbDisconnect}{ClickhouseConnection}(conn, ...)
 }
 \description{
 \code{ClickhouseConnection.} objects are usually created by
 \code{\link[DBI]{dbConnect}}
+
+Close the database connection
 }
 \keyword{internal}

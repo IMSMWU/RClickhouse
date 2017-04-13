@@ -20,6 +20,12 @@ clickhouse <- function() {
 
 #' @rdname ClickhouseDriver-class
 #' @export
+setMethod("show", "ClickhouseDriver", function(object) {
+  cat("<ClickhouseDriver>\n")
+})
+
+#' @rdname ClickhouseDriver-class
+#' @export
 setMethod("dbIsValid", "ClickhouseDriver", function(dbObj, ...) {
   TRUE
 })
@@ -30,14 +36,18 @@ setMethod("dbUnloadDriver", "ClickhouseDriver", function(drv, ...) {
   invisible(TRUE)
 })
 
-#' @rdname ClickhouseDriver-class
+#' Connect to a ClickHouse database.
 #' @export
-setMethod("dbConnect", "ClickhouseDriver",
-  function(drv, host="localhost", port=8123L, user="default", password="", ...) {
-    con <- new("ClickhouseConnection",
-       url = paste0("http://", user, ":", password, "@", host, ":", port, "/")
-    )
-    stopifnot(dbIsValid(con))
-    con
-  }
-)
+#' @rdname ClickhouseDriver-class
+#' @param drv ClickHouse database driver.
+#' @param host name of the host on which the database is running.
+#' @param port port on which the database is listening.
+#' @param db name of the default database.
+#' @param user name of the user to connect as.
+#' @param password the user's password.
+#' @value A database connection.
+#' @examples
+#' conn <- dbConnect(clckhs::clckhs("localhost", db = "mydb", user = "me")
+setMethod("dbConnect", "ClickhouseDriver", function(drv, host, port = 9000, db = "default", user = "default", password = "", ...) {
+  new("ClickhouseConnection", ptr = clckhs::connect(host, port, db, user, password))
+})

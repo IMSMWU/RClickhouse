@@ -2,7 +2,36 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #' @export
-getVersion <- function() {
-    .Call('clckhs_getVersion', PACKAGE = 'clckhs')
+fetch <- function(res, n) {
+    .Call('clckhs_fetch', PACKAGE = 'clckhs', res, n)
 }
 
+#' @export
+clearResult <- function(res) {
+    invisible(.Call('clckhs_clearResult', PACKAGE = 'clckhs', res))
+}
+
+#' @export
+hasCompleted <- function(res) {
+    .Call('clckhs_hasCompleted', PACKAGE = 'clckhs', res)
+}
+
+#' @export
+connect <- function(host, port, db, user, password) {
+    .Call('clckhs_connect', PACKAGE = 'clckhs', host, port, db, user, password)
+}
+
+#' @export
+disconnect <- function(conn) {
+    invisible(.Call('clckhs_disconnect', PACKAGE = 'clckhs', conn))
+}
+
+#' @export
+select <- function(conn, query) {
+    .Call('clckhs_select', PACKAGE = 'clckhs', conn, query)
+}
+
+# Register entry points for exported C++ functions
+methods::setLoadAction(function(ns) {
+    .Call('clckhs_RcppExport_registerCCallable', PACKAGE = 'clckhs')
+})

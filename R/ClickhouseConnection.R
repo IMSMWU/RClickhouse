@@ -9,7 +9,8 @@
 setClass("ClickhouseConnection",
   contains = "DBIConnection",
   slots = list(
-    url = "character"
+    url = "character",
+    ptr = "externalptr"
   )
 )
 
@@ -44,11 +45,6 @@ setMethod("dbIsValid", "ClickhouseConnection", function(dbObj, ...) {
   })
 })
 
-clickhouse <- function() {
-  new("ClickhouseDriver")
-}
-
-
 
 setMethod("dbListTables", "ClickhouseConnection", function(conn, ...) {
   as.character(dbGetQuery(conn, "SHOW TABLES")[[1]])
@@ -69,66 +65,13 @@ setMethod("dbRemoveTable", "ClickhouseConnection", function(conn, name, ...) {
 
 #' @importFrom data.table fread
 setMethod("dbSendQuery", "ClickhouseConnection", function(conn, statement, use = c("memory", "temp"), ...) {
-  # with use = "temp" we try to avoid exception with long vectors conversion in rawToChar
-  # <simpleError in rawToChar(req$content): long vectors are not supported yet: raw.c:68>
-  use <- match.arg(use)
-
-  q <- sub("[; ]*;\\s*$", "", statement, ignore.case=T, perl=T)
-  has_resultset <- grepl("^\\s*(SELECT|SHOW)\\s+", statement, perl=T, ignore.case=T)
-
-  if (has_resultset) {
-    if ( grepl(".*FORMAT\\s+\\w+\\s*$", statement, perl=T, ignore.case=T)) {
-      stop("Can't have FORMAT keyword in queries, query ", statement)
-    }
-    q <- paste0(q ," FORMAT TabSeparatedWithNames")
-  }
-
-  h <- curl::new_handle(CONNECTTIMEOUT = 60)
-  curl::handle_setopt(h, copypostfields = q)
-
-  if (use == "memory") {
-    req <- curl::curl_fetch_memory(conn@url, handle = h)
-  } else {
-    tmp <- tempfile()
-    req <- curl::curl_fetch_disk(conn@url, tmp, handle = h)
-  }
-
-  if (req$status_code != 200) {
-    if (use == "memory") {
-      stop(rawToChar(req$content))
-    } else {
-      stop(readLines(tmp))
-    }
-  }
-
-  dataenv <- new.env(parent = emptyenv())
-  if (has_resultset) {
-    # try to avoid problems when select just one column that can contain ""
-    # without "blank.lines.skip" we'll get warning:
-    # Stopped reading at empty line ... but text exists afterwards (discarded): ...
-    # and not all rows will be read
-    if (use == "memory") {
-      dataenv$data <- data.table::fread(rawToChar(req$content), sep="\t", header=TRUE,
-                                        showProgress=FALSE,
-                                        blank.lines.skip = TRUE)
-    } else {
-      dataenv$data <- data.table::fread(tmp, sep = "\t", header = TRUE,
-                                        showProgress = FALSE,
-                                        blank.lines.skip = TRUE)
-      unlink(tmp)
-    }
-  }
-  dataenv$success <- TRUE
-
-  dataenv$delivered <- -1
-  dataenv$open <- TRUE
-  dataenv$rows <- nrow(dataenv$data)
-
-  new("ClickhouseResult",
+  res <- clckhs::select(conn@ptr, statement);
+  return(new("ClickhouseResult",
       sql = statement,
-      env = dataenv,
-      conn = conn
-  )
+      env = new.env(parent = emptyenv()),   #TODO: set env
+      conn = conn,
+      ptr = res
+  ))
 })
 
 setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "character", value = "ANY"), definition = function(conn, name, value, overwrite=FALSE,
@@ -204,6 +147,10 @@ setMethod("dbRollback", "ClickhouseConnection", definition = function(conn, ...)
   stop("Transactions are not supported.")
 })
 
+#' Close the database connection
+#' @export
+#' @rdname ClickhouseConnection-class
 setMethod("dbDisconnect", "ClickhouseConnection", function(conn, ...) {
+  clckhs::disconnect(conn@ptr)
   invisible(TRUE)
 })
