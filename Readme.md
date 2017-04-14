@@ -1,5 +1,7 @@
 # Clckhs (Alpha)
 
+![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg) ![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](https://img.shields.io/github/release/inkrement/clckhs.svg)
+
 This R package is a basic DBI interface and dplyr SQL-backend for the clickhouse database. It is based on the [C++ Clickhouse Client](https://github.com/artpaul/clickhouse-cpp).
 
 ```R
