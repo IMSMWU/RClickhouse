@@ -2,7 +2,7 @@
 
 This R package is a basic DBI interface and dplyr SQL-backend for the clickhouse database. It is based on the [C++ Clickhouse Client](https://github.com/artpaul/clickhouse-cpp).
 
-```
+```R
 conn <- dbConnect(clckhs::clickhouse(), host="localhost")
 ```
 
