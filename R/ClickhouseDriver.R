@@ -50,5 +50,5 @@ setMethod("dbUnloadDriver", "ClickhouseDriver", function(drv, ...) {
 
 #' conn <- dbConnect(clckhs::clickhouse(), host="localhost")
 setMethod("dbConnect", "ClickhouseDriver", function(drv, host="localhost", port = 9000, db = "default", user = "default", password = "", ...) {
-  new("ClickhouseConnection", ptr = clckhs::connect(host, port, db, user, password))
+  new("ClickhouseConnection", ptr = clckhs::connect(host, port, db, user, password), port = port, host = host, user = user)
 })
