@@ -9,8 +9,10 @@
 setClass("ClickhouseConnection",
   contains = "DBIConnection",
   slots = list(
-    url = "character",
-    ptr = "externalptr"
+    ptr  = "externalptr",
+    host = "character",
+    port = "numeric",
+    user = "character"
   )
 )
 
@@ -24,12 +26,12 @@ setMethod("dbGetInfo", "ClickhouseConnection", def=function(dbObj, ...) {
     name = "ClickhouseConnection",
     db.version = envdata$version,
     uptime     = envdata$uptime,
-    url        = dbObj@url,
     dbname     = envdata$database,
-    username   = "", # TODO
-    host       = "", # TODO
-    port       = ""  # TODO
+    username   = conn@user,
+    host       = conn@host,
+    port       = conn@port
   )
+
 })
 
 
@@ -42,7 +44,6 @@ setMethod("dbIsValid", "ClickhouseConnection", function(dbObj, ...) {
     FALSE
   })
 })
-
 
 setMethod("dbListTables", "ClickhouseConnection", function(conn, ...) {
   as.character(dbGetQuery(conn, "SHOW TABLES")[[1]])
@@ -153,3 +154,6 @@ setMethod("dbDisconnect", "ClickhouseConnection", function(conn, ...) {
   clckhs::disconnect(conn@ptr)
   invisible(TRUE)
 })
+
+#' @export
+DBI::dbGetQuery
