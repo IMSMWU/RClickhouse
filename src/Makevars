@@ -1,5 +1,6 @@
 # combine with standard arguments for R
 PKG_CPPFLAGS = -I. -I./vendor/clickhouse-cpp -std=c++11
+CXX_STD = CXX11
 
 OBJ_FILES = \
 vendor/clickhouse-cpp/clickhouse/columns/string.o \
