@@ -6,10 +6,10 @@
 \alias{dbGetInfo,ClickhouseConnection-method}
 \alias{dbIsValid,ClickhouseConnection-method}
 \alias{dbListTables,ClickhouseConnection-method}
-\alias{dbExistsTable,ClickhouseConnection-method}
-\alias{dbReadTable,ClickhouseConnection,ANY-method}
-\alias{dbRemoveTable,ClickhouseConnection-method}
-\alias{dbSendQuery,ClickhouseConnection-method}
+\alias{dbExistsTable,ClickhouseConnection,character-method}
+\alias{dbReadTable,ClickhouseConnection,character-method}
+\alias{dbRemoveTable,ClickhouseConnection,character-method}
+\alias{dbSendQuery,ClickhouseConnection,character-method}
 \alias{dbDataType,ClickhouseConnection-method}
 \alias{dbBegin,ClickhouseConnection-method}
 \alias{dbCommit,ClickhouseConnection-method}
@@ -23,13 +23,13 @@
 
 \S4method{dbListTables}{ClickhouseConnection}(conn, ...)
 
-\S4method{dbExistsTable}{ClickhouseConnection}(conn, name, ...)
+\S4method{dbExistsTable}{ClickhouseConnection,character}(conn, name, ...)
 
-\S4method{dbReadTable}{ClickhouseConnection,ANY}(conn, name, ...)
+\S4method{dbReadTable}{ClickhouseConnection,character}(conn, name, ...)
 
-\S4method{dbRemoveTable}{ClickhouseConnection}(conn, name, ...)
+\S4method{dbRemoveTable}{ClickhouseConnection,character}(conn, name, ...)
 
-\S4method{dbSendQuery}{ClickhouseConnection}(conn, statement,
+\S4method{dbSendQuery}{ClickhouseConnection,character}(conn, statement,
   use = c("memory", "temp"), ...)
 
 \S4method{dbDataType}{ClickhouseConnection}(dbObj, obj, ...)

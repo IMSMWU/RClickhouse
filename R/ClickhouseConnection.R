@@ -53,26 +53,26 @@ setMethod("dbListTables", "ClickhouseConnection", function(conn, ...) {
 
 #' @export
 #' @rdname ClickhouseConnection-class
-setMethod("dbExistsTable", "ClickhouseConnection", function(conn, name, ...) {
+setMethod("dbExistsTable", c("ClickhouseConnection", "character"), function(conn, name, ...) {
   as.logical(name %in% dbListTables(conn))
 })
 
 #' @export
 #' @rdname ClickhouseConnection-class
-setMethod("dbReadTable", "ClickhouseConnection", function(conn, name, ...) {
+setMethod("dbReadTable", c("ClickhouseConnection", "character"), function(conn, name, ...) {
   dbGetQuery(conn, paste0("SELECT * FROM ", name))
 })
 
 #' @export
 #' @rdname ClickhouseConnection-class
-setMethod("dbRemoveTable", "ClickhouseConnection", function(conn, name, ...) {
+setMethod("dbRemoveTable",c("ClickhouseConnection", "character"), function(conn, name, ...) {
   dbExecute(conn, paste0("DROP TABLE ", name))
   invisible(TRUE)
 })
 
 #' @export
 #' @rdname ClickhouseConnection-class
-setMethod("dbSendQuery", "ClickhouseConnection", function(conn, statement, use = c("memory", "temp"), ...) {
+setMethod("dbSendQuery", c("ClickhouseConnection", "character"), function(conn, statement, use = c("memory", "temp"), ...) {
   res <- clckhs::select(conn@ptr, statement);
   return(new("ClickhouseResult",
       sql = statement,
@@ -170,6 +170,3 @@ setMethod("dbDisconnect", "ClickhouseConnection", function(conn, ...) {
   clckhs::disconnect(conn@ptr)
   invisible(TRUE)
 })
-
-#' @export
-DBI::dbGetQuery
