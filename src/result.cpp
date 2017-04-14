@@ -26,9 +26,9 @@ inline void convertCol(Result &r, size_t colIdx, Rcpp::DataFrame &df,
 // ambiguities in the Rcpp::Date constructor, which expects either int or
 // double, whereas ColumnDate values are uint32_t
 template<>
-inline void convertCol<clickhouse::ColumnDate, Rcpp::DateVector>(Result &r,
+inline void convertCol<ch::ColumnDate, Rcpp::DateVector>(Result &r,
     size_t colIdx, Rcpp::DataFrame &df, size_t start, size_t len) {
-  using CT = clickhouse::ColumnDate;
+  using CT = ch::ColumnDate;
   using RT = Rcpp::DateVector;
   r.convertTypedColumn<CT, RT>(colIdx, df, start, len,
     [](std::shared_ptr<CT> in, RT &out, size_t offset, size_t start, size_t end) {
@@ -40,12 +40,14 @@ inline void convertCol<clickhouse::ColumnDate, Rcpp::DateVector>(Result &r,
 }
 
 template<typename CT, typename RT>
-void Result::convertTypedColumn(size_t colIdx, Rcpp::DataFrame &df, size_t start, size_t len, std::function<void(std::shared_ptr<CT>, RT &, size_t, size_t, size_t)> convFunc) {
+void Result::convertTypedColumn(size_t colIdx, Rcpp::DataFrame &df,
+    size_t start, size_t len,
+    std::function<void(std::shared_ptr<CT>, RT &, size_t, size_t, size_t)> convFunc) {
   RT v(len);   // R vector for the column
 
   size_t i = 0;
   for(ColBlock &cb : columnBlocks) {
-    clickhouse::ColumnRef col = cb.columns[colIdx];
+    ch::ColumnRef col = cb.columns[colIdx];
 
     if(i+col->Size() >= start) {  // only if this block was not fetched yet
       auto ccol = col->As<CT>();
@@ -69,50 +71,50 @@ void Result::convertTypedColumn(size_t colIdx, Rcpp::DataFrame &df, size_t start
 }
 
 void Result::convertColumn(size_t colIdx, Rcpp::DataFrame &df, size_t start, size_t len) {
-  using TC = clickhouse::Type::Code;
-  clickhouse::TypeRef type = colTypes[colIdx];
+  using TC = ch::Type::Code;
+  ch::TypeRef type = colTypes[colIdx];
   switch(type->GetCode()) {
     case TC::Int8:
-      convertCol<clickhouse::ColumnInt8, Rcpp::IntegerVector>(*this, colIdx, df, start, len);
+      convertCol<ch::ColumnInt8, Rcpp::IntegerVector>(*this, colIdx, df, start, len);
       break;
     case TC::Int16:
-      convertCol<clickhouse::ColumnInt16, Rcpp::IntegerVector>(*this, colIdx, df, start, len);
+      convertCol<ch::ColumnInt16, Rcpp::IntegerVector>(*this, colIdx, df, start, len);
       break;
     case TC::Int32:
-      convertCol<clickhouse::ColumnInt32, Rcpp::IntegerVector>(*this, colIdx, df, start, len);
+      convertCol<ch::ColumnInt32, Rcpp::IntegerVector>(*this, colIdx, df, start, len);
       break;
     case TC::Int64:
-      convertCol<clickhouse::ColumnInt64, Rcpp::IntegerVector>(*this, colIdx, df, start, len);
+      convertCol<ch::ColumnInt64, Rcpp::IntegerVector>(*this, colIdx, df, start, len);
       break;
     case TC::UInt8:
-      convertCol<clickhouse::ColumnUInt8, Rcpp::IntegerVector>(*this, colIdx, df, start, len);
+      convertCol<ch::ColumnUInt8, Rcpp::IntegerVector>(*this, colIdx, df, start, len);
       break;
     case TC::UInt16:
-      convertCol<clickhouse::ColumnUInt16, Rcpp::IntegerVector>(*this, colIdx, df, start, len);
+      convertCol<ch::ColumnUInt16, Rcpp::IntegerVector>(*this, colIdx, df, start, len);
       break;
     case TC::UInt32:
-      convertCol<clickhouse::ColumnUInt32, Rcpp::IntegerVector>(*this, colIdx, df, start, len);
+      convertCol<ch::ColumnUInt32, Rcpp::IntegerVector>(*this, colIdx, df, start, len);
       break;
     case TC::UInt64:
-      convertCol<clickhouse::ColumnUInt64, Rcpp::IntegerVector>(*this, colIdx, df, start, len);
+      convertCol<ch::ColumnUInt64, Rcpp::IntegerVector>(*this, colIdx, df, start, len);
       break;
     case TC::Float32:
-      convertCol<clickhouse::ColumnFloat32, Rcpp::IntegerVector>(*this, colIdx, df, start, len);
+      convertCol<ch::ColumnFloat32, Rcpp::IntegerVector>(*this, colIdx, df, start, len);
       break;
     case TC::Float64:
-      convertCol<clickhouse::ColumnFloat64, Rcpp::IntegerVector>(*this, colIdx, df, start, len);
+      convertCol<ch::ColumnFloat64, Rcpp::IntegerVector>(*this, colIdx, df, start, len);
       break;
     case TC::String:
-      convertCol<clickhouse::ColumnString, Rcpp::StringVector>(*this, colIdx, df, start, len);
+      convertCol<ch::ColumnString, Rcpp::StringVector>(*this, colIdx, df, start, len);
       break;
     case TC::FixedString:
-      convertCol<clickhouse::ColumnFixedString, Rcpp::StringVector>(*this, colIdx, df, start, len);
+      convertCol<ch::ColumnFixedString, Rcpp::StringVector>(*this, colIdx, df, start, len);
       break;
     case TC::DateTime:
-      convertCol<clickhouse::ColumnDateTime, Rcpp::DatetimeVector>(*this, colIdx, df, start, len);
+      convertCol<ch::ColumnDateTime, Rcpp::DatetimeVector>(*this, colIdx, df, start, len);
       break;
     case TC::Date:
-      convertCol<clickhouse::ColumnDate, Rcpp::DateVector>(*this, colIdx, df, start, len);
+      convertCol<ch::ColumnDate, Rcpp::DateVector>(*this, colIdx, df, start, len);
       break;
     default:
       throw std::invalid_argument("unsupported type: "+type->GetName());
@@ -121,8 +123,8 @@ void Result::convertColumn(size_t colIdx, Rcpp::DataFrame &df, size_t start, siz
   //TODO: release blocks once they have been fetched
 }
 
-void Result::setColInfo(const clickhouse::Block &block) {
-  for(clickhouse::Block::Iterator bi(block); bi.IsValid(); bi.Next()) {
+void Result::setColInfo(const ch::Block &block) {
+  for(ch::Block::Iterator bi(block); bi.IsValid(); bi.Next()) {
     colNames.push_back(Rcpp::String(bi.Name()));
     colTypes.push_back(bi.Type());
   }
@@ -132,14 +134,14 @@ bool Result::isComplete() {
   return fetchedRows >= availRows;
 }
 
-void Result::addBlock(const clickhouse::Block &block) {
+void Result::addBlock(const ch::Block &block) {
   if(static_cast<size_t>(colNames.size()) < block.GetColumnCount()) {
     setColInfo(block);
   }
 
   if(block.GetRowCount() > 0) {   // don't add empty blocks
     ColBlock cb;
-    for(clickhouse::Block::Iterator bi(block); bi.IsValid(); bi.Next()) {
+    for(ch::Block::Iterator bi(block); bi.IsValid(); bi.Next()) {
       cb.columns.push_back(bi.Column());
     }
     columnBlocks.push_back(cb);
