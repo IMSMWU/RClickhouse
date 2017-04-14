@@ -9,7 +9,6 @@ conn <- dbConnect(clckhs::clickhouse(), host="localhost")
 ```
 
 ## Next Steps
-
  - enhance dplyr support
  - add usage information
 
@@ -20,12 +19,8 @@ conn <- dbConnect(clckhs::clickhouse(), host="localhost")
  * Test Package:              `Ctrl + Shift + T`
 
 Generate Namespace: `devtools::document()`
-To use latest dplyr-package: ` devtools::install_github("hadley/dplyr")`
 
 
-# Other dplyr sql-backends:
- * https://github.com/snowflakedb/dplyr-snowflakedb
- * https://gist.github.com/piccolbo/3d8ac40291f4eaee644b
- 
+
 ## Acknowledgements
 Big thanks to Kirill Müller, Maxwell Peterson, Artemkin Pavel and Hannes Mühleisen.
