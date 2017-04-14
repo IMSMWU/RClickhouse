@@ -1,6 +1,6 @@
 Package: clckhs
 Type: Package
-Title: Dplyr Backend for Clickhouse
+Title: DBI Interface and Dplyr Backend for Clickhouse
 Version: 0.1.0
 Encoding: UTF-8
 Authors@R: c(
