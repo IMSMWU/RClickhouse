@@ -16,22 +16,20 @@ setClass("ClickhouseConnection",
 
 #' @export
 #' @rdname ClickhouseConnection-class
-#' @importFrom httr parse_url
 setMethod("dbGetInfo", "ClickhouseConnection", def=function(dbObj, ...) {
   envdata <- dbGetQuery(dbObj, "SELECT version() as version, uptime() as uptime,
                         currentDatabase() as database")
 
-  urlparts <- httr::parse_url(dbObj@url)
-
   list(
     name = "ClickhouseConnection",
     db.version = envdata$version,
-    uptime = envdata$uptime,
-    url = dbObj@url,
-    dbname = envdata$database,
-    username = urlparts$username,
-    host = urlparts$hostname,
-    port = urlparts$port)
+    uptime     = envdata$uptime,
+    url        = dbObj@url,
+    dbname     = envdata$database,
+    username   = "", # TODO
+    host       = "", # TODO
+    port       = ""  # TODO
+  )
 })
 
 
@@ -63,6 +61,7 @@ setMethod("dbRemoveTable", "ClickhouseConnection", function(conn, name, ...) {
   invisible(TRUE)
 })
 
+#' @export
 #' @importFrom data.table fread
 setMethod("dbSendQuery", "ClickhouseConnection", function(conn, statement, use = c("memory", "temp"), ...) {
   res <- clckhs::select(conn@ptr, statement);
