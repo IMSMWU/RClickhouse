@@ -4,6 +4,11 @@
 
 This R package is a basic DBI interface and dplyr SQL-backend for the clickhouse database. It is based on the [C++ Clickhouse Client](https://github.com/artpaul/clickhouse-cpp).
 
+It is currently not available on CRAN so you have to install it using devtools:
+```R
+devtools:install_github("inkrement/clckhs@cpp")
+```
+
 ```R
 conn <- dbConnect(clckhs::clickhouse(), host="localhost")
 ```
