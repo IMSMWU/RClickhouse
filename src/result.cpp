@@ -69,12 +69,8 @@ void Result::convertTypedColumn(size_t colIdx, Rcpp::DataFrame &df, size_t start
 }
 
 void Result::convertColumn(size_t colIdx, Rcpp::DataFrame &df, size_t start, size_t len) {
-  if(columnBlocks.empty()) {
-    return;
-  }
-
   using TC = clickhouse::Type::Code;
-  clickhouse::TypeRef type = columnBlocks[0].columns[colIdx]->Type();
+  clickhouse::TypeRef type = colTypes[colIdx];
   switch(type->GetCode()) {
     case TC::Int8:
       convertCol<clickhouse::ColumnInt8, Rcpp::IntegerVector>(*this, colIdx, df, start, len);
@@ -125,9 +121,10 @@ void Result::convertColumn(size_t colIdx, Rcpp::DataFrame &df, size_t start, siz
   //TODO: release blocks once they have been fetched
 }
 
-void Result::setColNames(const clickhouse::Block &block) {
+void Result::setColInfo(const clickhouse::Block &block) {
   for(clickhouse::Block::Iterator bi(block); bi.IsValid(); bi.Next()) {
     colNames.push_back(Rcpp::String(bi.Name()));
+    colTypes.push_back(bi.Type());
   }
 }
 
@@ -137,7 +134,7 @@ bool Result::isComplete() {
 
 void Result::addBlock(const clickhouse::Block &block) {
   if(static_cast<size_t>(colNames.size()) < block.GetColumnCount()) {
-    setColNames(block);
+    setColInfo(block);
   }
 
   if(block.GetRowCount() > 0) {   // don't add empty blocks

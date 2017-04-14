@@ -13,13 +13,14 @@ class Result {
   };
 
   Rcpp::StringVector colNames;
+  std::vector<clickhouse::TypeRef> colTypes;
   std::vector<ColBlock> columnBlocks;
 
   // convert the given range of values from column colIdx to an R vector and
   // add it to the data frame df
   void convertColumn(size_t colIdx, Rcpp::DataFrame &df, size_t start, size_t len);
 
-  void setColNames(const clickhouse::Block &block);
+  void setColInfo(const clickhouse::Block &block);
 
   public:
   template<typename CT, typename RT>
