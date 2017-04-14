@@ -72,7 +72,7 @@ setMethod("dbRemoveTable",c("ClickhouseConnection", "character"), function(conn,
 
 #' @export
 #' @rdname ClickhouseConnection-class
-setMethod("dbSendQuery", c("ClickhouseConnection", "character"), function(conn, statement, use = c("memory", "temp"), ...) {
+setMethod("dbSendQuery", c("ClickhouseConnection", "character"), function(conn, statement, ...) {
   res <- clckhs::select(conn@ptr, statement);
   return(new("ClickhouseResult",
       sql = statement,
