@@ -1,13 +1,14 @@
 # combine with standard arguments for R
-PKG_CPPFLAGS = -I. -I./vendor/clickhouse-cpp -std=c++11
+PKG_CPPFLAGS = -I. -I./vendor/clickhouse-cpp -std=c++11 -fPIC
 
-PKG_LIBS = \
+OBJ_FILES = \
 vendor/clickhouse-cpp/clickhouse/columns/string.o \
 vendor/clickhouse-cpp/clickhouse/columns/date.o \
 vendor/clickhouse-cpp/clickhouse/columns/numeric.o \
 vendor/clickhouse-cpp/clickhouse/columns/tuple.o \
 vendor/clickhouse-cpp/clickhouse/columns/array.o \
 vendor/clickhouse-cpp/clickhouse/columns/factory.o \
+vendor/clickhouse-cpp/clickhouse/columns/nullable.cpp \
 vendor/clickhouse-cpp/clickhouse/query.o \
 vendor/clickhouse-cpp/clickhouse/base/platform.o \
 vendor/clickhouse-cpp/clickhouse/base/socket.o \
@@ -19,4 +20,6 @@ vendor/clickhouse-cpp/clickhouse/types/types.o \
 vendor/clickhouse-cpp/clickhouse/types/type_parser.o \
 vendor/clickhouse-cpp/clickhouse/block.o
 
-$(SHLIB): $(PKG_LIBS)
+PKG_LIBS = -lpthread -fPIC $(OBJ_FILES)
+
+$(SHLIB): $(OBJ_FILES)
