@@ -31,10 +31,10 @@ setMethod("dbGetInfo", "ClickhouseConnection", def=function(dbObj, ...) {
     host       = conn@host,
     port       = conn@port
   )
-
 })
 
-
+#' @export
+#' @rdname ClickhouseConnection-class
 setMethod("dbIsValid", "ClickhouseConnection", function(dbObj, ...) {
   tryCatch({
     dbGetQuery(dbObj, "select 1")
@@ -45,25 +45,33 @@ setMethod("dbIsValid", "ClickhouseConnection", function(dbObj, ...) {
   })
 })
 
+#' @export
+#' @rdname ClickhouseConnection-class
 setMethod("dbListTables", "ClickhouseConnection", function(conn, ...) {
   as.character(dbGetQuery(conn, "SHOW TABLES")[[1]])
 })
 
+#' @export
+#' @rdname ClickhouseConnection-class
 setMethod("dbExistsTable", "ClickhouseConnection", function(conn, name, ...) {
   as.logical(name %in% dbListTables(conn))
 })
 
+#' @export
+#' @rdname ClickhouseConnection-class
 setMethod("dbReadTable", "ClickhouseConnection", function(conn, name, ...) {
   dbGetQuery(conn, paste0("SELECT * FROM ", name))
 })
 
+#' @export
+#' @rdname ClickhouseConnection-class
 setMethod("dbRemoveTable", "ClickhouseConnection", function(conn, name, ...) {
   dbExecute(conn, paste0("DROP TABLE ", name))
   invisible(TRUE)
 })
 
 #' @export
-#' @importFrom data.table fread
+#' @rdname ClickhouseConnection-class
 setMethod("dbSendQuery", "ClickhouseConnection", function(conn, statement, use = c("memory", "temp"), ...) {
   res <- clckhs::select(conn@ptr, statement);
   return(new("ClickhouseResult",
@@ -127,6 +135,8 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
   return(invisible(TRUE))
   })
 
+#' @export
+#' @rdname ClickhouseConnection-class
 setMethod("dbDataType", signature(dbObj="ClickhouseConnection", obj = "ANY"), definition = function(dbObj,
                                                                                                     obj, ...) {
   if (is.logical(obj)) "UInt8"
@@ -135,14 +145,20 @@ setMethod("dbDataType", signature(dbObj="ClickhouseConnection", obj = "ANY"), de
   else "String"
 }, valueClass = "character")
 
+#' @export
+#' @rdname ClickhouseConnection-class
 setMethod("dbBegin", "ClickhouseConnection", definition = function(conn, ...) {
   stop("Transactions are not supported.")
 })
 
+#' @export
+#' @rdname ClickhouseConnection-class
 setMethod("dbCommit", "ClickhouseConnection", definition = function(conn, ...) {
   stop("Transactions are not supported.")
 })
 
+#' @export
+#' @rdname ClickhouseConnection-class
 setMethod("dbRollback", "ClickhouseConnection", definition = function(conn, ...) {
   stop("Transactions are not supported.")
 })

@@ -4,10 +4,41 @@
 \name{ClickhouseConnection-class}
 \alias{ClickhouseConnection-class}
 \alias{dbGetInfo,ClickhouseConnection-method}
+\alias{dbIsValid,ClickhouseConnection-method}
+\alias{dbListTables,ClickhouseConnection-method}
+\alias{dbExistsTable,ClickhouseConnection-method}
+\alias{dbReadTable,ClickhouseConnection,ANY-method}
+\alias{dbRemoveTable,ClickhouseConnection-method}
+\alias{dbSendQuery,ClickhouseConnection-method}
+\alias{dbDataType,ClickhouseConnection-method}
+\alias{dbBegin,ClickhouseConnection-method}
+\alias{dbCommit,ClickhouseConnection-method}
+\alias{dbRollback,ClickhouseConnection-method}
 \alias{dbDisconnect,ClickhouseConnection-method}
 \title{Class ClickhouseConnection}
 \usage{
 \S4method{dbGetInfo}{ClickhouseConnection}(dbObj, ...)
+
+\S4method{dbIsValid}{ClickhouseConnection}(dbObj, ...)
+
+\S4method{dbListTables}{ClickhouseConnection}(conn, ...)
+
+\S4method{dbExistsTable}{ClickhouseConnection}(conn, name, ...)
+
+\S4method{dbReadTable}{ClickhouseConnection,ANY}(conn, name, ...)
+
+\S4method{dbRemoveTable}{ClickhouseConnection}(conn, name, ...)
+
+\S4method{dbSendQuery}{ClickhouseConnection}(conn, statement,
+  use = c("memory", "temp"), ...)
+
+\S4method{dbDataType}{ClickhouseConnection}(dbObj, obj, ...)
+
+\S4method{dbBegin}{ClickhouseConnection}(conn, ...)
+
+\S4method{dbCommit}{ClickhouseConnection}(conn, ...)
+
+\S4method{dbRollback}{ClickhouseConnection}(conn, ...)
 
 \S4method{dbDisconnect}{ClickhouseConnection}(conn, ...)
 }
