@@ -18,14 +18,5 @@ conn <- dbConnect(clckhs::clickhouse(), host="localhost")
  - add usage information
 
 
-## Dev Info
- * Build and Reload Package:  `Ctrl + Shift + B`
- * Check Package:             `Ctrl + Shift + E`
- * Test Package:              `Ctrl + Shift + T`
-
-Generate Namespace: `devtools::document()`
-
-
-
 ## Acknowledgements
 Big thanks to Kirill Müller, Maxwell Peterson, Artemkin Pavel and Hannes Mühleisen.
