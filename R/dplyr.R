@@ -1,7 +1,9 @@
 #' @import methods
 #' @importFrom DBI dbConnect
 #' @export
-src_clickhouse <- function(dbname = "default", host = "localhost", port = 8123L, user = "default",
+#' @example
+#' ch <- src_clickhouse(host="your-clickhouse-host.com")
+src_clickhouse <- function(dbname = "default", host = "localhost", port = 9000L, user = "default",
                            password = "", ...) {
 
   con <- DBI::dbConnect(clckhs::clickhouse(), host = host, dbname = dbname,
