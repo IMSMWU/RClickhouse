@@ -27,9 +27,9 @@ setMethod("dbGetInfo", "ClickhouseConnection", def=function(dbObj, ...) {
     db.version = envdata$version,
     uptime     = envdata$uptime,
     dbname     = envdata$database,
-    username   = conn@user,
-    host       = conn@host,
-    port       = conn@port
+    username   = dbObj@user,
+    host       = dbObj@host,
+    port       = dbObj@port
   )
 })
 
