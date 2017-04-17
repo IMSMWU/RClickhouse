@@ -72,6 +72,12 @@ setMethod("dbRemoveTable",c("ClickhouseConnection", "character"), function(conn,
 
 #' @export
 #' @rdname ClickhouseConnection-class
+setMethod("dbListFields", c("ClickhouseConnection", "character"), function(conn, name, ...) {
+  dbGetQuery(conn, paste0("DESCRIBE TABLE ", name))$name
+})
+
+#' @export
+#' @rdname ClickhouseConnection-class
 setMethod("dbSendQuery", c("ClickhouseConnection", "character"), function(conn, statement, ...) {
   res <- clckhs::select(conn@ptr, statement);
   return(new("ClickhouseResult",

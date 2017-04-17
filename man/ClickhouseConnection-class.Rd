@@ -9,6 +9,7 @@
 \alias{dbExistsTable,ClickhouseConnection,character-method}
 \alias{dbReadTable,ClickhouseConnection,character-method}
 \alias{dbRemoveTable,ClickhouseConnection,character-method}
+\alias{dbListFields,ClickhouseConnection,character-method}
 \alias{dbSendQuery,ClickhouseConnection,character-method}
 \alias{dbDataType,ClickhouseConnection-method}
 \alias{dbBegin,ClickhouseConnection-method}
@@ -29,8 +30,9 @@
 
 \S4method{dbRemoveTable}{ClickhouseConnection,character}(conn, name, ...)
 
-\S4method{dbSendQuery}{ClickhouseConnection,character}(conn, statement,
-  use = c("memory", "temp"), ...)
+\S4method{dbListFields}{ClickhouseConnection,character}(conn, name, ...)
+
+\S4method{dbSendQuery}{ClickhouseConnection,character}(conn, statement, ...)
 
 \S4method{dbDataType}{ClickhouseConnection}(dbObj, obj, ...)
 
