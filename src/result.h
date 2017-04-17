@@ -1,35 +1,56 @@
+#pragma once
+
 #include <vector>
 #include <functional>
 
+#define RCPP_NEW_DATE_DATETIME_VECTORS 1
 #include <Rcpp.h>
 #include <clickhouse/client.h>
 
 namespace ch = clickhouse;
 
 class Result {
-  size_t fetchedRows = 0, // number of rows fetched so far
-         availRows = 0;   // number of rows received from DB
+  public:
 
   struct ColBlock {
     std::vector<ch::ColumnRef> columns;
   };
 
-  Rcpp::StringVector colNames;
-  std::vector<ch::TypeRef> colTypes;
-  std::vector<ColBlock> columnBlocks;
+  private:
+  using TypeList = std::vector<ch::TypeRef>;
 
-  // convert the given range of values from column colIdx to an R vector and
-  // add it to the data frame df
-  void convertColumn(size_t colIdx, Rcpp::DataFrame &df, size_t start, size_t len);
+  size_t fetchedRows = 0, // number of rows fetched so far
+         availRows = 0;   // number of rows received from DB
+
+  Rcpp::StringVector colNames;
+  TypeList colTypes;
+  std::vector<ColBlock> columnBlocks;
 
   void setColInfo(const ch::Block &block);
 
-  public:
-  template<typename CT, typename RT>
-  void convertTypedColumn(size_t colIdx, Rcpp::DataFrame &df, size_t start, size_t len, std::function<void(std::shared_ptr<CT>, RT &, size_t, size_t, size_t)> convFunc);
+  using TypeAccFunc = std::function<ch::TypeRef(const TypeList &)>;
 
-  bool isComplete();
+  public:
+  using AccFunc = std::function<ch::ColumnRef(const ColBlock &)>;
+
+  template<typename CT, typename RT>
+  using ConvertFunc = std::function<void(const ColBlock &,
+      std::shared_ptr<const CT>, RT &, size_t, size_t, size_t)>;
+
+  template<typename CT, typename RT>
+  void convertTypedColumn(AccFunc colAcc, Rcpp::DataFrame &df,
+      size_t start, size_t len, ConvertFunc<CT, RT> convFunc) const;
+
+  bool isComplete() const;
 
   void addBlock(const ch::Block &block);
+
+  // convert the given range of values from the column provided by colAcc to an
+  // R vector and add it to the data frame df
+  void convertColumn(AccFunc colAcc, TypeAccFunc typeAcc, Rcpp::DataFrame &df,
+      size_t start, size_t len, AccFunc nullAcc = nullptr) const;
+
+  // build a data frame containing n entries from the result set, starting at
+  // fetchedRows
   Rcpp::DataFrame fetchFrame(ssize_t n = -1);
 };
