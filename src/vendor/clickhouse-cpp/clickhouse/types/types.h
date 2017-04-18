@@ -40,7 +40,7 @@ public:
     /// Type of array's elements.
     TypeRef GetItemType() const;
 
-    /// Type of nested nullable element
+    /// Type of nested nullable element.
     TypeRef GetNestedType() const;
 
     /// String representation of the type.
