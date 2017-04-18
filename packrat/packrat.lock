@@ -14,8 +14,8 @@ Hash: 14dfb3e8ffe20996118306ff4de1fab2
 
 Package: DBI
 Source: CRAN
-Version: 0.6
-Hash: c1a897fa11e50c1f70258830fc50b1f3
+Version: 0.6-1
+Hash: 4aef5bda70897c1663d5b8bae2f4419a
 
 Package: R6
 Source: CRAN
@@ -24,13 +24,13 @@ Hash: 712773a3439bd32db5c40938e1a9aac2
 
 Package: Rcpp
 Source: CRAN
-Version: 0.12.9
-Hash: 7ab41cbe74918de8de87e435ef17e92d
+Version: 0.12.10
+Hash: 6cf65d0dd6a92f2d43c8d4805d33efe9
 
 Package: assertthat
 Source: CRAN
-Version: 0.1
-Hash: 0afb92b59b02593c70ff8046700ba9d3
+Version: 0.2.0
+Hash: e8805df54c65ac96d50235c44a82615c
 
 Package: backports
 Source: CRAN
@@ -45,7 +45,7 @@ Hash: e3a02070cf705d3ad1c5af1635a515a3
 Package: bindrcpp
 Source: CRAN
 Version: 0.1
-Hash: 79a7f9d3b93be0f3e42167138ba0c9a9
+Hash: 57498e6d551c8b99bfd980f34191867f
 Requires: Rcpp, bindr, plogr
 
 Package: brew
@@ -93,14 +93,14 @@ Hash: e53fb8c58673df868183697e39a6a4d6
 
 Package: dplyr
 Source: github
-Version: 0.5.0.9000
-Hash: 096a65991d2b3b2df53d730e89ac5e83
-Requires: BH, DBI, R6, Rcpp, assertthat, bindrcpp, glue, magrittr,
-    plogr, rlang, tibble
+Version: 0.5.0.9003
+Hash: d52c1e19ef019bd72fd263dd20f4dc52
+Requires: BH, R6, Rcpp, assertthat, bindrcpp, glue, magrittr,
+    pkgconfig, plogr, rlang, tibble
 GithubRepo: dplyr
-GithubUsername: hadley
+GithubUsername: tidyverse
 GithubRef: master
-GithubSha1: 1910360d76c935d44ed1364b9be8905a22545ca6
+GithubSha1: cba2c102f0486302fdceea323a552ec08ebe0b28
 
 Package: git2r
 Source: CRAN
@@ -109,12 +109,12 @@ Hash: 9dfaafbcca68be29b89ef7783dc1dac0
 
 Package: glue
 Source: github
-Version: 0.0.0.9000
-Hash: 98902aa5522a2e4a8e0d7ffffc75372c
+Version: 1.0.0
+Hash: b8d0708ee24e437f2abecdf37f01e791
 GithubRepo: glue
 GithubUsername: tidyverse
 GithubRef: master
-GithubSha1: 099b28388a3fa3063a23cff0f41c7484e9faf7e5
+GithubSha1: 3791aef16d314f11dfd6ad8e0e8b800c14c49d6b
 
 Package: httr
 Source: CRAN
@@ -158,6 +158,11 @@ Source: CRAN
 Version: 0.4.8-1
 Hash: 6ad605ba7b4b476d84be6632393f5765
 
+Package: pkgconfig
+Source: CRAN
+Version: 2.0.1
+Hash: 0dda4a2654a22b36a715c2b0b6fbacac
+
 Package: plogr
 Source: CRAN
 Version: 0.1-1
@@ -170,17 +175,17 @@ Hash: 77da8f1df873a4b91e5c4a68fe2fb1b6
 
 Package: rlang
 Source: github
-Version: 0.0.0.9000
-Hash: 05dd2b17d9ff6f271d0658070a32f0e1
+Version: 0.0.0.9017
+Hash: 447fba8f13035588c6583ea0495a053b
 GithubRepo: rlang
 GithubUsername: hadley
-GithubRef: master
-GithubSha1: 92eb8629a36af4a1c1cd24ff0d92ddb9e4d3946c
+GithubRef: 8fd2651
+GithubSha1: 8fd2651eacc39b9a736f475d14f56aab06e7abbc
 
 Package: roxygen2
 Source: CRAN
 Version: 6.0.1
-Hash: 3e17305cfd5f3a51f7ca450c08afec94
+Hash: 7a75b821e00443c60a239fa4070b4117
 Requires: R6, Rcpp, brew, commonmark, desc, digest, stringi, stringr,
     xml2
 
@@ -214,9 +219,9 @@ Requires: R6, crayon, digest, magrittr, praise
 
 Package: tibble
 Source: CRAN
-Version: 1.2
-Hash: 3857905737a164648031462bed6aa2ef
-Requires: Rcpp, assertthat, lazyeval
+Version: 1.3.0
+Hash: 8de64ed3345488e66b676875ed1ebdce
+Requires: Rcpp, lazyeval
 
 Package: whisker
 Source: CRAN
@@ -231,5 +236,5 @@ Hash: 774eb7be9087cdc24b53b74e5359cfac
 Package: xml2
 Source: CRAN
 Version: 1.1.1
-Hash: b913af17a4e43c2fb83f3b60b5353a27
+Hash: 19ad10ef8e73cb435eb49f9d5d259980
 Requires: BH, Rcpp

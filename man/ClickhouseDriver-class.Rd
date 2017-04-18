@@ -3,12 +3,15 @@
 \docType{class}
 \name{ClickhouseDriver-class}
 \alias{ClickhouseDriver-class}
+\alias{clickhouse}
 \alias{show,ClickhouseDriver-method}
 \alias{dbIsValid,ClickhouseDriver-method}
 \alias{dbUnloadDriver,ClickhouseDriver-method}
 \alias{dbConnect,ClickhouseDriver-method}
 \title{Class ClickhouseDriver}
 \usage{
+clickhouse()
+
 \S4method{show}{ClickhouseDriver}(object)
 
 \S4method{dbIsValid}{ClickhouseDriver}(dbObj, ...)
@@ -41,6 +44,8 @@ null-op.
 Connect to a ClickHouse database.
 }
 \examples{
+library(DBI)
+clckhs::clickhouse()
 conn <- dbConnect(clckhs::clickhouse(), host="localhost")
 }
 \keyword{internal}

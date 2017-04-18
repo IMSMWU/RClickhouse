@@ -12,7 +12,8 @@ Maintainer: Christian Hotz-Behofsits <christian.hotz-behofsits@wu.ac.at>
 Description: This is just a prototype 
 License: GPL-3
 Imports:
-    dplyr (>= 0.5.0),
+    dplyr (>= 0.5.0.9003),
+    dbplyr (>= 0.0.0.9000),
     methods (>= 3.3.2),
     DBI (>= 0.3.1),
     data.table (>= 1.10.4),

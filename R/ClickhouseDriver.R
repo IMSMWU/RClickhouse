@@ -4,12 +4,14 @@
 #' null-op.
 #'
 #' @export
+#' @rdname ClickhouseDriver-class
 #' @keywords internal
 setClass("ClickhouseDriver",
   contains = "DBIDriver"
 )
 
 #' @export
+#' @rdname ClickhouseDriver-class
 #' @import methods DBI
 #' @examples
 #' library(DBI)
@@ -47,7 +49,6 @@ setMethod("dbUnloadDriver", "ClickhouseDriver", function(drv, ...) {
 #' @param password the user's password.
 #' @return A database connection.
 #' @examples
-
 #' conn <- dbConnect(clckhs::clickhouse(), host="localhost")
 setMethod("dbConnect", "ClickhouseDriver", function(drv, host="localhost", port = 9000, db = "default", user = "default", password = "", ...) {
   new("ClickhouseConnection", ptr = clckhs::connect(host, port, db, user, password), port = port, host = host, user = user)

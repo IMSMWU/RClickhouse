@@ -1,46 +1,6 @@
-#' @import methods
-#' @importFrom DBI dbConnect
 #' @export
-#' @example
-#' ch <- src_clickhouse(host="your-clickhouse-host.com")
-src_clickhouse <- function(dbname = "default", host = "localhost", port = 9000L, user = "default",
-                           password = "", ...) {
-
-  con <- DBI::dbConnect(clckhs::clickhouse(), host = host, dbname = dbname,
-                        user = user, password = password, port = port, ...)
-
-  dplyr::src_dbi(con)
-}
-
-db_create_table.src_clickhouse <- function(con, table, types,
-                                           temporary = FALSE, engine="TinyLog", ...){
-
-  if (!dbExistsTable(con$con, table)) {
-    fts <- sapply(value, dbDataType, dbObj=con$con)
-    fdef <- paste(names(value), fts, collapse=', ')
-    ct <- paste0("CREATE TABLE ", qname, " (", fdef, ") ENGINE=", engine)
-    dbExecute(con$con, ct)
-  }
-}
-
-#' @importFrom dplyr copy_to
-#' @export
-#' @return a \code{tbl} object in the remote source
-#' @seealso \code{\link[dplyr]{copy_to}}
-#' @rdname clckhs
-# No transactions supported so
-# we have torewrite copy_to
-copy_to.src_clickhouse <- function(dest, df, name = deparse(substitute(df)),
-                                   overwrite = FALSE, ...) {
-  DBI::dbWriteTable(dest$con, name, df, overwrite=overwrite)
-
-  dplyr::tbl(dest, name)
-}
-
-
-#' @export
-#' @importFrom dplyr src_desc
-src_desc.ClickhouseConnection <- function(con) {
+#' @importFrom dplyr db_desc
+db_desc.ClickhouseConnection <- function(con) {
   info <- dbGetInfo(con)
 
   uptime_days <- round(info$uptime/60/60/24, digits = 2)
@@ -50,17 +10,15 @@ src_desc.ClickhouseConnection <- function(con) {
 }
 
 #' @export
-#' @importFrom dplyr sql_quote
 #' @importFrom dplyr sql_escape_string
 sql_escape_string.ClickhouseConnection <- function(con, x) {
-  dplyr::sql_quote(x, "'")
+  encodeString(x, na.encode = FALSE, quote = "'")
 }
 
 #' @export
-#' @importFrom dplyr sql_quote
 #' @importFrom dplyr sql_escape_ident
 sql_escape_ident.ClickhouseConnection <- function(con, x) {
-  dplyr::sql_quote(x, "`")
+  encodeString(x, na.encode = FALSE, quote = "`")
 }
 
 #' @export
@@ -79,7 +37,7 @@ db_analyze.ClickhouseConnection <- function(con, sql, ...) {
 #' @export
 #' @importFrom dplyr db_query_fields
 db_query_fields.ClickhouseConnection <- function(con, sql, ...) {
-  fields <- dplyr::build_sql("SELECT * FROM ", sql , " LIMIT 1", con = con)
+  fields <- dbplyr::build_sql("SELECT * FROM ", sql , " LIMIT 1", con = con)
 
   result <- dbSendQuery(con, fields)
   on.exit(dbClearResult(result))
