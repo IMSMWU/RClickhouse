@@ -23,14 +23,7 @@ setMethod("dbFetch", signature(res = "ClickhouseResult", n = "numeric"), definit
 
 #' @rdname ClickhouseResult-class
 #' @export
-setMethod("dbGetRowsAffected", "ClickhouseResult", definition = function(res, ...) {
-  as.numeric(NA)
-})
-
-#' @rdname ClickhouseResult-class
-#' @export
 setMethod("dbClearResult", "ClickhouseResult", definition = function(res, ...) {
-  #res@env$open <- FALSE
   clckhs::clearResult(res@ptr)
   invisible(TRUE)
 })
@@ -39,13 +32,6 @@ setMethod("dbClearResult", "ClickhouseResult", definition = function(res, ...) {
 #' @export
 setMethod("dbHasCompleted", "ClickhouseResult", definition = function(res, ...) {
   clckhs::hasCompleted(res@ptr)
-})
-
-
-#' @rdname ClickhouseResult-class
-#' @export
-setMethod("dbIsValid", "ClickhouseResult", function(dbObj, ...) {
-  dbObj@env$success && dbObj@env$open
 })
 
 #' @rdname ClickhouseResult-class
@@ -57,9 +43,23 @@ setMethod("dbGetStatement", "ClickhouseResult", function(res, ...) {
 })
 
 #' @rdname ClickhouseResult-class
+#' @export
+setMethod("dbIsValid", "ClickhouseResult", function(dbObj, ...) {
+  # todo
+  stop("not implemented yet")
+})
+
+#' @rdname ClickhouseResult-class
 #' @inheritParams DBI::dbGetRowCount
 #' @export
 setMethod("dbGetRowCount", "ClickhouseResult", function(res, ...) {
-  dbIsValid(res)
-  res@env$rows
+  # todo
+  stop("not implemented yet")
+})
+
+#' @rdname ClickhouseResult-class
+#' @export
+setMethod("dbGetRowsAffected", "ClickhouseResult", definition = function(res, ...) {
+  # todo
+  stop("not implemented yet")
 })
