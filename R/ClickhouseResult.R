@@ -53,8 +53,7 @@ setMethod("dbIsValid", "ClickhouseResult", function(dbObj, ...) {
 #' @inheritParams DBI::dbGetRowCount
 #' @export
 setMethod("dbGetRowCount", "ClickhouseResult", function(res, ...) {
-  # todo
-  stop("not implemented yet")
+  clckhs::getRowCount(res@ptr)
 })
 
 #' @rdname ClickhouseResult-class

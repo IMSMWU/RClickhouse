@@ -154,6 +154,10 @@ bool Result::isComplete() const {
   return fetchedRows >= availRows;
 }
 
+size_t Result::numFetchedRows() const {
+  return fetchedRows;
+}
+
 void Result::addBlock(const ch::Block &block) {
   if(static_cast<size_t>(colNames.size()) < block.GetColumnCount()) {
     setColInfo(block);

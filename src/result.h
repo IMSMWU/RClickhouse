@@ -42,6 +42,7 @@ class Result {
       size_t start, size_t len, ConvertFunc<CT, RT> convFunc) const;
 
   bool isComplete() const;
+  size_t numFetchedRows() const;
 
   void addBlock(const ch::Block &block);
 
