@@ -158,6 +158,10 @@ size_t Result::numFetchedRows() const {
   return fetchedRows;
 }
 
+size_t Result::numRowsAffected() const {
+  return 0;   //TODO
+}
+
 void Result::addBlock(const ch::Block &block) {
   if(static_cast<size_t>(colNames.size()) < block.GetColumnCount()) {
     setColInfo(block);

@@ -59,6 +59,5 @@ setMethod("dbGetRowCount", "ClickhouseResult", function(res, ...) {
 #' @rdname ClickhouseResult-class
 #' @export
 setMethod("dbGetRowsAffected", "ClickhouseResult", definition = function(res, ...) {
-  # todo
-  stop("not implemented yet")
+  clckhs::getRowsAffected(res@ptr)
 })

@@ -43,6 +43,7 @@ class Result {
 
   bool isComplete() const;
   size_t numFetchedRows() const;
+  size_t numRowsAffected() const;
 
   void addBlock(const ch::Block &block);
 

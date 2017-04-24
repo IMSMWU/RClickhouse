@@ -35,6 +35,12 @@ size_t getRowCount(XPtr<Result> res) {
 
 //' @export
 // [[Rcpp::export]]
+size_t getRowsAffected(XPtr<Result> res) {
+  return res->numRowsAffected();
+}
+
+//' @export
+// [[Rcpp::export]]
 XPtr<Client> connect(String host, int port, String db, String user, String password) {
   Client *client = new Client(ClientOptions()
             .SetHost(host)

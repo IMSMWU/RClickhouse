@@ -22,6 +22,11 @@ getRowCount <- function(res) {
 }
 
 #' @export
+getRowsAffected <- function(res) {
+    .Call('clckhs_getRowsAffected', PACKAGE = 'clckhs', res)
+}
+
+#' @export
 connect <- function(host, port, db, user, password) {
     .Call('clckhs_connect', PACKAGE = 'clckhs', host, port, db, user, password)
 }
