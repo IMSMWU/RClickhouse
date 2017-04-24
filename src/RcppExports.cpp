@@ -192,6 +192,37 @@ RcppExport SEXP clckhs_select(SEXP connSEXP, SEXP querySEXP) {
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// insert
+void insert(XPtr<Client> conn, String tableName, DataFrame df);
+static SEXP clckhs_insert_try(SEXP connSEXP, SEXP tableNameSEXP, SEXP dfSEXP) {
+BEGIN_RCPP
+    Rcpp::traits::input_parameter< XPtr<Client> >::type conn(connSEXP);
+    Rcpp::traits::input_parameter< String >::type tableName(tableNameSEXP);
+    Rcpp::traits::input_parameter< DataFrame >::type df(dfSEXP);
+    insert(conn, tableName, df);
+    return R_NilValue;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP clckhs_insert(SEXP connSEXP, SEXP tableNameSEXP, SEXP dfSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(clckhs_insert_try(connSEXP, tableNameSEXP, dfSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 
 // validate (ensure exported C++ functions exist before calling them)
 static int clckhs_RcppExport_validate(const char* sig) { 
@@ -203,6 +234,7 @@ static int clckhs_RcppExport_validate(const char* sig) {
         signatures.insert("XPtr<Client>(*connect)(String,int,String,String,String)");
         signatures.insert("void(*disconnect)(XPtr<Client>)");
         signatures.insert("XPtr<Result>(*select)(XPtr<Client>,String)");
+        signatures.insert("void(*insert)(XPtr<Client>,String,DataFrame)");
     }
     return signatures.find(sig) != signatures.end();
 }
@@ -215,6 +247,7 @@ RcppExport SEXP clckhs_RcppExport_registerCCallable() {
     R_RegisterCCallable("clckhs", "clckhs_connect", (DL_FUNC)clckhs_connect_try);
     R_RegisterCCallable("clckhs", "clckhs_disconnect", (DL_FUNC)clckhs_disconnect_try);
     R_RegisterCCallable("clckhs", "clckhs_select", (DL_FUNC)clckhs_select_try);
+    R_RegisterCCallable("clckhs", "clckhs_insert", (DL_FUNC)clckhs_insert_try);
     R_RegisterCCallable("clckhs", "clckhs_RcppExport_validate", (DL_FUNC)clckhs_RcppExport_validate);
     return R_NilValue;
 }

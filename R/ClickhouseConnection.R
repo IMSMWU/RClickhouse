@@ -127,15 +127,8 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
     for (c in names(classes[classes=="factor"])) {
       levels(value[[c]]) <- enc2utf8(levels(value[[c]]))
     }
-    write.table(value, textConnection("value_str", open="w"), sep="\t", row.names=F, col.names=F)
-    value_str2 <- paste0(get("value_str"), collapse="\n")
 
-    h <- curl::new_handle()
-    curl::handle_setopt(h, copypostfields = value_str2)
-    req <- curl::curl_fetch_memory(paste0(conn@url, "?query=",URLencode(paste0("INSERT INTO ", qname, " FORMAT TabSeparated"))), handle = h)
-    if (req$status_code != 200) {
-      stop("Error writing data to table ", rawToChar(req$content))
-    }
+    clckhs::insert(conn@ptr, qname, value);
   }
 
   return(invisible(TRUE))
@@ -145,10 +138,16 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
 #' @rdname ClickhouseConnection-class
 setMethod("dbDataType", signature(dbObj="ClickhouseConnection", obj = "ANY"), definition = function(dbObj,
                                                                                                     obj, ...) {
-  if (is.logical(obj)) "UInt8"
-  else if (is.integer(obj)) "Int32"
-  else if (is.numeric(obj)) "Float64"
-  else "String"
+  if (is.logical(obj)) t <- "UInt8"
+  else if (is.integer(obj)) t <- "Int32"
+  else if (is.numeric(obj)) t <- "Float64"
+  else if (inherits(obj, "POSIXct")) t <- "DateTime"
+  else if (inherits(obj, "Date")) t <- "Date"
+  else t <- "String"
+
+  if (anyNA(obj)) t <- paste0("Nullable(", t, ")")
+
+  return(t)
 }, valueClass = "character")
 
 #' @export

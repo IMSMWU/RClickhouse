@@ -31,6 +31,11 @@ select <- function(conn, query) {
     .Call('clckhs_select', PACKAGE = 'clckhs', conn, query)
 }
 
+#' @export
+insert <- function(conn, tableName, df) {
+    invisible(.Call('clckhs_insert', PACKAGE = 'clckhs', conn, tableName, df))
+}
+
 # Register entry points for exported C++ functions
 methods::setLoadAction(function(ns) {
     .Call('clckhs_RcppExport_registerCCallable', PACKAGE = 'clckhs')
