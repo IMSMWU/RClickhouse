@@ -3,28 +3,28 @@
 \docType{class}
 \name{ClickhouseResult-class}
 \alias{ClickhouseResult-class}
-\alias{dbFetch,ClickhouseResult,numeric-method}
-\alias{dbGetRowsAffected,ClickhouseResult-method}
+\alias{dbFetch,ClickhouseResult,ANY-method}
 \alias{dbClearResult,ClickhouseResult-method}
 \alias{dbHasCompleted,ClickhouseResult-method}
-\alias{dbIsValid,ClickhouseResult-method}
 \alias{dbGetStatement,ClickhouseResult-method}
+\alias{dbIsValid,ClickhouseResult-method}
 \alias{dbGetRowCount,ClickhouseResult-method}
+\alias{dbGetRowsAffected,ClickhouseResult-method}
 \title{Class ClickhouseResult}
 \usage{
-\S4method{dbFetch}{ClickhouseResult,numeric}(res, n = -1, ...)
-
-\S4method{dbGetRowsAffected}{ClickhouseResult}(res, ...)
+\S4method{dbFetch}{ClickhouseResult,ANY}(res, n = -1, ...)
 
 \S4method{dbClearResult}{ClickhouseResult}(res, ...)
 
 \S4method{dbHasCompleted}{ClickhouseResult}(res, ...)
 
-\S4method{dbIsValid}{ClickhouseResult}(dbObj, ...)
-
 \S4method{dbGetStatement}{ClickhouseResult}(res, ...)
 
+\S4method{dbIsValid}{ClickhouseResult}(dbObj, ...)
+
 \S4method{dbGetRowCount}{ClickhouseResult}(res, ...)
+
+\S4method{dbGetRowsAffected}{ClickhouseResult}(res, ...)
 }
 \arguments{
 \item{res}{An object inheriting from \linkS4class{DBIResult}.}
