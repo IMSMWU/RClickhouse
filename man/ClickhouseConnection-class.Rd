@@ -12,6 +12,7 @@
 \alias{dbListFields,ClickhouseConnection,character-method}
 \alias{dbSendQuery,ClickhouseConnection,character-method}
 \alias{dbDataType,ClickhouseConnection-method}
+\alias{dbQuoteIdentifier,ClickhouseConnection,character-method}
 \alias{dbBegin,ClickhouseConnection-method}
 \alias{dbCommit,ClickhouseConnection-method}
 \alias{dbRollback,ClickhouseConnection-method}
@@ -35,6 +36,8 @@
 \S4method{dbSendQuery}{ClickhouseConnection,character}(conn, statement, ...)
 
 \S4method{dbDataType}{ClickhouseConnection}(dbObj, obj, ...)
+
+\S4method{dbQuoteIdentifier}{ClickhouseConnection,character}(conn, x, ...)
 
 \S4method{dbBegin}{ClickhouseConnection}(conn, ...)
 

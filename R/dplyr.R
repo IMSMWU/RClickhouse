@@ -34,16 +34,6 @@ db_analyze.ClickhouseConnection <- function(con, sql, ...) {
   TRUE
 }
 
-#' @export
-#' @importFrom dplyr db_query_fields
-db_query_fields.ClickhouseConnection <- function(con, sql, ...) {
-  fields <- dbplyr::build_sql("SELECT * FROM ", sql , " LIMIT 1", con = con)
-
-  result <- dbSendQuery(con, fields)
-  on.exit(dbClearResult(result))
-  colnames(result@env$data)
-}
-
 # SQL translation
 #
 #' @importFrom dplyr sql_translate_env

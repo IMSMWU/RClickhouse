@@ -3,7 +3,7 @@
 \docType{class}
 \name{ClickhouseResult-class}
 \alias{ClickhouseResult-class}
-\alias{dbFetch,ClickhouseResult,ANY-method}
+\alias{dbFetch,ClickhouseResult-method}
 \alias{dbClearResult,ClickhouseResult-method}
 \alias{dbHasCompleted,ClickhouseResult-method}
 \alias{dbGetStatement,ClickhouseResult-method}
@@ -12,7 +12,7 @@
 \alias{dbGetRowsAffected,ClickhouseResult-method}
 \title{Class ClickhouseResult}
 \usage{
-\S4method{dbFetch}{ClickhouseResult,ANY}(res, n = -1, ...)
+\S4method{dbFetch}{ClickhouseResult}(res, n = -1, ...)
 
 \S4method{dbClearResult}{ClickhouseResult}(res, ...)
 
