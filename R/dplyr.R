@@ -60,3 +60,39 @@ sql_translate_env.ClickhouseConnection <- function(x) {
     dbplyr::base_no_win
   )
 }
+
+# DBIConnection fork without transactions
+#' @export
+db_copy_to.ClickhouseConnection <- function(con, table, values,
+                                     overwrite = FALSE, types = NULL, temporary = TRUE,
+                                     unique_indexes = NULL, indexes = NULL,
+                                     analyze = FALSE, ...) {
+
+  if(analyze == TRUE){
+    warning("clickhouse does not support a analyze statement.")
+  }
+  if(!is.null(unique_indexes)){
+    warning("clickhouse does not support unique indexes.")
+  }
+  if(!is.null(indexes)){
+    warning("clickhouse does not support indexes.")
+  }
+
+  if(is.null(types)){
+    types <- dplyr::db_data_type(con, values)
+  }
+
+  names(types) <- names(values)
+
+  tryCatch({
+    if (overwrite) {
+      dplyr::db_drop_table(con, table, force = TRUE)
+    }
+
+    dplyr::db_write_table(con, table, types = types, values = values, temporary = temporary)
+  }, error = function(err) {
+    stop(err)
+  })
+
+  table
+}
