@@ -113,10 +113,10 @@ void Result::convertColumn(AccFunc colAcc, TypeAccFunc typeAcc, Rcpp::DataFrame 
       convertCol<ch::ColumnUInt64, Rcpp::IntegerVector>(*this, colAcc, df, start, len, nullAcc);
       break;
     case TC::Float32:
-      convertCol<ch::ColumnFloat32, Rcpp::IntegerVector>(*this, colAcc, df, start, len, nullAcc);
+      convertCol<ch::ColumnFloat32, Rcpp::NumericVector>(*this, colAcc, df, start, len, nullAcc);
       break;
     case TC::Float64:
-      convertCol<ch::ColumnFloat64, Rcpp::IntegerVector>(*this, colAcc, df, start, len, nullAcc);
+      convertCol<ch::ColumnFloat64, Rcpp::NumericVector>(*this, colAcc, df, start, len, nullAcc);
       break;
     case TC::String:
       convertCol<ch::ColumnString, Rcpp::StringVector>(*this, colAcc, df, start, len, nullAcc);
