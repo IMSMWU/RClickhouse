@@ -152,6 +152,15 @@ setMethod("dbDataType", signature(dbObj="ClickhouseConnection", obj = "ANY"), de
 
 #' @export
 #' @rdname ClickhouseConnection-class
+setMethod("dbQuoteIdentifier", c("ClickhouseConnection", "character"),
+  function(conn, x, ...) {
+    x <- gsub('`', '``', x, fixed = TRUE)
+    SQL(paste('`', x, '`', sep = ""))
+  }
+)
+
+#' @export
+#' @rdname ClickhouseConnection-class
 setMethod("dbBegin", "ClickhouseConnection", definition = function(conn, ...) {
   stop("Transactions are not supported.")
 })
