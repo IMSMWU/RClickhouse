@@ -178,7 +178,7 @@ void Result::addBlock(const ch::Block &block) {
 }
 
 Rcpp::DataFrame Result::fetchFrame(ssize_t n) {
-  size_t nRows = n > 0 ? std::min(static_cast<size_t>(n), availRows-fetchedRows) : availRows-fetchedRows;
+  size_t nRows = n >= 0 ? std::min(static_cast<size_t>(n), availRows-fetchedRows) : availRows-fetchedRows;
   Rcpp::DataFrame df;
 
   for(size_t i = 0; i < static_cast<size_t>(colNames.size()); i++) {
