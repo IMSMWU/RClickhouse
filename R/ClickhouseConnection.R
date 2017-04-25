@@ -60,6 +60,7 @@ setMethod("dbExistsTable", c("ClickhouseConnection", "character"), function(conn
 #' @export
 #' @rdname ClickhouseConnection-class
 setMethod("dbReadTable", c("ClickhouseConnection", "character"), function(conn, name, ...) {
+  name <- dbQuoteIdentifier(conn, name)
   dbGetQuery(conn, paste0("SELECT * FROM ", name))
 })
 
