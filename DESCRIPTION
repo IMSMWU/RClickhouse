@@ -1,7 +1,7 @@
 Package: clckhs
 Type: Package
-Title: DBI Interface and Dplyr Backend for Clickhouse
-Version: 0.1.0
+Title: DBI Interface for ClickhouseDB
+Version: 0.2.0
 Encoding: UTF-8
 Authors@R: c(
     person("Christian", "Hotz-Behofsits", email = "christian.hotz-behofsits@wu.ac.at", role = c("aut", "cre")),
@@ -9,14 +9,13 @@ Authors@R: c(
     )
 Author: Christian Hotz-Behofsits
 Maintainer: Christian Hotz-Behofsits <christian.hotz-behofsits@wu.ac.at>
-Description: This is just a prototype 
+Description: Dplyr 0.6-ready DBI Interface for ClickhouseDB 
 License: GPL-3
 Imports:
-    dplyr (>= 0.5.0.9003),
-    dbplyr (>= 0.0.0.9000),
+    dplyr (>= 0.5.0.9004),
+    dbplyr (>= 0.0.0.9001),
     methods (>= 3.3.2),
     DBI (>= 0.3.1),
-    data.table (>= 1.10.4),
     Rcpp (>= 0.11.0)
 Encoding: UTF-8
 LazyData: true
