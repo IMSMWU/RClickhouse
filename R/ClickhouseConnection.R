@@ -137,18 +137,8 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
 
 #' @export
 #' @rdname ClickhouseConnection-class
-setMethod("dbDataType", signature(dbObj="ClickhouseConnection", obj = "ANY"), definition = function(dbObj,
-                                                                                                    obj, ...) {
-  if (is.logical(obj)) t <- "UInt8"
-  else if (is.integer(obj)) t <- "Int32"
-  else if (is.numeric(obj)) t <- "Float64"
-  else if (inherits(obj, "POSIXct")) t <- "DateTime"
-  else if (inherits(obj, "Date")) t <- "Date"
-  else t <- "String"
-
-  if (anyNA(obj)) t <- paste0("Nullable(", t, ")")
-
-  return(t)
+setMethod("dbDataType", signature(dbObj="ClickhouseConnection", obj = "ANY"), definition = function(dbObj, obj, ...) {
+  dbDataType(clickhouse(), obj)
 }, valueClass = "character")
 
 #' @export

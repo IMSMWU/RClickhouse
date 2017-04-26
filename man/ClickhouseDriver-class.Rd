@@ -8,6 +8,7 @@
 \alias{dbIsValid,ClickhouseDriver-method}
 \alias{dbUnloadDriver,ClickhouseDriver-method}
 \alias{dbConnect,ClickhouseDriver-method}
+\alias{dbDataType,ClickhouseDriver-method}
 \title{Class ClickhouseDriver}
 \usage{
 clickhouse()
@@ -20,6 +21,8 @@ clickhouse()
 
 \S4method{dbConnect}{ClickhouseDriver}(drv, host = "localhost", port = 9000,
   db = "default", user = "default", password = "", ...)
+
+\S4method{dbDataType}{ClickhouseDriver}(dbObj, obj, ...)
 }
 \arguments{
 \item{drv}{ClickHouse database driver.}

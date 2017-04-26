@@ -53,3 +53,18 @@ setMethod("dbUnloadDriver", "ClickhouseDriver", function(drv, ...) {
 setMethod("dbConnect", "ClickhouseDriver", function(drv, host="localhost", port = 9000, db = "default", user = "default", password = "", ...) {
   new("ClickhouseConnection", ptr = clckhs::connect(host, port, db, user, password), port = port, host = host, user = user)
 })
+
+#' @export
+#' @rdname ClickhouseDriver-class
+setMethod("dbDataType", signature(dbObj="ClickhouseDriver", obj = "ANY"), definition = function(dbObj, obj, ...) {
+  if (is.logical(obj)) t <- "UInt8"
+  else if (is.integer(obj)) t <- "Int32"
+  else if (is.numeric(obj)) t <- "Float64"
+  else if (inherits(obj, "POSIXct")) t <- "DateTime"
+  else if (inherits(obj, "Date")) t <- "Date"
+  else t <- "String"
+
+  if (anyNA(obj)) t <- paste0("Nullable(", t, ")")
+
+  return(t)
+}, valueClass = "character")
