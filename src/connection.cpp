@@ -41,13 +41,21 @@ size_t getRowsAffected(XPtr<Result> res) {
 
 //' @export
 // [[Rcpp::export]]
-XPtr<Client> connect(String host, int port, String db, String user, String password) {
+XPtr<Client> connect(String host, int port, String db, String user, String password, String compression) {
+  CompressionMethod comprMethod = CompressionMethod::None;
+  if(compression == "lz4") {
+    comprMethod = CompressionMethod::LZ4;
+  } else if(compression != "" && compression != "none") {
+    stop("unknown compression method '"+std::string(compression)+"'");
+  }
+
   Client *client = new Client(ClientOptions()
             .SetHost(host)
             .SetPort(port)
             .SetDefaultDatabase(db)
             .SetUser(user)
             .SetPassword(password)
+            .SetCompressionMethod(comprMethod)
             // (re)throw exceptions, which are then handled automatically by Rcpp
             .SetRethrowException(true));
   XPtr<Client> p(client, true);

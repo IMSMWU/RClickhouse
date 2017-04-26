@@ -20,7 +20,8 @@ clickhouse()
 \S4method{dbUnloadDriver}{ClickhouseDriver}(drv, ...)
 
 \S4method{dbConnect}{ClickhouseDriver}(drv, host = "localhost", port = 9000,
-  db = "default", user = "default", password = "", ...)
+  db = "default", user = "default", password = "", compression = "lz4",
+  ...)
 
 \S4method{dbDataType}{ClickhouseDriver}(dbObj, obj, ...)
 }
@@ -36,6 +37,8 @@ clickhouse()
 \item{user}{name of the user to connect as.}
 
 \item{password}{the user's password.}
+
+\item{compression}{the compression method for the connection (lz4 by default).}
 }
 \value{
 A database connection.

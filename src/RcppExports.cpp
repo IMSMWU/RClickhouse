@@ -159,8 +159,8 @@ RcppExport SEXP clckhs_getRowsAffected(SEXP resSEXP) {
     return rcpp_result_gen;
 }
 // connect
-XPtr<Client> connect(String host, int port, String db, String user, String password);
-static SEXP clckhs_connect_try(SEXP hostSEXP, SEXP portSEXP, SEXP dbSEXP, SEXP userSEXP, SEXP passwordSEXP) {
+XPtr<Client> connect(String host, int port, String db, String user, String password, String compression);
+static SEXP clckhs_connect_try(SEXP hostSEXP, SEXP portSEXP, SEXP dbSEXP, SEXP userSEXP, SEXP passwordSEXP, SEXP compressionSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< String >::type host(hostSEXP);
@@ -168,15 +168,16 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< String >::type db(dbSEXP);
     Rcpp::traits::input_parameter< String >::type user(userSEXP);
     Rcpp::traits::input_parameter< String >::type password(passwordSEXP);
-    rcpp_result_gen = Rcpp::wrap(connect(host, port, db, user, password));
+    Rcpp::traits::input_parameter< String >::type compression(compressionSEXP);
+    rcpp_result_gen = Rcpp::wrap(connect(host, port, db, user, password, compression));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP clckhs_connect(SEXP hostSEXP, SEXP portSEXP, SEXP dbSEXP, SEXP userSEXP, SEXP passwordSEXP) {
+RcppExport SEXP clckhs_connect(SEXP hostSEXP, SEXP portSEXP, SEXP dbSEXP, SEXP userSEXP, SEXP passwordSEXP, SEXP compressionSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(clckhs_connect_try(hostSEXP, portSEXP, dbSEXP, userSEXP, passwordSEXP));
+        rcpp_result_gen = PROTECT(clckhs_connect_try(hostSEXP, portSEXP, dbSEXP, userSEXP, passwordSEXP, compressionSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -293,7 +294,7 @@ static int clckhs_RcppExport_validate(const char* sig) {
         signatures.insert("bool(*hasCompleted)(XPtr<Result>)");
         signatures.insert("size_t(*getRowCount)(XPtr<Result>)");
         signatures.insert("size_t(*getRowsAffected)(XPtr<Result>)");
-        signatures.insert("XPtr<Client>(*connect)(String,int,String,String,String)");
+        signatures.insert("XPtr<Client>(*connect)(String,int,String,String,String,String)");
         signatures.insert("void(*disconnect)(XPtr<Client>)");
         signatures.insert("XPtr<Result>(*select)(XPtr<Client>,String)");
         signatures.insert("void(*insert)(XPtr<Client>,String,DataFrame)");
