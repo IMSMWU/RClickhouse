@@ -20,8 +20,10 @@ vendor/clickhouse-cpp/clickhouse/client.o \
 vendor/clickhouse-cpp/clickhouse/types/types.o \
 vendor/clickhouse-cpp/clickhouse/types/type_parser.o \
 vendor/clickhouse-cpp/clickhouse/block.o \
-vendor/clickhouse-cpp/contrib/cityhash/city.o
+vendor/clickhouse-cpp/contrib/cityhash/city.o \
+vendor/clickhouse-cpp/contrib/lz4/lz4.c \
+vendor/clickhouse-cpp/contrib/lz4/lz4hc.c
 
-PKG_LIBS = -std=c++11 -lpthread -fPIC -llz4 $(OBJ_FILES)
+PKG_LIBS = -std=c++11 -lpthread -fPIC $(OBJ_FILES)
 
 $(SHLIB): $(OBJ_FILES)
