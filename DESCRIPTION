@@ -30,6 +30,7 @@ Collate:
   'ClickhouseConnection.R'
   'ClickhouseResult.R'
   'dplyr.R'
+  'zzz.R'
 URL: https://github.com/inkrement/clckhs
 BugReports: https://github.com/inkrement/clckhs/issues
 LinkingTo: Rcpp
