@@ -5,6 +5,4 @@
 #include <result.h>
 using namespace clickhouse;
 
-#include "clckhs_RcppExports.h"
-
 #endif // RCPP_clckhs_H

@@ -1,5 +1,5 @@
 # combine with standard arguments for R
-PKG_CPPFLAGS = -I. -I./vendor/clickhouse-cpp -I./vendor/clickhouse-cpp/contrib -std=c++11
+PKG_CPPFLAGS = -I. -I../inst/include -I./vendor/clickhouse-cpp -I./vendor/clickhouse-cpp/contrib -std=c++11
 CXX_STD = CXX11
 
 OBJ_FILES = \
