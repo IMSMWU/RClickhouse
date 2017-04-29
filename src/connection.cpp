@@ -41,6 +41,12 @@ size_t getRowsAffected(XPtr<Result> res) {
 
 //' @export
 // [[Rcpp::export]]
+std::string getStatement(XPtr<Result> res) {
+  return res->getStatement();
+}
+
+//' @export
+// [[Rcpp::export]]
 XPtr<Client> connect(String host, int port, String db, String user, String password, String compression) {
   CompressionMethod comprMethod = CompressionMethod::None;
   if(compression == "lz4") {
@@ -71,7 +77,7 @@ void disconnect(XPtr<Client> conn) {
 //' @export
 // [[Rcpp::export]]
 XPtr<Result> select(XPtr<Client> conn, String query) {
-  Result *r = new Result;
+  Result *r = new Result(query);
   //TODO: async?
   conn->Select(query, [&r] (const Block& block) {
     r->addBlock(block);

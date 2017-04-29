@@ -42,8 +42,7 @@ setMethod("dbHasCompleted", "ClickhouseResult", definition = function(res, ...) 
 #' @inheritParams DBI::dbGetStatement
 #' @export
 setMethod("dbGetStatement", "ClickhouseResult", function(res, ...) {
-  dbIsValid(res)
-  res@sql
+  clckhs::getStatement(res@ptr)
 })
 
 #' @rdname ClickhouseResult-class

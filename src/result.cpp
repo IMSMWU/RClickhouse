@@ -2,6 +2,10 @@
 
 #include "result.h"
 
+Result::Result(std::string stmt) {
+  statement = stmt;
+}
+
 // helper function for converting the column data (can't be a member of Result
 // due to C++ prohibiting explicit specialization on members of a
 // non-specialized class)
@@ -138,9 +142,10 @@ void Result::convertColumn(AccFunc colAcc, TypeAccFunc typeAcc, Rcpp::DataFrame 
       break;
     }
     default:
-      throw std::invalid_argument("unsupported type: "+type->GetName());
+      throw std::invalid_argument("cannot read unsupported type: "+type->GetName());
       break;
   }
+  //TODO: release blocks once they have been fetched
 }
 
 void Result::setColInfo(const ch::Block &block) {
@@ -160,6 +165,10 @@ size_t Result::numFetchedRows() const {
 
 size_t Result::numRowsAffected() const {
   return 0;   //TODO
+}
+
+std::string Result::getStatement() const {
+  return statement;
 }
 
 void Result::addBlock(const ch::Block &block) {

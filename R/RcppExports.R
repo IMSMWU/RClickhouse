@@ -27,6 +27,11 @@ getRowsAffected <- function(res) {
 }
 
 #' @export
+getStatement <- function(res) {
+    .Call('clckhs_getStatement', PACKAGE = 'clckhs', res)
+}
+
+#' @export
 connect <- function(host, port, db, user, password, compression) {
     .Call('clckhs_connect', PACKAGE = 'clckhs', host, port, db, user, password, compression)
 }

@@ -11,7 +11,6 @@ namespace ch = clickhouse;
 
 class Result {
   public:
-
   struct ColBlock {
     std::vector<ch::ColumnRef> columns;
   };
@@ -21,6 +20,7 @@ class Result {
 
   size_t fetchedRows = 0, // number of rows fetched so far
          availRows = 0;   // number of rows received from DB
+  std::string statement;  // SQL statement corresponding to this result
 
   Rcpp::StringVector colNames;
   TypeList colTypes;
@@ -37,6 +37,8 @@ class Result {
   using ConvertFunc = std::function<void(const ColBlock &,
       std::shared_ptr<const CT>, RT &, size_t, size_t, size_t)>;
 
+  Result(std::string stmt);
+
   template<typename CT, typename RT>
   void convertTypedColumn(AccFunc colAcc, Rcpp::DataFrame &df,
       size_t start, size_t len, ConvertFunc<CT, RT> convFunc) const;
@@ -44,6 +46,7 @@ class Result {
   bool isComplete() const;
   size_t numFetchedRows() const;
   size_t numRowsAffected() const;
+  std::string getStatement() const;
 
   void addBlock(const ch::Block &block);
 

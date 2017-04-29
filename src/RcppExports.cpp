@@ -158,6 +158,36 @@ RcppExport SEXP clckhs_getRowsAffected(SEXP resSEXP) {
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// getStatement
+std::string getStatement(XPtr<Result> res);
+static SEXP clckhs_getStatement_try(SEXP resSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< XPtr<Result> >::type res(resSEXP);
+    rcpp_result_gen = Rcpp::wrap(getStatement(res));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP clckhs_getStatement(SEXP resSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(clckhs_getStatement_try(resSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 // connect
 XPtr<Client> connect(String host, int port, String db, String user, String password, String compression);
 static SEXP clckhs_connect_try(SEXP hostSEXP, SEXP portSEXP, SEXP dbSEXP, SEXP userSEXP, SEXP passwordSEXP, SEXP compressionSEXP) {
@@ -324,6 +354,7 @@ static int clckhs_RcppExport_validate(const char* sig) {
         signatures.insert("bool(*hasCompleted)(XPtr<Result>)");
         signatures.insert("size_t(*getRowCount)(XPtr<Result>)");
         signatures.insert("size_t(*getRowsAffected)(XPtr<Result>)");
+        signatures.insert("std::string(*getStatement)(XPtr<Result>)");
         signatures.insert("XPtr<Client>(*connect)(String,int,String,String,String,String)");
         signatures.insert("void(*disconnect)(XPtr<Client>)");
         signatures.insert("XPtr<Result>(*select)(XPtr<Client>,String)");
@@ -340,6 +371,7 @@ RcppExport SEXP clckhs_RcppExport_registerCCallable() {
     R_RegisterCCallable("clckhs", "clckhs_hasCompleted", (DL_FUNC)clckhs_hasCompleted_try);
     R_RegisterCCallable("clckhs", "clckhs_getRowCount", (DL_FUNC)clckhs_getRowCount_try);
     R_RegisterCCallable("clckhs", "clckhs_getRowsAffected", (DL_FUNC)clckhs_getRowsAffected_try);
+    R_RegisterCCallable("clckhs", "clckhs_getStatement", (DL_FUNC)clckhs_getStatement_try);
     R_RegisterCCallable("clckhs", "clckhs_connect", (DL_FUNC)clckhs_connect_try);
     R_RegisterCCallable("clckhs", "clckhs_disconnect", (DL_FUNC)clckhs_disconnect_try);
     R_RegisterCCallable("clckhs", "clckhs_select", (DL_FUNC)clckhs_select_try);
