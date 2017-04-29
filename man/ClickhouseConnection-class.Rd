@@ -14,6 +14,8 @@
 \alias{dbDataType,ClickhouseConnection-method}
 \alias{dbQuoteIdentifier,ClickhouseConnection,character-method}
 \alias{dbQuoteIdentifier,ClickhouseConnection,SQL-method}
+\alias{dbQuoteString,ClickhouseConnection,character-method}
+\alias{dbQuoteString,ClickhouseConnection,SQL-method}
 \alias{dbBegin,ClickhouseConnection-method}
 \alias{dbCommit,ClickhouseConnection-method}
 \alias{dbRollback,ClickhouseConnection-method}
@@ -41,6 +43,10 @@
 \S4method{dbQuoteIdentifier}{ClickhouseConnection,character}(conn, x, ...)
 
 \S4method{dbQuoteIdentifier}{ClickhouseConnection,SQL}(conn, x, ...)
+
+\S4method{dbQuoteString}{ClickhouseConnection,character}(conn, x, ...)
+
+\S4method{dbQuoteString}{ClickhouseConnection,SQL}(conn, x, ...)
 
 \S4method{dbBegin}{ClickhouseConnection}(conn, ...)
 

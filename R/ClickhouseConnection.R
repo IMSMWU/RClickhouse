@@ -166,6 +166,21 @@ setMethod("dbQuoteIdentifier", c("ClickhouseConnection", "SQL"),
 
 #' @export
 #' @rdname ClickhouseConnection-class
+setMethod("dbQuoteString", c("ClickhouseConnection", "character"),
+  function(conn, x, ...) {
+      x <- gsub('\\', '\\\\', x, fixed = TRUE)
+      x <- gsub("'", "\\'", x, fixed = TRUE)
+      SQL(ifelse(is.na(x), "NULL", paste0("'", x, "'")))
+  }
+)
+
+#' @export
+#' @rdname ClickhouseConnection-class
+setMethod("dbQuoteString", c("ClickhouseConnection", "SQL"),
+  function(conn, x, ...) { x })
+
+#' @export
+#' @rdname ClickhouseConnection-class
 setMethod("dbBegin", "ClickhouseConnection", definition = function(conn, ...) {
   stop("Transactions are not supported.")
 })
