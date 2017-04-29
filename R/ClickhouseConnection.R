@@ -18,6 +18,17 @@ setClass("ClickhouseConnection",
 
 #' @export
 #' @rdname ClickhouseConnection-class
+setMethod("show", "ClickhouseConnection", function(object) {
+  cat("<ClickhouseConnection>\n")
+  if (dbIsValid(object)) {
+    cat("  ", object@user, "@", object@host, ":", object@port, "\n", sep="")
+  } else {
+    cat("  DISCONNECTED\n")
+  }
+})
+
+#' @export
+#' @rdname ClickhouseConnection-class
 setMethod("dbGetInfo", "ClickhouseConnection", def=function(dbObj, ...) {
   envdata <- dbGetQuery(dbObj, "SELECT version() as version, uptime() as uptime,
                         currentDatabase() as database")

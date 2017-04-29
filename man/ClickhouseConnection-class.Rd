@@ -3,6 +3,7 @@
 \docType{class}
 \name{ClickhouseConnection-class}
 \alias{ClickhouseConnection-class}
+\alias{show,ClickhouseConnection-method}
 \alias{dbGetInfo,ClickhouseConnection-method}
 \alias{dbIsValid,ClickhouseConnection-method}
 \alias{dbListTables,ClickhouseConnection-method}
@@ -22,6 +23,8 @@
 \alias{dbDisconnect,ClickhouseConnection-method}
 \title{Class ClickhouseConnection}
 \usage{
+\S4method{show}{ClickhouseConnection}(object)
+
 \S4method{dbGetInfo}{ClickhouseConnection}(dbObj, ...)
 
 \S4method{dbIsValid}{ClickhouseConnection}(dbObj, ...)
