@@ -145,8 +145,15 @@ setMethod("dbDataType", signature(dbObj="ClickhouseConnection", obj = "ANY"), de
 #' @rdname ClickhouseConnection-class
 setMethod("dbQuoteIdentifier", c("ClickhouseConnection", "character"),
   function(conn, x, ...) {
-    x <- gsub('`', '``', x, fixed = TRUE)
-    SQL(paste('`', x, '`', sep = ""))
+    if (anyNA(x)) {
+      stop("Input to dbQuoteIdentifier must not contain NA.")
+    } else if (inherits(x, "SQL")) {
+      x
+    } else {
+      x <- gsub('\\', '\\\\', x, fixed = TRUE)
+      x <- gsub('`', '\\`', x, fixed = TRUE)
+      SQL(paste0('`', x, '`'))
+    }
   }
 )
 
