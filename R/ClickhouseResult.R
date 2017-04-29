@@ -24,7 +24,11 @@ setMethod("dbFetch", signature = "ClickhouseResult", definition = function(res, 
 #' @rdname ClickhouseResult-class
 #' @export
 setMethod("dbClearResult", "ClickhouseResult", definition = function(res, ...) {
-  clckhs::clearResult(res@ptr)
+  if (!clckhs::validPtr(res@ptr)) {
+    warning("Result has already been cleared.")
+  } else {
+    clckhs::clearResult(res@ptr)
+  }
   invisible(TRUE)
 })
 

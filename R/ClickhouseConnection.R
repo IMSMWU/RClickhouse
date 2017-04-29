@@ -216,6 +216,10 @@ setMethod("dbRollback", "ClickhouseConnection", definition = function(conn, ...)
 #' @export
 #' @rdname ClickhouseConnection-class
 setMethod("dbDisconnect", "ClickhouseConnection", function(conn, ...) {
-  clckhs::disconnect(conn@ptr)
+  if (!clckhs::validPtr(conn@ptr)) {
+    warning("Connection is already disconnected.")
+  } else {
+    clckhs::disconnect(conn@ptr)
+  }
   invisible(TRUE)
 })
