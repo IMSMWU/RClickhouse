@@ -49,8 +49,7 @@ setMethod("dbGetStatement", "ClickhouseResult", function(res, ...) {
 #' @rdname ClickhouseResult-class
 #' @export
 setMethod("dbIsValid", "ClickhouseResult", function(dbObj, ...) {
-  # todo
-  stop("not implemented yet")
+  clckhs::validPtr(dbObj@ptr)
 })
 
 #' @rdname ClickhouseResult-class
