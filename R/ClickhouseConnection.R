@@ -54,27 +54,31 @@ setMethod("dbListTables", "ClickhouseConnection", function(conn, ...) {
 #' @export
 #' @rdname ClickhouseConnection-class
 setMethod("dbExistsTable", c("ClickhouseConnection", "character"), function(conn, name, ...) {
-  as.logical(name %in% dbListTables(conn))
+  qname <- dbQuoteIdentifier(conn, name)
+  #NOTE: must match on quoted names, since the name argument may already be quoted
+  as.logical(qname %in% dbQuoteIdentifier(conn, dbListTables(conn)))
 })
 
 #' @export
 #' @rdname ClickhouseConnection-class
 setMethod("dbReadTable", c("ClickhouseConnection", "character"), function(conn, name, ...) {
-  name <- dbQuoteIdentifier(conn, name)
-  dbGetQuery(conn, paste0("SELECT * FROM ", name))
+  qname <- dbQuoteIdentifier(conn, name)
+  dbGetQuery(conn, paste0("SELECT * FROM ", qname))
 })
 
 #' @export
 #' @rdname ClickhouseConnection-class
 setMethod("dbRemoveTable",c("ClickhouseConnection", "character"), function(conn, name, ...) {
-  dbExecute(conn, paste0("DROP TABLE ", name))
+  qname <- dbQuoteIdentifier(conn, name)
+  dbExecute(conn, paste0("DROP TABLE ", qname))
   invisible(TRUE)
 })
 
 #' @export
 #' @rdname ClickhouseConnection-class
 setMethod("dbListFields", c("ClickhouseConnection", "character"), function(conn, name, ...) {
-  dbGetQuery(conn, paste0("DESCRIBE TABLE ", name))$name
+  qname <- dbQuoteIdentifier(conn, name)
+  dbGetQuery(conn, paste0("DESCRIBE TABLE ", qname))$name
 })
 
 #' @export
@@ -103,7 +107,7 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
     stop("Setting both overwrite and append to TRUE makes no sense.")
   }
 
-  qname <- name
+  qname <- dbQuoteIdentifier(conn, name)
 
   if (dbExistsTable(conn, qname)) {
     if (overwrite) dbRemoveTable(conn, qname)
