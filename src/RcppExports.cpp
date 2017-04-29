@@ -284,6 +284,36 @@ RcppExport SEXP clckhs_insert(SEXP connSEXP, SEXP tableNameSEXP, SEXP dfSEXP) {
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// validPtr
+bool validPtr(SEXP ptr);
+static SEXP clckhs_validPtr_try(SEXP ptrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< SEXP >::type ptr(ptrSEXP);
+    rcpp_result_gen = Rcpp::wrap(validPtr(ptr));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP clckhs_validPtr(SEXP ptrSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(clckhs_validPtr_try(ptrSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 
 // validate (ensure exported C++ functions exist before calling them)
 static int clckhs_RcppExport_validate(const char* sig) { 
@@ -298,6 +328,7 @@ static int clckhs_RcppExport_validate(const char* sig) {
         signatures.insert("void(*disconnect)(XPtr<Client>)");
         signatures.insert("XPtr<Result>(*select)(XPtr<Client>,String)");
         signatures.insert("void(*insert)(XPtr<Client>,String,DataFrame)");
+        signatures.insert("bool(*validPtr)(SEXP)");
     }
     return signatures.find(sig) != signatures.end();
 }
@@ -313,6 +344,7 @@ RcppExport SEXP clckhs_RcppExport_registerCCallable() {
     R_RegisterCCallable("clckhs", "clckhs_disconnect", (DL_FUNC)clckhs_disconnect_try);
     R_RegisterCCallable("clckhs", "clckhs_select", (DL_FUNC)clckhs_select_try);
     R_RegisterCCallable("clckhs", "clckhs_insert", (DL_FUNC)clckhs_insert_try);
+    R_RegisterCCallable("clckhs", "clckhs_validPtr", (DL_FUNC)clckhs_validPtr_try);
     R_RegisterCCallable("clckhs", "clckhs_RcppExport_validate", (DL_FUNC)clckhs_RcppExport_validate);
     return R_NilValue;
 }

@@ -46,6 +46,11 @@ insert <- function(conn, tableName, df) {
     invisible(.Call('clckhs_insert', PACKAGE = 'clckhs', conn, tableName, df))
 }
 
+#' @export
+validPtr <- function(ptr) {
+    .Call('clckhs_validPtr', PACKAGE = 'clckhs', ptr)
+}
+
 # Register entry points for exported C++ functions
 methods::setLoadAction(function(ns) {
     .Call('clckhs_RcppExport_registerCCallable', PACKAGE = 'clckhs')

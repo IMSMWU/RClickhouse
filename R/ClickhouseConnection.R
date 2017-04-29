@@ -47,13 +47,17 @@ setMethod("dbGetInfo", "ClickhouseConnection", def=function(dbObj, ...) {
 #' @export
 #' @rdname ClickhouseConnection-class
 setMethod("dbIsValid", "ClickhouseConnection", function(dbObj, ...) {
-  tryCatch({
-    dbGetQuery(dbObj, "select 1")
-    TRUE
-  }, error = function(e) {
-    print(e)
+  if (!clckhs::validPtr(dbObj@ptr)) {
     FALSE
-  })
+  } else {
+    tryCatch({
+      dbGetQuery(dbObj, "select 1")
+      TRUE
+    }, error = function(e) {
+      print(e)
+      FALSE
+    })
+  }
 })
 
 #' @export

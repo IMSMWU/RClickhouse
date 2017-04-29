@@ -247,3 +247,9 @@ void insert(XPtr<Client> conn, String tableName, DataFrame df) {
 
   conn->Insert(tableName, block);
 }
+
+//' @export
+// [[Rcpp::export]]
+bool validPtr(SEXP ptr) {
+  return R_ExternalPtrAddr(ptr);
+}
