@@ -151,8 +151,6 @@ setMethod("dbQuoteIdentifier", c("ClickhouseConnection", "character"),
   function(conn, x, ...) {
     if (anyNA(x)) {
       stop("Input to dbQuoteIdentifier must not contain NA.")
-    } else if (inherits(x, "SQL")) {
-      x
     } else {
       x <- gsub('\\', '\\\\', x, fixed = TRUE)
       x <- gsub('`', '\\`', x, fixed = TRUE)
@@ -160,6 +158,11 @@ setMethod("dbQuoteIdentifier", c("ClickhouseConnection", "character"),
     }
   }
 )
+
+#' @export
+#' @rdname ClickhouseConnection-class
+setMethod("dbQuoteIdentifier", c("ClickhouseConnection", "SQL"),
+  function(conn, x, ...) { x })
 
 #' @export
 #' @rdname ClickhouseConnection-class
