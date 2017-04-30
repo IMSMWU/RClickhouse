@@ -26,6 +26,16 @@ setMethod("show", "ClickhouseDriver", function(object) {
   cat("<ClickhouseDriver>\n")
 })
 
+#' @export
+#' @rdname ClickhouseDriver-class
+setMethod("dbGetInfo", "ClickhouseDriver", def=function(dbObj, ...) {
+  #TODO: return actual version numbers/git hashes
+  list(
+    driver.version = "alpha",
+    client.version = "git"
+  )
+})
+
 #' @rdname ClickhouseDriver-class
 #' @export
 setMethod("dbIsValid", "ClickhouseDriver", function(dbObj, ...) {
