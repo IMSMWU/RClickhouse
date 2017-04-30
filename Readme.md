@@ -5,11 +5,7 @@
 This R package is a DBI interface and dplyr SQL-backend for the [clickhouse database](https://clickhouse.yandex). It is based on the [C++ Clickhouse Client](https://github.com/artpaul/clickhouse-cpp) and uses compression for data transfer.
 
 ## Requirements & Installatiom
-
-The following packages are required:
- * lz4 (ubuntu: `apt install liblz4-dev`, mac: `brew install lz4`)
-
-This package is currently not available on CRAN so you have to install it using devtools:
+You need a C++ compiler and for Windows Rtools is required. This package is currently not available on CRAN so you have to install it using devtools:
 
 ```R
 devtools::install_github("inkrement/clckhs@cpp")
