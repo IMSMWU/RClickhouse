@@ -47,6 +47,7 @@ class Result {
   size_t numFetchedRows() const;
   size_t numRowsAffected() const;
   std::string getStatement() const;
+  TypeList getColTypes() const;
 
   void addBlock(const ch::Block &block);
 

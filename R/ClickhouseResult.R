@@ -63,3 +63,14 @@ setMethod("dbGetRowCount", "ClickhouseResult", function(res, ...) {
 setMethod("dbGetRowsAffected", "ClickhouseResult", definition = function(res, ...) {
   clckhs::getRowsAffected(res@ptr)
 })
+
+#' @rdname ClickhouseResult-class
+#' @export
+setMethod("dbColumnInfo", "ClickhouseResult", definition = function(res, ...) {
+  df <- dbFetch(res, 0)
+  data.frame(
+    name = colnames(df),
+    field.type = clckhs::resultTypes(res@ptr),
+    data.type = sapply(df, class)
+  )
+})

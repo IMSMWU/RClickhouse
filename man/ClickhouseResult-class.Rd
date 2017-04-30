@@ -10,6 +10,7 @@
 \alias{dbIsValid,ClickhouseResult-method}
 \alias{dbGetRowCount,ClickhouseResult-method}
 \alias{dbGetRowsAffected,ClickhouseResult-method}
+\alias{dbColumnInfo,ClickhouseResult-method}
 \title{Class ClickhouseResult}
 \usage{
 \S4method{dbFetch}{ClickhouseResult}(res, n = -1, ...)
@@ -25,11 +26,13 @@
 \S4method{dbGetRowCount}{ClickhouseResult}(res, ...)
 
 \S4method{dbGetRowsAffected}{ClickhouseResult}(res, ...)
+
+\S4method{dbColumnInfo}{ClickhouseResult}(res, ...)
 }
 \arguments{
-\item{res}{An object inheriting from \linkS4class{DBIResult}.}
-
 \item{...}{Other arguments passed on to methods.}
+
+\item{res}{An object inheriting from \linkS4class{DBIResult}.}
 }
 \description{
 Clickhouse's query results class.  This classes encapsulates the result of an SQL

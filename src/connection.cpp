@@ -47,6 +47,15 @@ std::string getStatement(XPtr<Result> res) {
 
 //' @export
 // [[Rcpp::export]]
+std::vector<std::string> resultTypes(XPtr<Result> res) {
+  auto colTypes = res->getColTypes();
+  std::vector<std::string> r(colTypes.size());
+  std::transform(colTypes.begin(), colTypes.end(), r.begin(), [](TypeRef r) { return r->GetName(); });
+  return r;
+}
+
+//' @export
+// [[Rcpp::export]]
 XPtr<Client> connect(String host, int port, String db, String user, String password, String compression) {
   CompressionMethod comprMethod = CompressionMethod::None;
   if(compression == "lz4") {

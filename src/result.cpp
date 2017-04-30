@@ -171,6 +171,10 @@ std::string Result::getStatement() const {
   return statement;
 }
 
+Result::TypeList Result::getColTypes() const {
+  return colTypes;
+}
+
 void Result::addBlock(const ch::Block &block) {
   if(static_cast<size_t>(colNames.size()) < block.GetColumnCount()) {
     setColInfo(block);
