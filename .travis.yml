@@ -1,12 +1,11 @@
 language: r
 cache: packages
-dist: precise
+dist: trusty
 sudo: false
 
 addons:
   apt:
     packages:
-      - libc6=2.15-0ubuntu10.18
       - clickhouse-server-base
       - clickhouse-server-common
     sources:
