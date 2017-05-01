@@ -1,7 +1,7 @@
 Package: clckhs
 Type: Package
 Title: DBI Interface for ClickhouseDB
-Version: 0.2.0
+Version: 0.3.0
 Encoding: UTF-8
 Authors@R: c(
     person("Christian", "Hotz-Behofsits", email = "christian.hotz-behofsits@wu.ac.at", role = c("aut", "cre")),
