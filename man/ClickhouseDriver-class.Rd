@@ -3,20 +3,55 @@
 \docType{class}
 \name{ClickhouseDriver-class}
 \alias{ClickhouseDriver-class}
+\alias{clickhouse}
+\alias{show,ClickhouseDriver-method}
 \alias{dbIsValid,ClickhouseDriver-method}
 \alias{dbUnloadDriver,ClickhouseDriver-method}
 \alias{dbConnect,ClickhouseDriver-method}
+\alias{dbDataType,ClickhouseDriver-method}
 \title{Class ClickhouseDriver}
 \usage{
+clickhouse()
+
+\S4method{show}{ClickhouseDriver}(object)
+
 \S4method{dbIsValid}{ClickhouseDriver}(dbObj, ...)
 
 \S4method{dbUnloadDriver}{ClickhouseDriver}(drv, ...)
 
-\S4method{dbConnect}{ClickhouseDriver}(drv, host = "localhost",
-  port = 8123L, user = "default", password = "", ...)
+\S4method{dbConnect}{ClickhouseDriver}(drv, host = "localhost", port = 9000,
+  db = "default", user = "default", password = "", compression = "lz4",
+  ...)
+
+\S4method{dbDataType}{ClickhouseDriver}(dbObj, obj, ...)
+}
+\arguments{
+\item{drv}{ClickHouse database driver.}
+
+\item{host}{name of the host on which the database is running.}
+
+\item{port}{port on which the database is listening.}
+
+\item{db}{name of the default database.}
+
+\item{user}{name of the user to connect as.}
+
+\item{password}{the user's password.}
+
+\item{compression}{the compression method for the connection (lz4 by default).}
+}
+\value{
+A database connection.
 }
 \description{
 This driver never needs to be unloaded and hence \code{dbUnload()} is a
 null-op.
+
+Connect to a ClickHouse database.
+}
+\examples{
+library(DBI)
+clckhs::clickhouse()
+conn <- dbConnect(clckhs::clickhouse(), host="localhost")
 }
 \keyword{internal}

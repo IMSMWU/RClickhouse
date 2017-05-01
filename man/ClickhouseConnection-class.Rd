@@ -3,13 +3,66 @@
 \docType{class}
 \name{ClickhouseConnection-class}
 \alias{ClickhouseConnection-class}
+\alias{show,ClickhouseConnection-method}
 \alias{dbGetInfo,ClickhouseConnection-method}
+\alias{dbIsValid,ClickhouseConnection-method}
+\alias{dbListTables,ClickhouseConnection-method}
+\alias{dbExistsTable,ClickhouseConnection,character-method}
+\alias{dbReadTable,ClickhouseConnection,character-method}
+\alias{dbRemoveTable,ClickhouseConnection,character-method}
+\alias{dbListFields,ClickhouseConnection,character-method}
+\alias{dbSendQuery,ClickhouseConnection,character-method}
+\alias{dbDataType,ClickhouseConnection-method}
+\alias{dbQuoteIdentifier,ClickhouseConnection,character-method}
+\alias{dbQuoteIdentifier,ClickhouseConnection,SQL-method}
+\alias{dbQuoteString,ClickhouseConnection,character-method}
+\alias{dbQuoteString,ClickhouseConnection,SQL-method}
+\alias{dbBegin,ClickhouseConnection-method}
+\alias{dbCommit,ClickhouseConnection-method}
+\alias{dbRollback,ClickhouseConnection-method}
+\alias{dbDisconnect,ClickhouseConnection-method}
 \title{Class ClickhouseConnection}
 \usage{
+\S4method{show}{ClickhouseConnection}(object)
+
 \S4method{dbGetInfo}{ClickhouseConnection}(dbObj, ...)
+
+\S4method{dbIsValid}{ClickhouseConnection}(dbObj, ...)
+
+\S4method{dbListTables}{ClickhouseConnection}(conn, ...)
+
+\S4method{dbExistsTable}{ClickhouseConnection,character}(conn, name, ...)
+
+\S4method{dbReadTable}{ClickhouseConnection,character}(conn, name, ...)
+
+\S4method{dbRemoveTable}{ClickhouseConnection,character}(conn, name, ...)
+
+\S4method{dbListFields}{ClickhouseConnection,character}(conn, name, ...)
+
+\S4method{dbSendQuery}{ClickhouseConnection,character}(conn, statement, ...)
+
+\S4method{dbDataType}{ClickhouseConnection}(dbObj, obj, ...)
+
+\S4method{dbQuoteIdentifier}{ClickhouseConnection,character}(conn, x, ...)
+
+\S4method{dbQuoteIdentifier}{ClickhouseConnection,SQL}(conn, x, ...)
+
+\S4method{dbQuoteString}{ClickhouseConnection,character}(conn, x, ...)
+
+\S4method{dbQuoteString}{ClickhouseConnection,SQL}(conn, x, ...)
+
+\S4method{dbBegin}{ClickhouseConnection}(conn, ...)
+
+\S4method{dbCommit}{ClickhouseConnection}(conn, ...)
+
+\S4method{dbRollback}{ClickhouseConnection}(conn, ...)
+
+\S4method{dbDisconnect}{ClickhouseConnection}(conn, ...)
 }
 \description{
 \code{ClickhouseConnection.} objects are usually created by
 \code{\link[DBI]{dbConnect}}
+
+Close the database connection
 }
 \keyword{internal}

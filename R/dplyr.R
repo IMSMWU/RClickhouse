@@ -1,44 +1,6 @@
-#' @import methods
-#' @importFrom DBI dbConnect
 #' @export
-src_clickhouse <- function(dbname = "default", host = "localhost", port = 8123L, user = "default",
-                           password = "", ...) {
-
-  con <- DBI::dbConnect(clckhs::clickhouse(), host = host, dbname = dbname,
-                        user = user, password = password, port = port, ...)
-
-  dplyr::src_dbi(con)
-}
-
-db_create_table.src_clickhouse <- function(con, table, types,
-                                           temporary = FALSE, engine="TinyLog", ...){
-
-  if (!dbExistsTable(con$con, table)) {
-    fts <- sapply(value, dbDataType, dbObj=con$con)
-    fdef <- paste(names(value), fts, collapse=', ')
-    ct <- paste0("CREATE TABLE ", qname, " (", fdef, ") ENGINE=", engine)
-    dbExecute(con$con, ct)
-  }
-}
-
-#' @importFrom dplyr copy_to
-#' @export
-#' @return a \code{tbl} object in the remote source
-#' @seealso \code{\link[dplyr]{copy_to}}
-#' @rdname clckhs
-# No transactions supported so
-# we have torewrite copy_to
-copy_to.src_clickhouse <- function(dest, df, name = deparse(substitute(df)),
-                                   overwrite = FALSE, ...) {
-  DBI::dbWriteTable(dest$con, name, df, overwrite=overwrite)
-
-  dplyr::tbl(dest, name)
-}
-
-
-#' @export
-#' @importFrom dplyr src_desc
-src_desc.ClickhouseConnection <- function(con) {
+#' @importFrom dplyr db_desc
+db_desc.ClickhouseConnection <- function(con) {
   info <- dbGetInfo(con)
 
   uptime_days <- round(info$uptime/60/60/24, digits = 2)
@@ -48,17 +10,15 @@ src_desc.ClickhouseConnection <- function(con) {
 }
 
 #' @export
-#' @importFrom dplyr sql_quote
 #' @importFrom dplyr sql_escape_string
 sql_escape_string.ClickhouseConnection <- function(con, x) {
-  dplyr::sql_quote(x, "'")
+  encodeString(x, na.encode = FALSE, quote = "'")
 }
 
 #' @export
-#' @importFrom dplyr sql_quote
 #' @importFrom dplyr sql_escape_ident
 sql_escape_ident.ClickhouseConnection <- function(con, x) {
-  dplyr::sql_quote(x, "`")
+  encodeString(x, na.encode = FALSE, quote = "`")
 }
 
 #' @export
@@ -74,39 +34,65 @@ db_analyze.ClickhouseConnection <- function(con, sql, ...) {
   TRUE
 }
 
-#' @export
-#' @importFrom dplyr db_query_fields
-db_query_fields.ClickhouseConnection <- function(con, sql, ...) {
-  fields <- dplyr::build_sql("SELECT * FROM ", sql , " LIMIT 1", con = con)
-
-  result <- dbSendQuery(con, fields)
-  on.exit(dbClearResult(result))
-  colnames(result@env$data)
-}
-
 # SQL translation
 #
 #' @importFrom dplyr sql_translate_env
 #' @export
 sql_translate_env.ClickhouseConnection <- function(x) {
-  dplyr::sql_variant(
-    dplyr::sql_translator(.parent = dplyr::base_scalar,
-      "^" = dplyr::sql_prefix("pow"),
+  dbplyr::sql_variant(
+    dbplyr::sql_translator(.parent = dbplyr::base_scalar,
+      "^" = dbplyr::sql_prefix("pow"),
 
       # Casting
-      as.logical = dplyr::sql_prefix("toUInt8"),
-      as.numeric = dplyr::sql_prefix("toFloat64"),
-      as.double = dplyr::sql_prefix("toFloat64"),
-      as.integer = dplyr::sql_prefix("toInt64"),
-      as.character = dplyr::sql_prefix("toString"),
+      as.logical = dbplyr::sql_prefix("toUInt8"),
+      as.numeric = dbplyr::sql_prefix("toFloat64"),
+      as.double = dbplyr::sql_prefix("toFloat64"),
+      as.integer = dbplyr::sql_prefix("toInt64"),
+      as.character = dbplyr::sql_prefix("toString"),
 
       # Date/time
-      Sys.date = dplyr::sql_prefix("today"),
-      Sys.time = dplyr::sql_prefix("now")
+      Sys.date = dbplyr::sql_prefix("today"),
+      Sys.time = dbplyr::sql_prefix("now")
     ),
-    dplyr::sql_translator(.parent = dplyr::base_agg,
-      "%||%" = dplyr::sql_prefix("concat")
+    dbplyr::sql_translator(.parent = dbplyr::base_agg,
+      "%||%" = dbplyr::sql_prefix("concat")
     ),
-    dplyr::base_no_win
+    dbplyr::base_no_win
   )
+}
+
+# DBIConnection fork without transactions
+#' @export
+db_copy_to.ClickhouseConnection <- function(con, table, values,
+                                     overwrite = FALSE, types = NULL, temporary = TRUE,
+                                     unique_indexes = NULL, indexes = NULL,
+                                     analyze = FALSE, ...) {
+
+  if(analyze == TRUE){
+    warning("clickhouse does not support a analyze statement.")
+  }
+  if(!is.null(unique_indexes)){
+    warning("clickhouse does not support unique indexes.")
+  }
+  if(!is.null(indexes)){
+    warning("clickhouse does not support indexes.")
+  }
+
+  if(is.null(types)){
+    types <- dplyr::db_data_type(con, values)
+  }
+
+  names(types) <- names(values)
+
+  tryCatch({
+    if (overwrite) {
+      dplyr::db_drop_table(con, table, force = TRUE)
+    }
+
+    dplyr::db_write_table(con, table, types = types, values = values, temporary = temporary)
+  }, error = function(err) {
+    stop(err)
+  })
+
+  table
 }

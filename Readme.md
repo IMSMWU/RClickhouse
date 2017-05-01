@@ -1,28 +1,29 @@
-# Clckhs (Prototype)
+# Clckhs
 
-**This is my first R-package, so be warned!**
+![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg) ![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](https://img.shields.io/github/release/inkrement/clckhs.svg) [![Build Status](https://travis-ci.org/inkrement/clckhs.svg?branch=master)](https://travis-ci.org/inkrement/clckhs)
 
-It is a basic dplyr SQL-backend for the clickhouse database. The DBI interface is based on Hannes Mühleisen's [clickhouse-r package](https://github.com/hannesmuehleisen/clickhouse-r).
+This R package is a DBI interface and dplyr SQL-backend for the [clickhouse database](https://clickhouse.yandex). It is based on the [C++ Clickhouse Client](https://github.com/artpaul/clickhouse-cpp) and uses compression for data transfer.
 
-## Next Steps
+## Requirements & Installatiom
+You need a C++ compiler and for Windows Rtools is required. This package is currently not available on CRAN so you have to install it using devtools:
 
- - Replace HTTP interface with TCP C++ connection
- - enhance dplyr support
- - add usage information
+```R
+devtools::install_github("inkrement/clckhs@cpp")
+```
 
+## Usage
+```R
+# create a DBI Connection
+con <- DBI::dbConnect(clckhs::clickhouse(),host="example-db.com")
 
-## Dev Info
- * Build and Reload Package:  `Ctrl + Shift + B`
- * Check Package:             `Ctrl + Shift + E`
- * Test Package:              `Ctrl + Shift + T`
+# now you can write data to the db
+DBI::dbWriteTable(con, "mtcars", mtcars)
 
-Generate Namespace: `devtools::document()`
-To use latest dplyr-package: ` devtools::install_github("hadley/dplyr")`
+# ... and query it using dpylr
+library(dplyr)
 
+tbl(con, "mtcars") %>% group_by(cyl) %>% summarise(smpg=sum(mpg))
+```
 
-# Other dplyr sql-backends:
- * https://github.com/snowflakedb/dplyr-snowflakedb
- * https://gist.github.com/piccolbo/3d8ac40291f4eaee644b
- 
 ## Acknowledgements
-Big thanks to krlmlr (Kirill Müller), Maxwell Peterson and hannesmuehleisen (Hannes Mühleisen).
+Big thanks to Kirill Müller, Maxwell Peterson, Artemkin Pavel and Hannes Mühleisen.

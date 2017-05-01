@@ -4,12 +4,14 @@
 #' null-op.
 #'
 #' @export
+#' @rdname ClickhouseDriver-class
 #' @keywords internal
 setClass("ClickhouseDriver",
   contains = "DBIDriver"
 )
 
 #' @export
+#' @rdname ClickhouseDriver-class
 #' @import methods DBI
 #' @examples
 #' library(DBI)
@@ -17,6 +19,12 @@ setClass("ClickhouseDriver",
 clickhouse <- function() {
   new("ClickhouseDriver")
 }
+
+#' @rdname ClickhouseDriver-class
+#' @export
+setMethod("show", "ClickhouseDriver", function(object) {
+  cat("<ClickhouseDriver>\n")
+})
 
 #' @rdname ClickhouseDriver-class
 #' @export
@@ -30,14 +38,34 @@ setMethod("dbUnloadDriver", "ClickhouseDriver", function(drv, ...) {
   invisible(TRUE)
 })
 
-#' @rdname ClickhouseDriver-class
+#' Connect to a ClickHouse database.
 #' @export
-setMethod("dbConnect", "ClickhouseDriver",
-  function(drv, host="localhost", port=8123L, user="default", password="", ...) {
-    con <- new("ClickhouseConnection",
-       url = paste0("http://", user, ":", password, "@", host, ":", port, "/")
-    )
-    stopifnot(dbIsValid(con))
-    con
-  }
-)
+#' @rdname ClickhouseDriver-class
+#' @param drv ClickHouse database driver.
+#' @param host name of the host on which the database is running.
+#' @param port port on which the database is listening.
+#' @param db name of the default database.
+#' @param user name of the user to connect as.
+#' @param password the user's password.
+#' @param compression the compression method for the connection (lz4 by default).
+#' @return A database connection.
+#' @examples
+#' conn <- dbConnect(clckhs::clickhouse(), host="localhost")
+setMethod("dbConnect", "ClickhouseDriver", function(drv, host="localhost", port = 9000, db = "default", user = "default", password = "", compression = "lz4", ...) {
+  new("ClickhouseConnection", ptr = clckhs::connect(host, port, db, user, password, compression), port = port, host = host, user = user)
+})
+
+#' @export
+#' @rdname ClickhouseDriver-class
+setMethod("dbDataType", signature(dbObj="ClickhouseDriver", obj = "ANY"), definition = function(dbObj, obj, ...) {
+  if (is.logical(obj)) t <- "UInt8"
+  else if (is.integer(obj)) t <- "Int32"
+  else if (is.numeric(obj)) t <- "Float64"
+  else if (inherits(obj, "POSIXct")) t <- "DateTime"
+  else if (inherits(obj, "Date")) t <- "Date"
+  else t <- "String"
+
+  if (anyNA(obj)) t <- paste0("Nullable(", t, ")")
+
+  return(t)
+}, valueClass = "character")

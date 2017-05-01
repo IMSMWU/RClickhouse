@@ -9,126 +9,103 @@
 setClass("ClickhouseConnection",
   contains = "DBIConnection",
   slots = list(
-    url = "character"
+    ptr  = "externalptr",
+    host = "character",
+    port = "numeric",
+    user = "character"
   )
 )
 
 #' @export
 #' @rdname ClickhouseConnection-class
-#' @importFrom httr parse_url
+setMethod("show", "ClickhouseConnection", function(object) {
+  cat("<ClickhouseConnection>\n")
+  if (dbIsValid(object)) {
+    cat("  ", object@user, "@", object@host, ":", object@port, "\n", sep="")
+  } else {
+    cat("  DISCONNECTED\n")
+  }
+})
+
+#' @export
+#' @rdname ClickhouseConnection-class
 setMethod("dbGetInfo", "ClickhouseConnection", def=function(dbObj, ...) {
   envdata <- dbGetQuery(dbObj, "SELECT version() as version, uptime() as uptime,
                         currentDatabase() as database")
 
-  urlparts <- httr::parse_url(dbObj@url)
-
   list(
     name = "ClickhouseConnection",
     db.version = envdata$version,
-    uptime = envdata$uptime,
-    url = dbObj@url,
-    dbname = envdata$database,
-    username = urlparts$username,
-    host = urlparts$hostname,
-    port = urlparts$port)
+    uptime     = envdata$uptime,
+    dbname     = envdata$database,
+    username   = dbObj@user,
+    host       = dbObj@host,
+    port       = dbObj@port
+  )
 })
 
-
+#' @export
+#' @rdname ClickhouseConnection-class
 setMethod("dbIsValid", "ClickhouseConnection", function(dbObj, ...) {
-  tryCatch({
-    dbGetQuery(dbObj, "select 1")
-    TRUE
-  }, error = function(e) {
-    print(e)
+  if (!clckhs::validPtr(dbObj@ptr)) {
     FALSE
-  })
+  } else {
+    tryCatch({
+      dbGetQuery(dbObj, "select 1")
+      TRUE
+    }, error = function(e) {
+      print(e)
+      FALSE
+    })
+  }
 })
 
-clickhouse <- function() {
-  new("ClickhouseDriver")
-}
-
-
-
+#' @export
+#' @rdname ClickhouseConnection-class
 setMethod("dbListTables", "ClickhouseConnection", function(conn, ...) {
   as.character(dbGetQuery(conn, "SHOW TABLES")[[1]])
 })
 
-setMethod("dbExistsTable", "ClickhouseConnection", function(conn, name, ...) {
-  as.logical(name %in% dbListTables(conn))
+#' @export
+#' @rdname ClickhouseConnection-class
+setMethod("dbExistsTable", c("ClickhouseConnection", "character"), function(conn, name, ...) {
+  qname <- dbQuoteIdentifier(conn, name)
+  #NOTE: must match on quoted names, since the name argument may already be quoted
+  as.logical(qname %in% dbQuoteIdentifier(conn, dbListTables(conn)))
 })
 
-setMethod("dbReadTable", "ClickhouseConnection", function(conn, name, ...) {
-  dbGetQuery(conn, paste0("SELECT * FROM ", name))
+#' @export
+#' @rdname ClickhouseConnection-class
+setMethod("dbReadTable", c("ClickhouseConnection", "character"), function(conn, name, ...) {
+  qname <- dbQuoteIdentifier(conn, name)
+  dbGetQuery(conn, paste0("SELECT * FROM ", qname))
 })
 
-setMethod("dbRemoveTable", "ClickhouseConnection", function(conn, name, ...) {
-  dbExecute(conn, paste0("DROP TABLE ", name))
+#' @export
+#' @rdname ClickhouseConnection-class
+setMethod("dbRemoveTable",c("ClickhouseConnection", "character"), function(conn, name, ...) {
+  qname <- dbQuoteIdentifier(conn, name)
+  dbExecute(conn, paste0("DROP TABLE ", qname))
   invisible(TRUE)
 })
 
-#' @importFrom data.table fread
-setMethod("dbSendQuery", "ClickhouseConnection", function(conn, statement, use = c("memory", "temp"), ...) {
-  # with use = "temp" we try to avoid exception with long vectors conversion in rawToChar
-  # <simpleError in rawToChar(req$content): long vectors are not supported yet: raw.c:68>
-  use <- match.arg(use)
+#' @export
+#' @rdname ClickhouseConnection-class
+setMethod("dbListFields", c("ClickhouseConnection", "character"), function(conn, name, ...) {
+  qname <- dbQuoteIdentifier(conn, name)
+  dbGetQuery(conn, paste0("DESCRIBE TABLE ", qname))$name
+})
 
-  q <- sub("[; ]*;\\s*$", "", statement, ignore.case=T, perl=T)
-  has_resultset <- grepl("^\\s*(SELECT|SHOW)\\s+", statement, perl=T, ignore.case=T)
-
-  if (has_resultset) {
-    if ( grepl(".*FORMAT\\s+\\w+\\s*$", statement, perl=T, ignore.case=T)) {
-      stop("Can't have FORMAT keyword in queries, query ", statement)
-    }
-    q <- paste0(q ," FORMAT TabSeparatedWithNames")
-  }
-
-  h <- curl::new_handle(CONNECTTIMEOUT = 60)
-  curl::handle_setopt(h, copypostfields = q)
-
-  if (use == "memory") {
-    req <- curl::curl_fetch_memory(conn@url, handle = h)
-  } else {
-    tmp <- tempfile()
-    req <- curl::curl_fetch_disk(conn@url, tmp, handle = h)
-  }
-
-  if (req$status_code != 200) {
-    if (use == "memory") {
-      stop(rawToChar(req$content))
-    } else {
-      stop(readLines(tmp))
-    }
-  }
-
-  dataenv <- new.env(parent = emptyenv())
-  if (has_resultset) {
-    # try to avoid problems when select just one column that can contain ""
-    # without "blank.lines.skip" we'll get warning:
-    # Stopped reading at empty line ... but text exists afterwards (discarded): ...
-    # and not all rows will be read
-    if (use == "memory") {
-      dataenv$data <- data.table::fread(rawToChar(req$content), sep="\t", header=TRUE,
-                                        showProgress=FALSE,
-                                        blank.lines.skip = TRUE)
-    } else {
-      dataenv$data <- data.table::fread(tmp, sep = "\t", header = TRUE,
-                                        showProgress = FALSE,
-                                        blank.lines.skip = TRUE)
-      unlink(tmp)
-    }
-  }
-  dataenv$success <- TRUE
-
-  dataenv$delivered <- -1
-  dataenv$open <- TRUE
-  dataenv$rows <- nrow(dataenv$data)
-
-  new("ClickhouseResult",
+#' @export
+#' @rdname ClickhouseConnection-class
+setMethod("dbSendQuery", c("ClickhouseConnection", "character"), function(conn, statement, ...) {
+  res <- clckhs::select(conn@ptr, statement);
+  return(new("ClickhouseResult",
       sql = statement,
-      env = dataenv,
-      conn = conn
-  )
+      env = new.env(parent = emptyenv()),   #TODO: set env
+      conn = conn,
+      ptr = res
+  ))
 })
 
 setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "character", value = "ANY"), definition = function(conn, name, value, overwrite=FALSE,
@@ -145,7 +122,7 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
     stop("Setting both overwrite and append to TRUE makes no sense.")
   }
 
-  qname <- name
+  qname <- dbQuoteIdentifier(conn, name)
 
   if (dbExistsTable(conn, qname)) {
     if (overwrite) dbRemoveTable(conn, qname)
@@ -170,40 +147,79 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
     for (c in names(classes[classes=="factor"])) {
       levels(value[[c]]) <- enc2utf8(levels(value[[c]]))
     }
-    write.table(value, textConnection("value_str", open="w"), sep="\t", row.names=F, col.names=F)
-    value_str2 <- paste0(get("value_str"), collapse="\n")
 
-    h <- curl::new_handle()
-    curl::handle_setopt(h, copypostfields = value_str2)
-    req <- curl::curl_fetch_memory(paste0(conn@url, "?query=",URLencode(paste0("INSERT INTO ", qname, " FORMAT TabSeparated"))), handle = h)
-    if (req$status_code != 200) {
-      stop("Error writing data to table ", rawToChar(req$content))
-    }
+    clckhs::insert(conn@ptr, qname, value);
   }
 
   return(invisible(TRUE))
   })
 
-setMethod("dbDataType", signature(dbObj="ClickhouseConnection", obj = "ANY"), definition = function(dbObj,
-                                                                                                    obj, ...) {
-  if (is.logical(obj)) "UInt8"
-  else if (is.integer(obj)) "Int32"
-  else if (is.numeric(obj)) "Float64"
-  else "String"
+#' @export
+#' @rdname ClickhouseConnection-class
+setMethod("dbDataType", signature(dbObj="ClickhouseConnection", obj = "ANY"), definition = function(dbObj, obj, ...) {
+  dbDataType(clickhouse(), obj)
 }, valueClass = "character")
 
+#' @export
+#' @rdname ClickhouseConnection-class
+setMethod("dbQuoteIdentifier", c("ClickhouseConnection", "character"),
+  function(conn, x, ...) {
+    if (anyNA(x)) {
+      stop("Input to dbQuoteIdentifier must not contain NA.")
+    } else {
+      x <- gsub('\\', '\\\\', x, fixed = TRUE)
+      x <- gsub('`', '\\`', x, fixed = TRUE)
+      SQL(paste0('`', x, '`'))
+    }
+  }
+)
+
+#' @export
+#' @rdname ClickhouseConnection-class
+setMethod("dbQuoteIdentifier", c("ClickhouseConnection", "SQL"),
+  function(conn, x, ...) { x })
+
+#' @export
+#' @rdname ClickhouseConnection-class
+setMethod("dbQuoteString", c("ClickhouseConnection", "character"),
+  function(conn, x, ...) {
+      x <- gsub('\\', '\\\\', x, fixed = TRUE)
+      x <- gsub("'", "\\'", x, fixed = TRUE)
+      SQL(ifelse(is.na(x), "NULL", paste0("'", x, "'")))
+  }
+)
+
+#' @export
+#' @rdname ClickhouseConnection-class
+setMethod("dbQuoteString", c("ClickhouseConnection", "SQL"),
+  function(conn, x, ...) { x })
+
+#' @export
+#' @rdname ClickhouseConnection-class
 setMethod("dbBegin", "ClickhouseConnection", definition = function(conn, ...) {
   stop("Transactions are not supported.")
 })
 
+#' @export
+#' @rdname ClickhouseConnection-class
 setMethod("dbCommit", "ClickhouseConnection", definition = function(conn, ...) {
   stop("Transactions are not supported.")
 })
 
+#' @export
+#' @rdname ClickhouseConnection-class
 setMethod("dbRollback", "ClickhouseConnection", definition = function(conn, ...) {
   stop("Transactions are not supported.")
 })
 
+#' Close the database connection
+#' @export
+#' @rdname ClickhouseConnection-class
 setMethod("dbDisconnect", "ClickhouseConnection", function(conn, ...) {
+  if (!clckhs::validPtr(conn@ptr)) {
+    warning("Connection is already disconnected.")
+  } else {
+    clckhs::disconnect(conn@ptr)
+  }
   invisible(TRUE)
 })

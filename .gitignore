@@ -2,3 +2,8 @@ packrat/lib*/
 .Rproj.user
 .RData
 .Rhistory
+*.o
+*.so
+*_RcppExports.h
+CMakeFiles/
+CMakeCache.txt

@@ -10,75 +10,67 @@ setClass("ClickhouseResult",
   slots = list(
     sql = "character",
     env = "environment",
-    conn = "ClickhouseConnection"
+    conn = "ClickhouseConnection",
+    ptr = "externalptr"
   )
 )
 
 #' @rdname ClickhouseResult-class
 #' @export
-setMethod("fetch", signature(res = "ClickhouseResult", n = "numeric"), definition = function(res, n, ...) {
-  if (!dbIsValid(res) || dbHasCompleted(res)) {
-    stop("Cannot fetch results from exhausted, closed or invalid response.")
-  }
-  if (n == 0) {
-    stop("Fetch 0 rows? Really?")
-  }
-  if (res@env$delivered < 0) {
-    res@env$delivered <- 0
-  }
-  if (res@env$delivered >= res@env$rows) {
-    return(res@env$data[F,, drop=F])
-  }
-  if (n > -1) {
-    n <- min(n, res@env$rows - res@env$delivered)
-    res@env$delivered <- res@env$delivered + n
-    return(res@env$data[(res@env$delivered - n + 1):(res@env$delivered),, drop=F])
-  }
-  else {
-    start <- res@env$delivered + 1
-    res@env$delivered <- res@env$rows
-    return(res@env$data[start:res@env$rows,, drop=F])
-  }
-})
-
-#' @rdname ClickhouseResult-class
-#' @export
-setMethod("dbGetRowsAffected", "ClickhouseResult", definition = function(res, ...) {
-  as.numeric(NA)
+setMethod("dbFetch", signature = "ClickhouseResult", definition = function(res, n = -1, ...) {
+  return(clckhs::fetch(res@ptr, n))
 })
 
 #' @rdname ClickhouseResult-class
 #' @export
 setMethod("dbClearResult", "ClickhouseResult", definition = function(res, ...) {
-  res@env$open <- FALSE
+  if (!clckhs::validPtr(res@ptr)) {
+    warning("Result has already been cleared.")
+  } else {
+    clckhs::clearResult(res@ptr)
+  }
   invisible(TRUE)
 })
 
 #' @rdname ClickhouseResult-class
 #' @export
 setMethod("dbHasCompleted", "ClickhouseResult", definition = function(res, ...) {
-  res@env$delivered >= res@env$rows
-})
-
-
-#' @rdname ClickhouseResult-class
-#' @export
-setMethod("dbIsValid", "ClickhouseResult", function(dbObj, ...) {
-  dbObj@env$success && dbObj@env$open
+  clckhs::hasCompleted(res@ptr)
 })
 
 #' @rdname ClickhouseResult-class
 #' @inheritParams DBI::dbGetStatement
 #' @export
 setMethod("dbGetStatement", "ClickhouseResult", function(res, ...) {
-  dbIsValid(res)
-  res@sql
+  clckhs::getStatement(res@ptr)
+})
+
+#' @rdname ClickhouseResult-class
+#' @export
+setMethod("dbIsValid", "ClickhouseResult", function(dbObj, ...) {
+  clckhs::validPtr(dbObj@ptr)
 })
 
 #' @rdname ClickhouseResult-class
 #' @inheritParams DBI::dbGetRowCount
 #' @export
 setMethod("dbGetRowCount", "ClickhouseResult", function(res, ...) {
-  dbIsValid(res)
-  res@env$rows
+  clckhs::getRowCount(res@ptr)
+})
+
+#' @rdname ClickhouseResult-class
+#' @export
+setMethod("dbGetRowsAffected", "ClickhouseResult", definition = function(res, ...) {
+  clckhs::getRowsAffected(res@ptr)
+})
+
+#' @rdname ClickhouseResult-class
+#' @export
+setMethod("dbColumnInfo", "ClickhouseResult", definition = function(res, ...) {
+  df <- dbFetch(res, 0)
+  data.frame(
+    name = colnames(df),
+    field.type = clckhs::resultTypes(res@ptr),
+    data.type = sapply(df, class)
+  )
 })
