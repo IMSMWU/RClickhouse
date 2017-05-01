@@ -1,0 +1,18 @@
+language: r
+cache: packages
+dist: precise
+sudo: false
+
+addons:
+  apt:
+    packages:
+      - clickhouse-server-common
+    sources:
+    - sourceline: 'deb http://repo.yandex.ru/clickhouse/trusty stable main'
+
+services: clickhouse-server
+
+r_github_packages:
+  - rstats-db/DBI
+  - hadley/dbplyr
+
