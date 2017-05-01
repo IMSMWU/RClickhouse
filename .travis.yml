@@ -6,6 +6,7 @@ sudo: false
 addons:
   apt:
     packages:
+      - clickhouse-server-base
       - clickhouse-server-common
     sources:
     - sourceline: 'deb http://repo.yandex.ru/clickhouse/trusty stable main'
