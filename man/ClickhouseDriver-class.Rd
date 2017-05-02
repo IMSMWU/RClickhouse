@@ -5,6 +5,7 @@
 \alias{ClickhouseDriver-class}
 \alias{clickhouse}
 \alias{show,ClickhouseDriver-method}
+\alias{dbGetInfo,ClickhouseDriver-method}
 \alias{dbIsValid,ClickhouseDriver-method}
 \alias{dbUnloadDriver,ClickhouseDriver-method}
 \alias{dbConnect,ClickhouseDriver-method}
@@ -14,6 +15,8 @@
 clickhouse()
 
 \S4method{show}{ClickhouseDriver}(object)
+
+\S4method{dbGetInfo}{ClickhouseDriver}(dbObj, ...)
 
 \S4method{dbIsValid}{ClickhouseDriver}(dbObj, ...)
 
