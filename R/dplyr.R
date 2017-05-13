@@ -96,3 +96,43 @@ db_copy_to.ClickhouseConnection <- function(con, table, values,
 
   table
 }
+
+#############
+##  JOINS  ##
+#############
+
+#' @export
+sql_join.ClickhouseConnection <- function(con, x, y, vars, type = "inner", by = NULL, ...) {
+  JOIN <- switch(
+    type,
+    left = dbplyr::sql("LEFT JOIN"),
+    inner = dbplyr::sql("INNER JOIN"),
+    right = dbplyr::sql("RIGHT JOIN"),
+    full = dbplyr::sql("FULL JOIN"),
+    stop("Unknown join type:", type, call. = FALSE)
+  )
+
+  select <- dbplyr::sql_vector(c(
+    dbplyr:::sql_as(con, names(vars$x), vars$x, table = "TBL_LEFT"),
+    sql_as(con, names(vars$y), vars$y, table = "TBL_RIGHT")
+  ), collapse = ", ", parens = FALSE)
+
+  on <- sql_vector(
+    paste0(
+      dbplyr:::sql_table_prefix(con, by$x, "TBL_LEFT"),
+      " = ",
+      dbplyr:::sql_table_prefix(con, by$y, "TBL_RIGHT")
+    ),
+    collapse = " AND ",
+    parens = TRUE
+  )
+
+  # Wrap with SELECT since callers assume a valid query is returned
+  dbplyr::build_sql(
+    "SELECT ", select, "\n",
+    "  FROM ", x, "\n",
+    "  ALL ", JOIN, " ", y, "\n",
+    "  ON ", on, "\n",
+    con = con
+  )
+}
