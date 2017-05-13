@@ -107,16 +107,10 @@ sql_join.ClickhouseConnection <- function(con, x, y, vars, type = "inner", by = 
     type,
     left = dbplyr::sql("LEFT JOIN"),
     inner = dbplyr::sql("INNER JOIN"),
-    right = dbplyr::sql("LEFT JOIN"),
+    right = dbplyr::sql("RIGHT JOIN"),
+    full = dbplyr::sql("FULL JOIN"),
     stop("Unknown join type:", type, call. = FALSE)
   )
-
-  # swap x and y to create a left join
-  if(type == "right"){
-    tmp <- x
-    x <- y
-    y <- tmp
-  }
 
   select <- dbplyr::sql_vector(c(
     dbplyr:::sql_as(con, names(vars$x), vars$x, table = "TBL_LEFT"),
