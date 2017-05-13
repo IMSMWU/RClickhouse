@@ -108,7 +108,6 @@ sql_join.ClickhouseConnection <- function(con, x, y, vars, type = "inner", by = 
     left = dbplyr::sql("LEFT JOIN"),
     inner = dbplyr::sql("INNER JOIN"),
     right = dbplyr::sql("RIGHT JOIN"),
-    full = dbplyr::sql("FULL JOIN"),
     stop("Unknown join type:", type, call. = FALSE)
   )
 
