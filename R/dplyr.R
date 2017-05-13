@@ -116,22 +116,20 @@ sql_join.ClickhouseConnection <- function(con, x, y, vars, type = "inner", by = 
     sql_as(con, names(vars$y), vars$y, table = "TBL_RIGHT")
   ), collapse = ", ", parens = FALSE)
 
-  on <- sql_vector(
-    paste0(
-      dbplyr:::sql_table_prefix(con, by$x, "TBL_LEFT"),
-      " = ",
-      dbplyr:::sql_table_prefix(con, by$y, "TBL_RIGHT")
-    ),
-    collapse = " AND ",
-    parens = TRUE
-  )
+  # check if same columns are used
+  if( !(by$x %in% by$y) || !(by$y %in% by$x) ){
+    stop("clickhouse does not support the ON keyword and using is used instead,
+         so columns must have the same name")
+  }
+
+  using_columns <- dbplyr::sql_vector(union(by$x, by$y), collapse = ", ")
 
   # Wrap with SELECT since callers assume a valid query is returned
   dbplyr::build_sql(
     "SELECT ", select, "\n",
     "  FROM ", x, "\n",
     "  ALL ", JOIN, " ", y, "\n",
-    "  ON ", on, "\n",
+    "  USING ", using_columns, "\n",
     con = con
   )
 }
