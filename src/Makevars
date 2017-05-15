@@ -1,5 +1,9 @@
+ifeq ($(OS), Windows_NT)
+    SYS_FLAGS = -D_WIN32_WINNT=0x0600
+endif
+
 # combine with standard arguments for R
-PKG_CPPFLAGS = -I. -I../inst/include -I./vendor/clickhouse-cpp -I./vendor/clickhouse-cpp/contrib -std=c++11
+PKG_CPPFLAGS = $(SYS_FLAGS) -I. -I../inst/include -I./vendor/clickhouse-cpp -I./vendor/clickhouse-cpp/contrib -std=c++11
 CXX_STD = CXX11
 
 OBJ_FILES = \
@@ -24,6 +28,10 @@ vendor/clickhouse-cpp/contrib/cityhash/city.o \
 vendor/clickhouse-cpp/contrib/lz4/lz4.o \
 vendor/clickhouse-cpp/contrib/lz4/lz4hc.o
 
-PKG_LIBS = -std=c++11 -lpthread -fPIC $(OBJ_FILES)
+ifeq ($(OS), Windows_NT)
+    SYS_LIBS = -lws2_32
+endif
+
+PKG_LIBS = -g -std=c++11 -fPIC $(OBJ_FILES) -lpthread $(SYS_LIBS)
 
 $(SHLIB): $(OBJ_FILES)
