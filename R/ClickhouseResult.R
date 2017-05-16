@@ -18,6 +18,11 @@ setClass("ClickhouseResult",
 #' @rdname ClickhouseResult-class
 #' @export
 setMethod("dbFetch", signature = "ClickhouseResult", definition = function(res, n = -1, ...) {
+  if (length(n) > 1) stop("n must be integer")
+  if (is.infinite(n)) n <- -1
+  if (n != as.integer(n) || (n < 0 && n != -1)) {
+    stop("n must be a positive integer, -1 or Inf")
+  }
   return(clckhs::fetch(res@ptr, n))
 })
 

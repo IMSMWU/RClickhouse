@@ -73,6 +73,10 @@ setMethod("dbConnect", "ClickhouseDriver", function(drv, host="localhost", port 
 #' @export
 #' @rdname ClickhouseDriver-class
 setMethod("dbDataType", signature(dbObj="ClickhouseDriver", obj = "ANY"), definition = function(dbObj, obj, ...) {
+  if (is.null(obj) || all(is.na(obj))) {
+    stop("Invalid argument to dbDataType: must not be NULL or all NA")
+  }
+
   if (is.logical(obj)) t <- "UInt8"
   else if (is.integer(obj)) t <- "Int32"
   else if (is.numeric(obj)) t <- "Float64"
