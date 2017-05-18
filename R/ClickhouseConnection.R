@@ -109,7 +109,7 @@ setMethod("dbSendQuery", c("ClickhouseConnection", "character"), function(conn, 
 })
 
 setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "character", value = "ANY"), definition = function(conn, name, value, overwrite=FALSE,
-                                                                                                                             append=FALSE, engine="TinyLog", ...) {
+                                                                                                                             append=FALSE, engine="TinyLog", field.types=NULL, ...) {
   if (is.vector(value) && !is.list(value)) value <- data.frame(x = value, stringsAsFactors = F)
   if (length(value) < 1) stop("value must have at least one column")
   if (is.null(names(value))) names(value) <- paste("V", 1:length(value), sep='')
@@ -120,6 +120,9 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
   }
   if (overwrite && append) {
     stop("Setting both overwrite and append to TRUE makes no sense.")
+  }
+  if (!is.null(field.types) && (length(field.types) != length(value) || !is.character(field.types))) {
+    stop("field.types, if given, must be a string vector with one entry per data columns")
   }
 
   qname <- dbQuoteIdentifier(conn, name)
@@ -132,8 +135,10 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
   }
 
   if (!dbExistsTable(conn, qname)) {
-    fts <- sapply(value, dbDataType, dbObj=conn)
-    fdef <- paste(names(value), fts, collapse=', ')
+    if (is.null(field.types)) {
+      field.types <- sapply(value, dbDataType, dbObj=conn)
+    }
+    fdef <- paste(names(value), field.types, collapse=', ')
     ct <- paste0("CREATE TABLE ", qname, " (", fdef, ") ENGINE=", engine)
     dbExecute(conn, ct)
   }
