@@ -170,7 +170,8 @@ template<typename CT, typename VT>
 std::shared_ptr<CT> vecToString(SEXP v, std::shared_ptr<ColumnUInt8> nullCol = nullptr) {
   auto col = std::make_shared<CT>();
   switch(TYPEOF(v)) {
-    case INTSXP: {
+    case INTSXP:
+    case STRSXP: {
       auto sv = as<StringVector>(v);
       if(nullCol) {
         for(auto e : sv) {
