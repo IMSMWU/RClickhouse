@@ -76,9 +76,33 @@ setMethod("dbExistsTable", c("ClickhouseConnection", "character"), function(conn
 
 #' @export
 #' @rdname ClickhouseConnection-class
-setMethod("dbReadTable", c("ClickhouseConnection", "character"), function(conn, name, ...) {
+setMethod("dbReadTable", c("ClickhouseConnection", "character"), function(conn, name, row.names = NA, ...) {
+  if ((!is.na(row.names) && !is.logical(row.names) && !is.character(row.names)) || length(row.names) != 1) {
+    stop("row.names must be NA, logical, or a string")
+  }
+
   qname <- dbQuoteIdentifier(conn, name)
-  dbGetQuery(conn, paste0("SELECT * FROM ", qname))
+  df <- dbGetQuery(conn, paste0("SELECT * FROM ", qname))
+
+  rownames.col <- NA
+  if (!is.na(row.names) && row.names == FALSE) {
+    rownames(df) <- c()
+  } else if (is.na(row.names) || row.names == TRUE) {
+    rownames.col <- "row_names"
+  } else if (is.character(row.names)) {
+    rownames.col <- row.names
+  }
+
+  if (!is.na(rownames.col)) {
+    if (rownames.col %in% colnames(df)) {
+      rownames(df) <- df[[rownames.col]]
+    } else if (!is.na(row.names) && (row.names == TRUE || is.character(row.names))) {
+      stop(paste0("attempting to read row names from column ", rownames.col,
+                  ", which does not exist in table ", qname))
+    }
+  }
+
+  return(df)
 })
 
 #' @export
@@ -172,7 +196,7 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
   }
 
   return(invisible(TRUE))
-  })
+})
 
 #' @export
 #' @rdname ClickhouseConnection-class

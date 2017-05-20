@@ -33,7 +33,8 @@
 
 \S4method{dbExistsTable}{ClickhouseConnection,character}(conn, name, ...)
 
-\S4method{dbReadTable}{ClickhouseConnection,character}(conn, name, ...)
+\S4method{dbReadTable}{ClickhouseConnection,character}(conn, name,
+  row.names = NA, ...)
 
 \S4method{dbRemoveTable}{ClickhouseConnection,character}(conn, name, ...)
 
