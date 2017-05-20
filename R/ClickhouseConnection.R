@@ -109,7 +109,7 @@ setMethod("dbSendQuery", c("ClickhouseConnection", "character"), function(conn, 
 })
 
 setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "character", value = "ANY"), definition = function(conn, name, value, overwrite=FALSE,
-                                                                                                                             append=FALSE, engine="TinyLog", field.types=NULL, ...) {
+                                                                                                                             append=FALSE, engine="TinyLog", row.names=NA, field.types=NULL, ...) {
   if (is.vector(value) && !is.list(value)) value <- data.frame(x = value, stringsAsFactors = F)
   if (length(value) < 1) stop("value must have at least one column")
   if (is.null(names(value))) names(value) <- paste("V", 1:length(value), sep='')
@@ -124,6 +124,9 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
   if (!is.null(field.types) && (length(field.types) != length(value) || !is.character(field.types))) {
     stop("field.types, if given, must be a string vector with one entry per data columns")
   }
+  if ((!is.na(row.names) && !is.logical(row.names) && !is.character(row.names)) || length(row.names) != 1) {
+    stop("row.names must be NA, logical, or a string")
+  }
 
   qname <- dbQuoteIdentifier(conn, name)
 
@@ -134,9 +137,21 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
                                     existing table.")
   }
 
+  rownames.col <- NA
+  if ((!is.na(row.names) && row.names == TRUE) || (is.na(row.names) && .row_names_info(value) >= 0)) {
+    rownames.col <- "row_names"
+  } else if (is.character(row.names)) {
+    rownames.col <- row.names
+  }
+  if (!is.na(rownames.col)) {
+    value[rownames.col] <- as.character(rownames(value))
+  }
+
   if (!dbExistsTable(conn, qname)) {
     if (is.null(field.types)) {
       field.types <- sapply(value, dbDataType, dbObj=conn)
+    } else if (!is.na(rownames.col)) {
+      field.types <- append(field.types, "String")
     }
     fdef <- paste(names(value), field.types, collapse=', ')
     ct <- paste0("CREATE TABLE ", qname, " (", fdef, ") ENGINE=", engine)
