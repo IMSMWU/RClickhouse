@@ -97,6 +97,8 @@ db_copy_to.ClickhouseConnection <- function(con, table, values,
   table
 }
 
+#' @export
+#' @importFrom dbplyr sql_escape_logical
 sql_escape_logical.ClickhouseConnection <- function(con, x) {
   if(is.na(x)) {
     return("NULL")
