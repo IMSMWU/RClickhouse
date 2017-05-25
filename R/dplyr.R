@@ -96,3 +96,11 @@ db_copy_to.ClickhouseConnection <- function(con, table, values,
 
   table
 }
+
+sql_escape_logical.ClickhouseConnection <- function(con, x) {
+  if(is.na(x)) {
+    return("NULL")
+  } else {
+    return(as.character(as.integer(x)))
+  }
+}
