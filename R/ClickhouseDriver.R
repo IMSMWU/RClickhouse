@@ -60,7 +60,9 @@ setMethod("dbUnloadDriver", "ClickhouseDriver", function(drv, ...) {
 #' @param compression the compression method for the connection (lz4 by default).
 #' @return A database connection.
 #' @examples
+#' \dontrun{
 #' conn <- dbConnect(clckhs::clickhouse(), host="localhost")
+#' }
 setMethod("dbConnect", "ClickhouseDriver", function(drv, host="localhost", port = 9000, db = "default", user = "default", password = "", compression = "lz4", ...) {
   ptr <- clckhs::connect(host, port, db, user, password, compression)
   reg.finalizer(ptr, function(p) {
