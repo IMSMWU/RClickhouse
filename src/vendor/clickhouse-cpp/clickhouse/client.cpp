@@ -1,9 +1,11 @@
 #include "client.h"
 #include "protocol.h"
-#include "wire_format.h"
 
 #include "base/coded.h"
+#include "base/compressed.h"
 #include "base/socket.h"
+#include "base/wire_format.h"
+
 #include "columns/factory.h"
 
 #include <cityhash/city.h>
@@ -12,8 +14,8 @@
 #include <assert.h>
 #include <atomic>
 #include <system_error>
+#include <thread>
 #include <vector>
-#include <iostream>
 
 #define DBMS_NAME                                       "ClickHouse"
 #define DBMS_VERSION_MAJOR                              1
@@ -26,8 +28,6 @@
 #define DBMS_MIN_REVISION_WITH_CLIENT_INFO              54032
 #define DBMS_MIN_REVISION_WITH_SERVER_TIMEZONE          54058
 #define DBMS_MIN_REVISION_WITH_QUOTA_KEY_IN_CLIENT_INFO 54060
-
-#define DBMS_MAX_COMPRESSED_SIZE                        0x40000000ULL   // 1GB
 
 namespace clickhouse {
 
@@ -66,6 +66,8 @@ public:
 
     void Ping();
 
+    void ResetConnection();
+
 private:
     bool Handshake();
 
@@ -94,6 +96,10 @@ private:
         socket_.Close();
     }
 
+    /// In case of network errors tries to reconnect to server and
+    /// call fuc several times.
+    void RetryGuard(std::function<void()> fuc);
+
 private:
     class EnsureNull {
     public:
@@ -119,7 +125,6 @@ private:
 
     const ClientOptions options_;
     QueryEvents* events_;
-    uint64_t query_id_;
     int compression_ = CompressionState::Disable;
 
     SocketHolder socket_;
@@ -144,7 +149,6 @@ static uint64_t GenerateQueryId() {
 Client::Impl::Impl(const ClientOptions& opts)
     : options_(opts)
     , events_(nullptr)
-    , query_id_(GenerateQueryId())
     , socket_(SocketConnect(NetworkAddress(opts.host, std::to_string(opts.port))))
     , socket_input_(socket_)
     , buffered_input_(&socket_input_)
@@ -173,7 +177,9 @@ Client::Impl::~Impl() {
 void Client::Impl::ExecuteQuery(Query query) {
     EnsureNull en(static_cast<QueryEvents*>(&query), &events_);
 
-    // TODO check connection
+    if (options_.ping_before_query) {
+        RetryGuard([this]() { Ping(); });
+    }
 
     SendQuery(query.GetText());
 
@@ -183,7 +189,9 @@ void Client::Impl::ExecuteQuery(Query query) {
 }
 
 void Client::Impl::Insert(const std::string& table_name, const Block& block) {
-    // TODO check connection
+    if (options_.ping_before_query) {
+        RetryGuard([this]() { Ping(); });
+    }
 
     SendQuery("INSERT INTO " + table_name + " VALUES");
 
@@ -219,7 +227,30 @@ void Client::Impl::Ping() {
     WireFormat::WriteUInt64(&output_, ClientCodes::Ping);
     output_.Flush();
 
-    ReceivePacket();
+    uint64_t server_packet;
+    const bool ret = ReceivePacket(&server_packet);
+
+    if (!ret || server_packet != ServerCodes::Pong) {
+        throw std::runtime_error("fail to ping server");
+    }
+}
+
+void Client::Impl::ResetConnection() {
+    SocketHolder s(SocketConnect(NetworkAddress(options_.host, std::to_string(options_.port))));
+
+    if (s.Closed()) {
+        throw std::system_error(errno, std::system_category());
+    }
+
+    socket_ = std::move(s);
+    socket_input_ = SocketInput(socket_);
+    socket_output_ = SocketOutput(socket_);
+    buffered_input_.Reset();
+    buffered_output_.Reset();
+
+    if (!Handshake()) {
+        throw std::runtime_error("fail to connect to " + options_.host);
+    }
 }
 
 bool Client::Impl::Handshake() {
@@ -398,62 +429,11 @@ bool Client::Impl::ReceiveData() {
     }
 
     if (compression_ == CompressionState::Enable) {
-        uint128 hash;
-        uint32_t compressed = 0;
-        uint32_t original = 0;
-        uint8_t method = 0;
+        CompressedInput compressed(&input_);
+        CodedInputStream coded(&compressed);
 
-        if (!WireFormat::ReadFixed(&input_, &hash)) {
+        if (!ReadBlock(&block, &coded)) {
             return false;
-        }
-        if (!WireFormat::ReadFixed(&input_, &method)) {
-            return false;
-        }
-
-        if (method != 0x82) {
-            throw std::runtime_error("unsupported compression method " +
-                                     std::to_string(int(method)));
-        } else {
-            if (!WireFormat::ReadFixed(&input_, &compressed)) {
-                return false;
-            }
-            if (!WireFormat::ReadFixed(&input_, &original)) {
-                return false;
-            }
-
-            if (compressed > DBMS_MAX_COMPRESSED_SIZE) {
-                throw std::runtime_error("compressed data too big");
-            }
-
-            Buffer buf(original);
-            Buffer tmp(compressed);
-
-            // Заполнить заголовок сжатых данных.
-            {
-                BufferOutput out(&tmp);
-                out.Write(&method,     sizeof(method));
-                out.Write(&compressed, sizeof(compressed));
-                out.Write(&original,   sizeof(original));
-            }
-
-            if (!WireFormat::ReadBytes(&input_, tmp.data() + 9, compressed - 9)) {
-                return false;
-            } else {
-                if (hash != CityHash128((const char*)tmp.data(), compressed)) {
-                    throw std::runtime_error("data was corrupted");
-                }
-            }
-
-            if (LZ4_decompress_fast((const char*)tmp.data() + 9, (char*)buf.data(), original) < 0) {
-                throw std::runtime_error("can't decompress data");
-            } else {
-                ArrayInput mem(buf.data(), original);
-                CodedInputStream coded(&mem);
-
-                if (!ReadBlock(&block, &coded)) {
-                    return false;
-                }
-            }
         }
     } else {
         if (!ReadBlock(&block, &input_)) {
@@ -512,7 +492,7 @@ bool Client::Impl::ReceiveException(bool rethrow) {
 
 void Client::Impl::SendQuery(const std::string& query) {
     WireFormat::WriteUInt64(&output_, ClientCodes::Query);
-    WireFormat::WriteString(&output_, std::to_string(query_id_));
+    WireFormat::WriteString(&output_, std::to_string(GenerateQueryId()));
 
     /// Client info.
     if (server_info_.revision >= DBMS_MIN_REVISION_WITH_CLIENT_INFO) {
@@ -683,6 +663,27 @@ bool Client::Impl::ReceiveHello() {
     return false;
 }
 
+void Client::Impl::RetryGuard(std::function<void()> func) {
+    for (int i = 0; i <= options_.send_retries; ++i) {
+        try {
+            func();
+            return;
+        } catch (const std::system_error&) {
+            bool ok = true;
+
+            try {
+                std::this_thread::sleep_for(options_.retry_timeout);
+                ResetConnection();
+            } catch (...) {
+                ok = false;
+            }
+
+            if (!ok) {
+                throw;
+            }
+        }
+    }
+}
 
 Client::Client(const ClientOptions& opts)
     : options_(opts)
@@ -711,6 +712,10 @@ void Client::Insert(const std::string& table_name, const Block& block) {
 
 void Client::Ping() {
     impl_->Ping();
+}
+
+void Client::ResetConnection() {
+    impl_->ResetConnection();
 }
 
 }

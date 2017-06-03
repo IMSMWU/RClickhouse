@@ -20,6 +20,7 @@ vendor/clickhouse-cpp/clickhouse/base/socket.o \
 vendor/clickhouse-cpp/clickhouse/base/input.o \
 vendor/clickhouse-cpp/clickhouse/base/output.o \
 vendor/clickhouse-cpp/clickhouse/base/coded.o \
+vendor/clickhouse-cpp/clickhouse/base/compressed.o \
 vendor/clickhouse-cpp/clickhouse/client.o \
 vendor/clickhouse-cpp/clickhouse/types/types.o \
 vendor/clickhouse-cpp/clickhouse/types/type_parser.o \

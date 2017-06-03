@@ -44,6 +44,7 @@ protected:
  */
 class ArrayInput : public ZeroCopyInput {
 public:
+     ArrayInput() noexcept;
      ArrayInput(const void* buf, size_t len) noexcept;
     ~ArrayInput() override;
 
@@ -80,6 +81,8 @@ class BufferedInput : public ZeroCopyInput {
 public:
      BufferedInput(InputStream* slave, size_t buflen = 8192);
     ~BufferedInput() override;
+
+    void Reset();
 
 protected:
     size_t DoRead(void* buf, size_t len) override;
