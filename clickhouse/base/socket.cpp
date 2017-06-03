@@ -134,8 +134,14 @@ SocketInput::~SocketInput() = default;
 size_t SocketInput::DoRead(void* buf, size_t len) {
     const ssize_t ret = ::recv(s_, (char*)buf, (int)len, 0);
 
-    if (ret >= 0) {
+    if (ret > 0) {
         return (size_t)ret;
+    }
+
+    if (ret == 0) {
+        throw std::system_error(
+            errno, std::system_category(), "closed"
+        );
     }
 
     throw std::system_error(
@@ -152,7 +158,13 @@ SocketOutput::SocketOutput(SOCKET s)
 SocketOutput::~SocketOutput() = default;
 
 void SocketOutput::DoWrite(const void* data, size_t len) {
-    if (::send(s_, (const char*)data, len, 0) != (int)len) {
+#if defined (_linux_)
+    static const int flags = MSG_NOSIGNAL;
+#else
+    static const int flags = 0;
+#endif
+
+    if (::send(s_, (const char*)data, len, flags) != (int)len) {
         throw std::system_error(
             errno, std::system_category(), "fail to send data"
         );

@@ -16,6 +16,11 @@ size_t ZeroCopyInput::DoRead(void* buf, size_t len) {
     return result;
 }
 
+ArrayInput::ArrayInput() noexcept
+    : data_(nullptr)
+    , len_(0)
+{
+}
 
 ArrayInput::ArrayInput(const void* buf, size_t len) noexcept
     : data_(static_cast<const uint8_t*>(buf))
@@ -44,6 +49,10 @@ BufferedInput::BufferedInput(InputStream* slave, size_t buflen)
 }
 
 BufferedInput::~BufferedInput() = default;
+
+void BufferedInput::Reset() {
+    array_input_.Reset(nullptr, 0);
+}
 
 size_t BufferedInput::DoNext(const void** ptr, size_t len)  {
     if (array_input_.Exhausted()) {
