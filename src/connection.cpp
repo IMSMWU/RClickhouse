@@ -88,8 +88,10 @@ void disconnect(XPtr<Client> conn) {
 XPtr<Result> select(XPtr<Client> conn, String query) {
   Result *r = new Result(query);
   //TODO: async?
-  conn->Select(query, [&r] (const Block& block) {
+
+  conn->SelectCancelable(query, [&r] (const Block& block) {
     r->addBlock(block);
+    return R_ToplevelExec(checkInterruptFn, NULL) != FALSE;
   });
 
   XPtr<Result> rp(r, true);
