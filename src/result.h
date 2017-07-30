@@ -53,7 +53,7 @@ class Result {
 
   // convert the given range of values from the column provided by colAcc to an
   // R vector and add it to the data frame df
-  void convertColumn(AccFunc colAcc, TypeAccFunc typeAcc, Rcpp::DataFrame &df,
+  void convertColumn(std::string name, AccFunc colAcc, TypeAccFunc typeAcc, Rcpp::DataFrame &df,
       size_t start, size_t len, AccFunc nullAcc = nullptr) const;
 
   // build a data frame containing n entries from the result set, starting at

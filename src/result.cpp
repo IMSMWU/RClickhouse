@@ -2,6 +2,13 @@
 
 #include "result.h"
 
+// helper function which emits an R warning without causing a longjmp
+// see https://stackoverflow.com/questions/24557711/how-to-generate-an-r-warning-safely-in-rcpp
+void warn(std::string text) {
+      Rcpp::Function warning("warning");
+      warning(text);
+}
+
 Result::Result(std::string stmt) {
   statement = stmt;
 }
@@ -87,7 +94,7 @@ void Result::convertTypedColumn(AccFunc colAcc, Rcpp::DataFrame &df,
   df.push_back(v);
 }
 
-void Result::convertColumn(AccFunc colAcc, TypeAccFunc typeAcc, Rcpp::DataFrame &df,
+void Result::convertColumn(std::string name, AccFunc colAcc, TypeAccFunc typeAcc, Rcpp::DataFrame &df,
     size_t start, size_t len, AccFunc nullAcc) const {
   using TC = ch::Type::Code;
   auto type = typeAcc(colTypes);
@@ -102,7 +109,8 @@ void Result::convertColumn(AccFunc colAcc, TypeAccFunc typeAcc, Rcpp::DataFrame 
       convertCol<ch::ColumnInt32, Rcpp::IntegerVector>(*this, colAcc, df, start, len, nullAcc);
       break;
     case TC::Int64:
-      convertCol<ch::ColumnInt64, Rcpp::IntegerVector>(*this, colAcc, df, start, len, nullAcc);
+      if(start == 0) warn("column "+name+" converted from Int64 to Numeric");
+      convertCol<ch::ColumnInt64, Rcpp::NumericVector>(*this, colAcc, df, start, len, nullAcc);
       break;
     case TC::UInt8:
       convertCol<ch::ColumnUInt8, Rcpp::IntegerVector>(*this, colAcc, df, start, len, nullAcc);
@@ -110,12 +118,16 @@ void Result::convertColumn(AccFunc colAcc, TypeAccFunc typeAcc, Rcpp::DataFrame 
     case TC::UInt16:
       convertCol<ch::ColumnUInt16, Rcpp::IntegerVector>(*this, colAcc, df, start, len, nullAcc);
       break;
-    case TC::UInt32:
-      convertCol<ch::ColumnUInt32, Rcpp::IntegerVector>(*this, colAcc, df, start, len, nullAcc);
+    case TC::UInt32: {
+      if(start == 0) warn("column "+name+" converted from UInt32 to Numeric");
+      convertCol<ch::ColumnUInt32, Rcpp::NumericVector>(*this, colAcc, df, start, len, nullAcc);
       break;
-    case TC::UInt64:
-      convertCol<ch::ColumnUInt64, Rcpp::IntegerVector>(*this, colAcc, df, start, len, nullAcc);
+    }
+    case TC::UInt64: {
+      if(start == 0) warn("column "+name+" converted from UInt64 to Numeric");
+      convertCol<ch::ColumnUInt64, Rcpp::NumericVector>(*this, colAcc, df, start, len, nullAcc);
       break;
+    }
     case TC::Float32:
       convertCol<ch::ColumnFloat32, Rcpp::NumericVector>(*this, colAcc, df, start, len, nullAcc);
       break;
@@ -135,7 +147,7 @@ void Result::convertColumn(AccFunc colAcc, TypeAccFunc typeAcc, Rcpp::DataFrame 
       convertCol<ch::ColumnDate, Rcpp::DateVector>(*this, colAcc, df, start, len, nullAcc);
       break;
     case TC::Nullable: {
-      convertColumn([&colAcc](const ColBlock &cb){return colAcc(cb)->As<ch::ColumnNullable>()->Nested();},
+      convertColumn(name, [&colAcc](const ColBlock &cb){return colAcc(cb)->As<ch::ColumnNullable>()->Nested();},
           [&typeAcc](const TypeList &tl){return typeAcc(tl)->GetNestedType();},
           df, start, len,
           [&colAcc](const ColBlock &cb){return colAcc(cb)->As<ch::ColumnNullable>();});
@@ -195,7 +207,7 @@ Rcpp::DataFrame Result::fetchFrame(ssize_t n) {
   Rcpp::DataFrame df;
 
   for(size_t i = 0; i < static_cast<size_t>(colNames.size()); i++) {
-    convertColumn([&i](const ColBlock &cb){return cb.columns[i];},
+    convertColumn(std::string(colNames[i]), [&i](const ColBlock &cb){return cb.columns[i];},
         [&i](const TypeList &tl){return tl[i];}, df, fetchedRows, nRows);
   }
 
