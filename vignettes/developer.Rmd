@@ -1,0 +1,7 @@
+# Developer Informations
+
+## Update Clickhouse-cpp dependencies
+
+```{bash}
+git subtree pull --prefix src/vendor/clickhouse-cpp/ https://github.com/artpaul/clickhouse-cpp.git master --squash
+```
