@@ -162,9 +162,6 @@ std::shared_ptr<ColumnDate> vecToScalar<ColumnDate, const std::time_t>(SEXP v,
       stop("cannot write R type "+std::to_string(TYPEOF(v))+
           " to column of type Date");
   }
-  for(size_t i = 0; i < col->Size(); i++) {
-    Rcout << "entry " << i << ": " << col->At(i) << std::endl;
-  }
   return col;
 }
 
