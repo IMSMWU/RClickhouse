@@ -13,64 +13,13 @@ Result::Result(std::string stmt) {
   statement = stmt;
 }
 
-// helper function for converting the column data (can't be a member of Result
-// due to C++ prohibiting explicit specialization on members of a
-// non-specialized class)
 template<typename CT, typename RT>
-inline void convertCol(const Result &r, Result::AccFunc colAcc, Rcpp::DataFrame &df,
-    size_t start, size_t len, Result::AccFunc nullAcc) {
-  r.convertTypedColumn<CT, RT>(colAcc, df, start, len,
-    [&nullAcc](const Result::ColBlock &cb, std::shared_ptr<const CT> in, RT &out,
-        size_t offset, size_t start, size_t end) {
-      for(size_t j = start; j < end; j++) {
-        if(nullAcc) {
-          std::shared_ptr<ch::ColumnNullable> nullCol = nullAcc(cb)->As<ch::ColumnNullable>();
-          // can't use the ternary operator here, since that would require explicit
-          // conversion from the Clickhouse storage type (which is far messier)
-          if(nullCol->IsNull(j)) {
-            out[offset+j-start] = RT::get_na();
-          } else {
-            out[offset+j-start] = in->At(j);
-          }
-        } else {
-          out[offset+j-start] = in->At(j);
-        }
-      }
-    }
-  );
-}
-
-// Date requires specialization: otherwise causes problems due to type
-// ambiguities in the Rcpp::Date constructor, which expects either int or
-// double, whereas ColumnDate values are uint32_t
-template<>
-inline void convertCol<ch::ColumnDate, Rcpp::DateVector>(const Result &r,
-    Result::AccFunc colAcc, Rcpp::DataFrame &df, size_t start, size_t len,
-    Result::AccFunc nullAcc) {
-  using CT = ch::ColumnDate;
-  using RT = Rcpp::DateVector;
-  r.convertTypedColumn<CT, RT>(colAcc, df, start, len,
-    [&nullAcc](const Result::ColBlock &cb, std::shared_ptr<const CT> in, RT &out,
-        size_t offset, size_t start, size_t end) {
-      for(size_t j = start; j < end; j++) {
-        if(nullAcc) {
-          std::shared_ptr<ch::ColumnNullable> nullCol = nullAcc(cb)->As<ch::ColumnNullable>();
-          out[offset+j-start] = nullCol->IsNull(j) ? RT::get_na() : static_cast<int>(in->At(j)/(60*60*24));
-        } else {
-          out[offset+j-start] = static_cast<int>(in->At(j)/(60*60*24));
-        }
-      }
-    }
-  );
-}
-
-template<typename CT, typename RT>
-void Result::convertTypedColumn(AccFunc colAcc, Rcpp::DataFrame &df,
+void Result::convertTypedColumn(AccFunc colAcc, Rcpp::List &df,
     size_t start, size_t len,
     ConvertFunc<CT, RT> convFunc) const {
   RT v(len);   // R vector for the column
 
-  size_t i = 0;
+  size_t i = 0, offset = 0;
   for(const ColBlock &cb : columnBlocks) {
     const ch::ColumnRef col = colAcc(cb);
     if(i+col->Size() >= start) {  // only if this block was not fetched yet
@@ -83,7 +32,8 @@ void Result::convertTypedColumn(AccFunc colAcc, Rcpp::DataFrame &df,
       // guaranteed to be >=0, since the loop is aborted if i >= start+len
              localEnd = std::min(start+len-i, col->Size());
 
-      convFunc(cb, ccol, v, i, localStart, localEnd);
+      convFunc(cb, ccol, v, offset, localStart, localEnd);
+      offset += localEnd-localStart;
     }
 
     i += col->Size();
@@ -94,70 +44,147 @@ void Result::convertTypedColumn(AccFunc colAcc, Rcpp::DataFrame &df,
   df.push_back(v);
 }
 
-void Result::convertColumn(std::string name, AccFunc colAcc, TypeAccFunc typeAcc, Rcpp::DataFrame &df,
-    size_t start, size_t len, AccFunc nullAcc) const {
+// helper function for converting a sequence of scalar column entries (can't be
+// a member of Result due to C++ prohibiting explicit specialization on members
+// of a non-specialized class)
+template<typename CT, typename RT>
+void convertEntries(std::shared_ptr<const CT> in, NullCol nullCol, RT &out,
+    size_t offset, size_t start, size_t end) {
+  for(size_t j = start; j < end; j++) {
+    // can't use the ternary operator here, since that would require explicit
+    // conversion from the Clickhouse storage type (which is far messier)
+    if(nullCol && nullCol->IsNull(j)) {
+      out[offset+j-start] = RT::get_na();
+    } else {
+      out[offset+j-start] = in->At(j);
+    }
+  }
+}
+
+// Date requires specialization: otherwise causes problems due to type
+// ambiguities in the Rcpp::Date constructor, which expects either int or
+// double, whereas ColumnDate values are uint32_t
+template<>
+void convertEntries<ch::ColumnDate, Rcpp::DateVector>(std::shared_ptr<const ch::ColumnDate> in,
+    NullCol nullCol, Rcpp::DateVector &out, size_t offset, size_t start, size_t end) {
+  for(size_t j = start; j < end; j++) {
+    if(nullCol && nullCol->IsNull(j)) {
+      out[offset+j-start] = Rcpp::DateVector::get_na();
+    } else {
+      out[offset+j-start] = in->At(j);
+    }
+  }
+}
+
+template<typename CT, typename RT>
+class ScalarConverter : public Converter {
+  void processBlocks(Result &r, Result::AccFunc colAcc, Rcpp::List &target,
+      size_t start, size_t len, Result::AccFunc nullAcc) {
+    r.convertTypedColumn<CT, RT>(colAcc, target, start, len,
+        [&nullAcc](const Result::ColBlock &cb, std::shared_ptr<const CT> in,
+          RT &out, size_t offset, size_t start, size_t end) {
+      NullCol nullCol =
+        nullAcc ? nullAcc(cb)->As<ch::ColumnNullable>() : nullptr;
+      convertEntries<CT,RT>(in, nullCol, out, offset, start, end);
+    });
+  }
+  void processCol(ch::ColumnRef col, Rcpp::List &target, size_t targetIdx,
+      NullCol nullCol) {
+    auto typedCol = col->As<CT>();
+    RT v(col->Size());
+    convertEntries<CT,RT>(typedCol, nullCol, v, 0, 0, col->Size());
+    target[targetIdx] = v;
+  }
+};
+
+class NullableConverter : public Converter {
+  using CT = ch::ColumnNullable;
+  std::unique_ptr<Converter> elemConverter;
+
+public:
+  NullableConverter(std::unique_ptr<Converter> elemProc) : elemConverter(std::move(elemProc)) {}
+
+  //NOTE: nested nullable is not currently permitted in Clickhouse
+  void processBlocks(Result &r, Result::AccFunc colAcc, Rcpp::List &target, size_t start, size_t len, Result::AccFunc) {
+    elemConverter->processBlocks(r, [&colAcc](const Result::ColBlock &cb){return colAcc(cb)->As<CT>()->Nested();}, target, start, len, [&colAcc](const Result::ColBlock &cb){return colAcc(cb)->As<ch::ColumnNullable>();});
+  }
+
+  void processCol(ch::ColumnRef col, Rcpp::List &target, size_t targetIdx, NullCol) {
+    auto typedCol = col->As<CT>();
+    processCol(typedCol->Nested(), target, targetIdx, typedCol);
+  }
+};
+
+class ArrayConverter : public Converter {
+  std::unique_ptr<Converter> elemConverter;
+
+public:
+  ArrayConverter(std::unique_ptr<Converter> elemProc) : elemConverter(std::move(elemProc)) {}
+
+  //NOTE: arrays can't be nested in a Nullable, so that can be ignored
+  void processBlocks(Result &r, Result::AccFunc colAcc, Rcpp::List &target, size_t start, size_t len, Result::AccFunc) {
+    using CT = ch::ColumnArray;
+    using RT = Rcpp::List;
+    auto eproc = std::move(elemConverter);
+    r.convertTypedColumn<ch::ColumnArray, Rcpp::List>(colAcc, target, start, len, [&eproc](const Result::ColBlock &, std::shared_ptr<const CT> in, RT &out, size_t offset, size_t start, size_t end) {
+      for(size_t j = start; j < end; j++) {
+        ch::ColumnRef entry = in->GetAsColumn(j);
+        eproc->processCol(entry, out, offset+j-start, nullptr);
+      }
+    });
+  }
+
+  void processCol(ch::ColumnRef, Rcpp::List &, size_t, NullCol) {
+    throw std::invalid_argument("nested arrays are currently not supported");
+  }
+};
+
+std::unique_ptr<Converter> Result::buildConverter(std::string name, ch::TypeRef type) const {
   using TC = ch::Type::Code;
-  auto type = typeAcc(colTypes);
   switch(type->GetCode()) {
     case TC::Int8:
-      convertCol<ch::ColumnInt8, Rcpp::IntegerVector>(*this, colAcc, df, start, len, nullAcc);
-      break;
+      return std::unique_ptr<ScalarConverter<ch::ColumnInt8, Rcpp::IntegerVector>>(new ScalarConverter<ch::ColumnInt8, Rcpp::IntegerVector>);
     case TC::Int16:
-      convertCol<ch::ColumnInt16, Rcpp::IntegerVector>(*this, colAcc, df, start, len, nullAcc);
-      break;
+      return std::unique_ptr<ScalarConverter<ch::ColumnInt16, Rcpp::IntegerVector>>(new ScalarConverter<ch::ColumnInt16, Rcpp::IntegerVector>);
     case TC::Int32:
-      convertCol<ch::ColumnInt32, Rcpp::IntegerVector>(*this, colAcc, df, start, len, nullAcc);
-      break;
+      return std::unique_ptr<ScalarConverter<ch::ColumnInt32, Rcpp::IntegerVector>>(new ScalarConverter<ch::ColumnInt32, Rcpp::IntegerVector>);
     case TC::Int64:
-      if(start == 0) warn("column "+name+" converted from Int64 to Numeric");
-      convertCol<ch::ColumnInt64, Rcpp::NumericVector>(*this, colAcc, df, start, len, nullAcc);
-      break;
+      warn("column "+name+" converted from Int64 to Numeric");
+      return std::unique_ptr<ScalarConverter<ch::ColumnInt64, Rcpp::NumericVector>>(new ScalarConverter<ch::ColumnInt64, Rcpp::NumericVector>);
     case TC::UInt8:
-      convertCol<ch::ColumnUInt8, Rcpp::IntegerVector>(*this, colAcc, df, start, len, nullAcc);
-      break;
+      return std::unique_ptr<ScalarConverter<ch::ColumnUInt8, Rcpp::IntegerVector>>(new ScalarConverter<ch::ColumnUInt8, Rcpp::IntegerVector>);
     case TC::UInt16:
-      convertCol<ch::ColumnUInt16, Rcpp::IntegerVector>(*this, colAcc, df, start, len, nullAcc);
-      break;
+      return std::unique_ptr<ScalarConverter<ch::ColumnUInt16, Rcpp::IntegerVector>>(new ScalarConverter<ch::ColumnUInt16, Rcpp::IntegerVector>);
     case TC::UInt32: {
-      if(start == 0) warn("column "+name+" converted from UInt32 to Numeric");
-      convertCol<ch::ColumnUInt32, Rcpp::NumericVector>(*this, colAcc, df, start, len, nullAcc);
-      break;
+      warn("column "+name+" converted from UInt32 to Numeric");
+      return std::unique_ptr<ScalarConverter<ch::ColumnUInt32, Rcpp::NumericVector>>(new ScalarConverter<ch::ColumnUInt32, Rcpp::NumericVector>);
     }
     case TC::UInt64: {
-      if(start == 0) warn("column "+name+" converted from UInt64 to Numeric");
-      convertCol<ch::ColumnUInt64, Rcpp::NumericVector>(*this, colAcc, df, start, len, nullAcc);
-      break;
+      warn("column "+name+" converted from UInt64 to Numeric");
+      return std::unique_ptr<ScalarConverter<ch::ColumnUInt64, Rcpp::NumericVector>>(new ScalarConverter<ch::ColumnUInt64, Rcpp::NumericVector>);
     }
     case TC::Float32:
-      convertCol<ch::ColumnFloat32, Rcpp::NumericVector>(*this, colAcc, df, start, len, nullAcc);
-      break;
+      return std::unique_ptr<ScalarConverter<ch::ColumnFloat32, Rcpp::NumericVector>>(new ScalarConverter<ch::ColumnFloat32, Rcpp::NumericVector>);
     case TC::Float64:
-      convertCol<ch::ColumnFloat64, Rcpp::NumericVector>(*this, colAcc, df, start, len, nullAcc);
-      break;
+      return std::unique_ptr<ScalarConverter<ch::ColumnFloat64, Rcpp::NumericVector>>(new ScalarConverter<ch::ColumnFloat64, Rcpp::NumericVector>);
     case TC::String:
-      convertCol<ch::ColumnString, Rcpp::StringVector>(*this, colAcc, df, start, len, nullAcc);
-      break;
+      return std::unique_ptr<ScalarConverter<ch::ColumnString, Rcpp::StringVector>>(new ScalarConverter<ch::ColumnString, Rcpp::StringVector>);
     case TC::FixedString:
-      convertCol<ch::ColumnFixedString, Rcpp::StringVector>(*this, colAcc, df, start, len, nullAcc);
-      break;
+      return std::unique_ptr<ScalarConverter<ch::ColumnFixedString, Rcpp::StringVector>>(new ScalarConverter<ch::ColumnFixedString, Rcpp::StringVector>);
     case TC::DateTime:
-      convertCol<ch::ColumnDateTime, Rcpp::DatetimeVector>(*this, colAcc, df, start, len, nullAcc);
-      break;
+      return std::unique_ptr<ScalarConverter<ch::ColumnDateTime, Rcpp::DatetimeVector>>(new ScalarConverter<ch::ColumnDateTime, Rcpp::DatetimeVector>);
     case TC::Date:
-      convertCol<ch::ColumnDate, Rcpp::DateVector>(*this, colAcc, df, start, len, nullAcc);
-      break;
+      return std::unique_ptr<ScalarConverter<ch::ColumnDate, Rcpp::DateVector>>(new ScalarConverter<ch::ColumnDate, Rcpp::DateVector>);
     case TC::Nullable: {
-      convertColumn(name, [&colAcc](const ColBlock &cb){return colAcc(cb)->As<ch::ColumnNullable>()->Nested();},
-          [&typeAcc](const TypeList &tl){return typeAcc(tl)->GetNestedType();},
-          df, start, len,
-          [&colAcc](const ColBlock &cb){return colAcc(cb)->As<ch::ColumnNullable>();});
-      break;
+      return std::unique_ptr<NullableConverter>(new NullableConverter(buildConverter(name, type->GetNestedType())));
+    }
+    case TC::Array: {
+      return std::unique_ptr<ArrayConverter>(new ArrayConverter(buildConverter(name, type->GetItemType())));
     }
     default:
       throw std::invalid_argument("cannot read unsupported type: "+type->GetName());
       break;
   }
-  //TODO: release blocks once they have been fetched
 }
 
 void Result::setColInfo(const ch::Block &block) {
@@ -207,8 +234,10 @@ Rcpp::DataFrame Result::fetchFrame(ssize_t n) {
   Rcpp::DataFrame df;
 
   for(size_t i = 0; i < static_cast<size_t>(colNames.size()); i++) {
-    convertColumn(std::string(colNames[i]), [&i](const ColBlock &cb){return cb.columns[i];},
-        [&i](const TypeList &tl){return tl[i];}, df, fetchedRows, nRows);
+    //TODO: it would be sufficient to build the Converter just once
+    std::unique_ptr<Converter> proc = buildConverter(std::string(colNames[i]), colTypes[i]);
+    proc->processBlocks(*this, [&i](const ColBlock &cb){return cb.columns[i];}, df, fetchedRows, nRows, nullptr);
+    //TODO: release blocks once they have been fetched
   }
 
   df.attr("class") = "data.frame";

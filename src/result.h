@@ -9,6 +9,10 @@
 
 namespace ch = clickhouse;
 
+class Converter;
+
+using NullCol = std::shared_ptr<ch::ColumnNullable>;
+
 class Result {
   public:
   struct ColBlock {
@@ -40,7 +44,7 @@ class Result {
   Result(std::string stmt);
 
   template<typename CT, typename RT>
-  void convertTypedColumn(AccFunc colAcc, Rcpp::DataFrame &df,
+  void convertTypedColumn(AccFunc colAcc, Rcpp::List &df,
       size_t start, size_t len, ConvertFunc<CT, RT> convFunc) const;
 
   bool isComplete() const;
@@ -51,12 +55,25 @@ class Result {
 
   void addBlock(const ch::Block &block);
 
-  // convert the given range of values from the column provided by colAcc to an
-  // R vector and add it to the data frame df
-  void convertColumn(std::string name, AccFunc colAcc, TypeAccFunc typeAcc, Rcpp::DataFrame &df,
-      size_t start, size_t len, AccFunc nullAcc = nullptr) const;
+  // build a converter tree for the given Clickhouse column type
+  std::unique_ptr<Converter> buildConverter(std::string name, ch::TypeRef type) const;
 
   // build a data frame containing n entries from the result set, starting at
   // fetchedRows
   Rcpp::DataFrame fetchFrame(ssize_t n = -1);
+};
+
+// a nested converter structure used to convert a column to an R vector and add
+// it to a data frame
+class Converter {
+public:
+  // convert len column entries, beginning at start, from the blocks in r, and
+  // add the resulting column to target
+  virtual void processBlocks(Result &r, Result::AccFunc colAcc, Rcpp::List &target,
+      size_t start, size_t len, Result::AccFunc nullAcc) = 0;
+
+  // convert the given column to an R vector, which is inserted in the target
+  // list at targetIdx
+  virtual void processCol(ch::ColumnRef col, Rcpp::List &target, size_t targetIdx,
+      NullCol nullCol) = 0;
 };
