@@ -14,6 +14,7 @@ vendor/clickhouse-cpp/clickhouse/columns/tuple.o \
 vendor/clickhouse-cpp/clickhouse/columns/array.o \
 vendor/clickhouse-cpp/clickhouse/columns/factory.o \
 vendor/clickhouse-cpp/clickhouse/columns/nullable.o \
+vendor/clickhouse-cpp/clickhouse/columns/enum.o \
 vendor/clickhouse-cpp/clickhouse/query.o \
 vendor/clickhouse-cpp/clickhouse/base/platform.o \
 vendor/clickhouse-cpp/clickhouse/base/socket.o \
