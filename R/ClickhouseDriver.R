@@ -79,14 +79,18 @@ setMethod("dbDataType", signature(dbObj="ClickhouseDriver", obj = "ANY"), defini
     stop("Invalid argument to dbDataType: must not be NULL or all NA")
   }
 
-  if (is.logical(obj)) t <- "UInt8"
-  else if (is.integer(obj)) t <- "Int32"
-  else if (is.numeric(obj)) t <- "Float64"
-  else if (inherits(obj, "POSIXct")) t <- "DateTime"
-  else if (inherits(obj, "Date")) t <- "Date"
-  else t <- "String"
+  if (is.list(obj)) {
+    t <- paste0("Array(", dbDataType(dbObj, unlist(obj, recursive=F)), ")")
+  } else {
+    if (is.logical(obj)) t <- "UInt8"
+    else if (is.integer(obj)) t <- "Int32"
+    else if (is.numeric(obj)) t <- "Float64"
+    else if (inherits(obj, "POSIXct")) t <- "DateTime"
+    else if (inherits(obj, "Date")) t <- "Date"
+    else t <- "String"
 
-  if (anyNA(obj)) t <- paste0("Nullable(", t, ")")
+    if (anyNA(obj)) t <- paste0("Nullable(", t, ")")
+  }
 
   return(t)
 }, valueClass = "character")

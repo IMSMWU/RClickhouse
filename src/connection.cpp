@@ -139,6 +139,9 @@ std::shared_ptr<CT> vecToScalar(SEXP v, std::shared_ptr<ColumnUInt8> nullCol = n
           [](LogicalVector::stored_type x) {return x;});
       break;
     }
+    case NILSXP:
+      // treated as an empty column
+      break;
     default:
       stop("cannot write R type "+std::to_string(TYPEOF(v))+
           " to column of type "+col->Type()->GetName());
@@ -158,6 +161,9 @@ std::shared_ptr<ColumnDate> vecToScalar<ColumnDate, const std::time_t>(SEXP v,
             [](DateVector::stored_type x) {return x*(60*60*24);});
       break;
     }
+    case NILSXP:
+      // treated as an empty column
+      break;
     default:
       stop("cannot write R type "+std::to_string(TYPEOF(v))+
           " to column of type Date");
@@ -188,8 +194,11 @@ std::shared_ptr<CT> vecToString(SEXP v, std::shared_ptr<ColumnUInt8> nullCol = n
       }
       break;
     }
+    case NILSXP:
+      // treated as an empty column
+      break;
     default:
-      stop("cannot write R string of type "+std::to_string(TYPEOF(v))+
+      stop("cannot write R type "+std::to_string(TYPEOF(v))+
           " to column of type "+col->Type()->GetName());
   }
   return col;
@@ -228,6 +237,22 @@ ColumnRef vecToColumn(TypeRef t, SEXP v, std::shared_ptr<ColumnUInt8> nullCol = 
       auto nullCtlCol = std::make_shared<ColumnUInt8>();
       auto valCol = vecToColumn(t->GetNestedType(), v, nullCtlCol);
       return std::make_shared<ColumnNullable>(valCol, nullCtlCol);
+    }
+    case TC::Array: {
+      std::shared_ptr<ColumnArray> arrCol = nullptr;
+      Rcpp::List rlist = as<Rcpp::List>(v);
+
+      for(typename Rcpp::List::stored_type e : rlist) {
+        auto valCol = vecToColumn(t->GetItemType(), e);
+        if (!arrCol) {
+          // create a zero-length copy (necessary because the ColumnArray
+          // constructor mangles the argument column)
+          auto initCol = valCol->Slice(0, 0);
+          arrCol = std::make_shared<ColumnArray>(initCol);
+        }
+        arrCol->AppendAsColumn(valCol);
+      }
+      return arrCol;
     }
     default:
       stop("cannot write unsupported type: "+t->GetName());
