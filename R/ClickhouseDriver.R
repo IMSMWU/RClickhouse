@@ -72,6 +72,12 @@ setMethod("dbConnect", "ClickhouseDriver", function(drv, host="localhost", port 
   new("ClickhouseConnection", ptr = ptr, port = port, host = host, user = user)
 })
 
+buildEnumType <- function(obj) {
+  lvls <- levels(obj)
+  idmap <- mapply(function(name, id) paste0(quoteString(name), "=", id), lvls, seq(0, length(lvls)-1))
+  return(paste0("Enum16(", paste(idmap, collapse=",", sep=","), ")"))
+}
+
 #' @export
 #' @rdname ClickhouseDriver-class
 setMethod("dbDataType", signature(dbObj="ClickhouseDriver", obj = "ANY"), definition = function(dbObj, obj, ...) {
@@ -82,7 +88,8 @@ setMethod("dbDataType", signature(dbObj="ClickhouseDriver", obj = "ANY"), defini
   if (is.list(obj)) {
     t <- paste0("Array(", dbDataType(dbObj, unlist(obj, recursive=F)), ")")
   } else {
-    if (is.logical(obj)) t <- "UInt8"
+    if (is.factor(obj)) t <- buildEnumType(obj)
+    else if (is.logical(obj)) t <- "UInt8"
     else if (is.integer(obj)) t <- "Int32"
     else if (is.numeric(obj)) t <- "Float64"
     else if (inherits(obj, "POSIXct")) t <- "DateTime"

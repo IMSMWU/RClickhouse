@@ -76,6 +76,21 @@ void convertEntries<ch::ColumnDate, Rcpp::DateVector>(std::shared_ptr<const ch::
   }
 }
 
+template<typename VT>
+using LevelMapT = std::map<VT, unsigned>;
+
+template<typename CT, typename VT, typename RT>
+void convertEnumEntries(std::shared_ptr<const CT> in, LevelMapT<VT> &levelMap,
+    NullCol nullCol, RT &out, size_t offset, size_t start, size_t end) {
+  for(size_t j = start; j < end; j++) {
+    if(nullCol && nullCol->IsNull(j)) {
+      out[offset+j-start] = RT::get_na();
+    } else {
+      out[offset+j-start] = levelMap[in->At(j)];
+    }
+  }
+}
+
 template<typename CT, typename RT>
 class ScalarConverter : public Converter {
   void processBlocks(Result &r, Result::AccFunc colAcc, Rcpp::List &target,
@@ -139,6 +154,51 @@ public:
   }
 };
 
+template<typename CT, typename VT, typename RT>
+class EnumConverter : public Converter {
+  ch::EnumType type;
+  Rcpp::CharacterVector levels;
+  LevelMapT<VT> levelMap;
+
+  void genLevelMap(LevelMapT<VT> &levelMap, Rcpp::CharacterVector &levels) {
+    for (auto ei : type.GetValueToNameMap()) {
+      levels.push_back(ei.second);
+      levelMap[ei.first] = levels.size();  // note: R factor level indices start at 1
+    }
+  }
+
+public:
+  EnumConverter(ch::TypeRef type) : type(type) {
+    genLevelMap(levelMap, levels);
+  }
+
+  void processBlocks(Result &r, Result::AccFunc colAcc, Rcpp::List &target,
+      size_t start, size_t len, Result::AccFunc nullAcc) {
+
+    r.convertTypedColumn<CT, RT>(colAcc, target, start, len,
+        [&](const Result::ColBlock &cb, std::shared_ptr<const CT> in,
+          RT &out, size_t offset, size_t start, size_t end) {
+      NullCol nullCol =
+        nullAcc ? nullAcc(cb)->As<ch::ColumnNullable>() : nullptr;
+      convertEnumEntries<CT,VT,RT>(in, levelMap, nullCol, out, offset, start, end);
+
+      out.attr("class") = "factor";
+      out.attr("levels") = levels;
+    });
+  }
+  void processCol(ch::ColumnRef col, Rcpp::List &target, size_t targetIdx,
+      NullCol nullCol) {
+    auto typedCol = col->As<CT>();
+    RT v(col->Size());
+
+    convertEnumEntries<CT,VT,RT>(typedCol, levelMap, nullCol, v, 0, 0, col->Size());
+
+    v.attr("class") = "factor";
+    v.attr("levels") = levels;
+    target[targetIdx] = v;
+  }
+};
+
 std::unique_ptr<Converter> Result::buildConverter(std::string name, ch::TypeRef type) const {
   using TC = ch::Type::Code;
   switch(type->GetCode()) {
@@ -175,12 +235,14 @@ std::unique_ptr<Converter> Result::buildConverter(std::string name, ch::TypeRef 
       return std::unique_ptr<ScalarConverter<ch::ColumnDateTime, Rcpp::DatetimeVector>>(new ScalarConverter<ch::ColumnDateTime, Rcpp::DatetimeVector>);
     case TC::Date:
       return std::unique_ptr<ScalarConverter<ch::ColumnDate, Rcpp::DateVector>>(new ScalarConverter<ch::ColumnDate, Rcpp::DateVector>);
-    case TC::Nullable: {
+    case TC::Nullable:
       return std::unique_ptr<NullableConverter>(new NullableConverter(buildConverter(name, type->GetNestedType())));
-    }
-    case TC::Array: {
+    case TC::Array:
       return std::unique_ptr<ArrayConverter>(new ArrayConverter(buildConverter(name, type->GetItemType())));
-    }
+    case TC::Enum8:
+      return std::unique_ptr<EnumConverter<ch::ColumnEnum8, int8_t, Rcpp::IntegerVector>>(new EnumConverter<ch::ColumnEnum8, int8_t, Rcpp::IntegerVector>(type));
+    case TC::Enum16:
+      return std::unique_ptr<EnumConverter<ch::ColumnEnum16, int16_t, Rcpp::IntegerVector>>(new EnumConverter<ch::ColumnEnum16, int16_t, Rcpp::IntegerVector>(type));
     default:
       throw std::invalid_argument("cannot read unsupported type: "+type->GetName());
       break;

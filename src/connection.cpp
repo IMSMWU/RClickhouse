@@ -204,6 +204,42 @@ std::shared_ptr<CT> vecToString(SEXP v, std::shared_ptr<ColumnUInt8> nullCol = n
   return col;
 }
 
+template<typename CT, typename VT>
+std::shared_ptr<CT> vecToEnum(SEXP v, TypeRef type, std::shared_ptr<ColumnUInt8> nullCol = nullptr) {
+  ch::EnumType et(type);
+  auto iv = as<IntegerVector>(v);
+  CharacterVector levels = iv.attr("levels");
+
+  // the R levels are contiguous and (starting at 1), so a vector works
+  std::vector<VT> levelMap(levels.size());
+  for (size_t i = 0; i < levels.size(); i++) {
+    std::string name(levels[i]);
+    if (!et.HasEnumName(name)) {
+      stop("entry '"+name+"' does not exist in enum type "+et.GetName());
+    }
+    levelMap[i] = et.GetEnumValue(name);
+  }
+
+  auto col = std::make_shared<CT>(type);
+  switch(TYPEOF(v)) {
+    case INTSXP: {
+      toColumn<CT, IntegerVector, VT>(v, col, nullCol,
+          [&levelMap](IntegerVector::stored_type x) {
+          // subtract 1 since R's factor values start at 1
+          return levelMap[x-1];
+        });
+      break;
+    }
+    case NILSXP:
+      // treated as an empty column
+      break;
+    default:
+      stop("cannot write factor of type "+std::to_string(TYPEOF(v))+
+          " to column of type "+col->Type()->GetName());
+  }
+  return col;
+}
+
 ColumnRef vecToColumn(TypeRef t, SEXP v, std::shared_ptr<ColumnUInt8> nullCol = nullptr) {
   using TC = Type::Code;
   switch(t->GetCode()) {
@@ -254,6 +290,10 @@ ColumnRef vecToColumn(TypeRef t, SEXP v, std::shared_ptr<ColumnUInt8> nullCol = 
       }
       return arrCol;
     }
+    case TC::Enum8:
+      return vecToEnum<ColumnEnum8, int8_t>(v, t, nullCol);
+    case TC::Enum16:
+      return vecToEnum<ColumnEnum16, int16_t>(v, t, nullCol);
     default:
       stop("cannot write unsupported type: "+t->GetName());
   }

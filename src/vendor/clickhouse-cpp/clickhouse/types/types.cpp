@@ -206,4 +206,8 @@ bool EnumType::HasEnumValue(int16_t value) const {
     return type_->enum_->value_to_name.find(value) != type_->enum_->value_to_name.end();
 }
 
+std::map<int16_t, std::string>& EnumType::GetValueToNameMap() const {
+    return type_->enum_->value_to_name;
+}
+
 }

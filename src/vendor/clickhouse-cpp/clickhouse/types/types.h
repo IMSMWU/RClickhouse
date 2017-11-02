@@ -124,6 +124,7 @@ public:
     int16_t GetEnumValue(const std::string& name) const;
     bool HasEnumName(const std::string& name) const;
     bool HasEnumValue(int16_t value) const;
+    std::map<int16_t, std::string>& GetValueToNameMap() const;
 
 private:
     TypeRef type_;

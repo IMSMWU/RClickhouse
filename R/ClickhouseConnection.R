@@ -223,14 +223,16 @@ setMethod("dbQuoteIdentifier", c("ClickhouseConnection", "character"),
 setMethod("dbQuoteIdentifier", c("ClickhouseConnection", "SQL"),
   function(conn, x, ...) { x })
 
+quoteString <- function(x) {
+  x <- gsub('\\', '\\\\', x, fixed = TRUE)
+  x <- gsub("'", "\\'", x, fixed = TRUE)
+  return(SQL(ifelse(is.na(x), "NULL", paste0("'", x, "'"))))
+}
+
 #' @export
 #' @rdname ClickhouseConnection-class
 setMethod("dbQuoteString", c("ClickhouseConnection", "character"),
-  function(conn, x, ...) {
-      x <- gsub('\\', '\\\\', x, fixed = TRUE)
-      x <- gsub("'", "\\'", x, fixed = TRUE)
-      SQL(ifelse(is.na(x), "NULL", paste0("'", x, "'")))
-  }
+  function(conn, x, ...) { quoteString(x) }
 )
 
 #' @export
