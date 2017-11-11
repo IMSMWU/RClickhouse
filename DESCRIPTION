@@ -23,6 +23,8 @@ RoxygenNote: 6.0.1
 NeedsCompilation: yes
 Depends:
     R (>= 3.3.2)
+Suggests:
+    testthat
 Collate:
   'RcppExports.R'
   'clckhs.R'
