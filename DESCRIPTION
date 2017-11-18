@@ -7,8 +7,6 @@ Authors@R: c(
     person("Christian", "Hotz-Behofsits", email = "christian.hotz-behofsits@wu.ac.at", role = c("aut", "cre")),
     person("Clemens", "Danninger", role = c("aut"))
     )
-Author: Christian Hotz-Behofsits
-Maintainer: Christian Hotz-Behofsits <christian.hotz-behofsits@wu.ac.at>
 Description: Dplyr 0.6-ready DBI Interface for ClickhouseDB 
 License: GPL-3
 Imports:
@@ -27,12 +25,12 @@ Suggests:
     testthat
 Collate:
   'RcppExports.R'
-  'clckhs.R'
+  'RClickhouse.R'
   'ClickhouseDriver.R'
   'ClickhouseConnection.R'
   'ClickhouseResult.R'
   'dplyr.R'
   'zzz.R'
-URL: https://github.com/inkrement/clckhs
-BugReports: https://github.com/inkrement/clckhs/issues
+URL: https://github.com/IMSMWU/RClickhouse
+BugReports: https://github.com/IMSMWU/RClickhouse/issues
 LinkingTo: Rcpp
