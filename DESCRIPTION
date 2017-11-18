@@ -1,4 +1,4 @@
-Package: clckhs
+Package: RClickhouse
 Type: Package
 Title: DBI Interface for ClickhouseDB
 Version: 0.3.0
