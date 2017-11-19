@@ -15,7 +15,7 @@ setClass("ClickhouseDriver",
 #' @import methods DBI
 #' @examples
 #' library(DBI)
-#' clckhs::clickhouse()
+#' RClickhouse::clickhouse()
 clickhouse <- function() {
   new("ClickhouseDriver")
 }
@@ -61,12 +61,12 @@ setMethod("dbUnloadDriver", "ClickhouseDriver", function(drv, ...) {
 #' @return A database connection.
 #' @examples
 #' \dontrun{
-#' conn <- dbConnect(clckhs::clickhouse(), host="localhost")
+#' conn <- dbConnect(RClickhouse::clickhouse(), host="localhost")
 #' }
 setMethod("dbConnect", "ClickhouseDriver", function(drv, host="localhost", port = 9000, db = "default", user = "default", password = "", compression = "lz4", ...) {
-  ptr <- clckhs::connect(host, port, db, user, password, compression)
+  ptr <- RClickhouse::connect(host, port, db, user, password, compression)
   reg.finalizer(ptr, function(p) {
-    if (clckhs::validPtr(p))
+    if (RClickhouse::validPtr(p))
       warning("connection was garbage collected without being disconnected")
   })
   new("ClickhouseConnection", ptr = ptr, port = port, host = host, user = user)

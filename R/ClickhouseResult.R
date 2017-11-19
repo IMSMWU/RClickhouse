@@ -23,16 +23,16 @@ setMethod("dbFetch", signature = "ClickhouseResult", definition = function(res, 
   if (n != as.integer(n) || (n < 0 && n != -1)) {
     stop("n must be a positive integer, -1 or Inf")
   }
-  return(clckhs::fetch(res@ptr, n))
+  return(RClickhouse::fetch(res@ptr, n))
 })
 
 #' @rdname ClickhouseResult-class
 #' @export
 setMethod("dbClearResult", "ClickhouseResult", definition = function(res, ...) {
-  if (!clckhs::validPtr(res@ptr)) {
+  if (!RClickhouse::validPtr(res@ptr)) {
     warning("Result has already been cleared.")
   } else {
-    clckhs::clearResult(res@ptr)
+    RClickhouse::clearResult(res@ptr)
   }
   invisible(TRUE)
 })
@@ -40,33 +40,33 @@ setMethod("dbClearResult", "ClickhouseResult", definition = function(res, ...) {
 #' @rdname ClickhouseResult-class
 #' @export
 setMethod("dbHasCompleted", "ClickhouseResult", definition = function(res, ...) {
-  clckhs::hasCompleted(res@ptr)
+  RClickhouse::hasCompleted(res@ptr)
 })
 
 #' @rdname ClickhouseResult-class
 #' @inheritParams DBI::dbGetStatement
 #' @export
 setMethod("dbGetStatement", "ClickhouseResult", function(res, ...) {
-  clckhs::getStatement(res@ptr)
+  RClickhouse::getStatement(res@ptr)
 })
 
 #' @rdname ClickhouseResult-class
 #' @export
 setMethod("dbIsValid", "ClickhouseResult", function(dbObj, ...) {
-  clckhs::validPtr(dbObj@ptr)
+  RClickhouse::validPtr(dbObj@ptr)
 })
 
 #' @rdname ClickhouseResult-class
 #' @inheritParams DBI::dbGetRowCount
 #' @export
 setMethod("dbGetRowCount", "ClickhouseResult", function(res, ...) {
-  clckhs::getRowCount(res@ptr)
+  RClickhouse::getRowCount(res@ptr)
 })
 
 #' @rdname ClickhouseResult-class
 #' @export
 setMethod("dbGetRowsAffected", "ClickhouseResult", definition = function(res, ...) {
-  clckhs::getRowsAffected(res@ptr)
+  RClickhouse::getRowsAffected(res@ptr)
 })
 
 #' @rdname ClickhouseResult-class
@@ -75,7 +75,7 @@ setMethod("dbColumnInfo", "ClickhouseResult", definition = function(res, ...) {
   df <- dbFetch(res, 0)
   data.frame(
     name = colnames(df),
-    field.type = clckhs::resultTypes(res@ptr),
+    field.type = RClickhouse::resultTypes(res@ptr),
     data.type = sapply(df, class)
   )
 })

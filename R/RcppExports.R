@@ -3,65 +3,65 @@
 
 #' @export
 fetch <- function(res, n) {
-    .Call('clckhs_fetch', PACKAGE = 'clckhs', res, n)
+    .Call('RClickhouse_fetch', PACKAGE = 'RClickhouse', res, n)
 }
 
 #' @export
 clearResult <- function(res) {
-    invisible(.Call('clckhs_clearResult', PACKAGE = 'clckhs', res))
+    invisible(.Call('RClickhouse_clearResult', PACKAGE = 'RClickhouse', res))
 }
 
 #' @export
 hasCompleted <- function(res) {
-    .Call('clckhs_hasCompleted', PACKAGE = 'clckhs', res)
+    .Call('RClickhouse_hasCompleted', PACKAGE = 'RClickhouse', res)
 }
 
 #' @export
 getRowCount <- function(res) {
-    .Call('clckhs_getRowCount', PACKAGE = 'clckhs', res)
+    .Call('RClickhouse_getRowCount', PACKAGE = 'RClickhouse', res)
 }
 
 #' @export
 getRowsAffected <- function(res) {
-    .Call('clckhs_getRowsAffected', PACKAGE = 'clckhs', res)
+    .Call('RClickhouse_getRowsAffected', PACKAGE = 'RClickhouse', res)
 }
 
 #' @export
 getStatement <- function(res) {
-    .Call('clckhs_getStatement', PACKAGE = 'clckhs', res)
+    .Call('RClickhouse_getStatement', PACKAGE = 'RClickhouse', res)
 }
 
 #' @export
 resultTypes <- function(res) {
-    .Call('clckhs_resultTypes', PACKAGE = 'clckhs', res)
+    .Call('RClickhouse_resultTypes', PACKAGE = 'RClickhouse', res)
 }
 
 #' @export
 connect <- function(host, port, db, user, password, compression) {
-    .Call('clckhs_connect', PACKAGE = 'clckhs', host, port, db, user, password, compression)
+    .Call('RClickhouse_connect', PACKAGE = 'RClickhouse', host, port, db, user, password, compression)
 }
 
 #' @export
 disconnect <- function(conn) {
-    invisible(.Call('clckhs_disconnect', PACKAGE = 'clckhs', conn))
+    invisible(.Call('RClickhouse_disconnect', PACKAGE = 'RClickhouse', conn))
 }
 
 #' @export
 select <- function(conn, query) {
-    .Call('clckhs_select', PACKAGE = 'clckhs', conn, query)
+    .Call('RClickhouse_select', PACKAGE = 'RClickhouse', conn, query)
 }
 
 #' @export
 insert <- function(conn, tableName, df) {
-    invisible(.Call('clckhs_insert', PACKAGE = 'clckhs', conn, tableName, df))
+    invisible(.Call('RClickhouse_insert', PACKAGE = 'RClickhouse', conn, tableName, df))
 }
 
 #' @export
 validPtr <- function(ptr) {
-    .Call('clckhs_validPtr', PACKAGE = 'clckhs', ptr)
+    .Call('RClickhouse_validPtr', PACKAGE = 'RClickhouse', ptr)
 }
 
 # Register entry points for exported C++ functions
 methods::setLoadAction(function(ns) {
-    .Call('clckhs_RcppExport_registerCCallable', PACKAGE = 'clckhs')
+    .Call('RClickhouse_RcppExport_registerCCallable', PACKAGE = 'RClickhouse')
 })

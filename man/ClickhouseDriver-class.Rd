@@ -54,9 +54,9 @@ Connect to a ClickHouse database.
 }
 \examples{
 library(DBI)
-clckhs::clickhouse()
+RClickhouse::clickhouse()
 \dontrun{
-conn <- dbConnect(clckhs::clickhouse(), host="localhost")
+conn <- dbConnect(RClickhouse::clickhouse(), host="localhost")
 }
 }
 \keyword{internal}

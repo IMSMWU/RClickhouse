@@ -1,7 +1,7 @@
 library(testthat)
-library(clckhs)
+library(RClickhouse)
 
 serveraddr <- "127.0.0.1"
 tblname    <- "test"
 
-test_check("clckhs")
+test_check("RClickhouse")
