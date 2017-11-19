@@ -158,7 +158,8 @@ template<typename CT, typename VT, typename RT>
 class EnumConverter : public Converter {
   ch::EnumType type;
   Rcpp::CharacterVector levels;
-  LevelMapT<VT> levelMap;
+  LevelMapT<VT> levelMap;   // mapping from enum values in the column type to
+                            // level indices in the R factor to be created
 
   void genLevelMap(LevelMapT<VT> &levelMap, Rcpp::CharacterVector &levels) {
     for (auto ei : type.GetValueToNameMap()) {

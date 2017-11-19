@@ -98,6 +98,7 @@ XPtr<Result> select(XPtr<Client> conn, String query) {
   return rp;
 }
 
+// write the contents of an R vector into a Clickhouse column
 template<typename CT, typename RT, typename VT>
 void toColumn(SEXP v, std::shared_ptr<CT> col, std::shared_ptr<ColumnUInt8> nullCol,
     std::function<VT(typename RT::stored_type)> convertFn) {
@@ -210,7 +211,8 @@ std::shared_ptr<CT> vecToEnum(SEXP v, TypeRef type, std::shared_ptr<ColumnUInt8>
   auto iv = as<IntegerVector>(v);
   CharacterVector levels = iv.attr("levels");
 
-  // the R levels are contiguous and (starting at 1), so a vector works
+  // build a mapping from R factor levels to the enum values in the column type
+  // the R levels are contiguous (starting at 1), so a vector works as a "map"
   std::vector<VT> levelMap(levels.size());
   for (size_t i = 0; i < levels.size(); i++) {
     std::string name(levels[i]);
@@ -284,6 +286,7 @@ ColumnRef vecToColumn(TypeRef t, SEXP v, std::shared_ptr<ColumnUInt8> nullCol = 
           // create a zero-length copy (necessary because the ColumnArray
           // constructor mangles the argument column)
           auto initCol = valCol->Slice(0, 0);
+          // initialize the array column with the type of the R vector's first element
           arrCol = std::make_shared<ColumnArray>(initCol);
         }
         arrCol->AppendAsColumn(valCol);
