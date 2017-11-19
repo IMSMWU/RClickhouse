@@ -61,7 +61,7 @@ XPtr<Client> connect(String host, int port, String db, String user, String passw
   if(compression == "lz4") {
     comprMethod = CompressionMethod::LZ4;
   } else if(compression != "" && compression != "none") {
-    stop("unknown compression method '"+std::string(compression)+"'");
+    stop("unknown or unsupported compression method '"+std::string(compression)+"'");
   }
 
   Client *client = new Client(ClientOptions()
