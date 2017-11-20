@@ -3,3 +3,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.travis\.yml$
+.*\.o$
+^src/vendor/clickhouse-cpp/.buckconfig$
+^src/vendor/clickhouse-cpp/.travis.yml$
