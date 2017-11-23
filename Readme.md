@@ -2,7 +2,7 @@
 
 ![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg) ![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](https://img.shields.io/github/release/inkrement/clckhs.svg) [![Build Status](https://travis-ci.org/inkrement/clckhs.svg?branch=master)](https://travis-ci.org/inkrement/clckhs)
 
-This R package is a DBI interface for the [Yandex clickhouse database](https://clickhouse.yandex). It provides basic dbplyr support and is based on the official [C++ Clickhouse Client](https://github.com/artpaul/clickhouse-cpp).
+This R package is a DBI interface for the [Yandex Clickhouse](https://clickhouse.yandex) database. It provides basic dplyr support by auto-generating SQL-commands using dbplyr and is based on the official [C++ Clickhouse Client](https://github.com/artpaul/clickhouse-cpp).
 
 ## Requirements & Installation
 A C++ compiler and for Windows Rtools are required. The latest version can be installed directly from github using devtools like this:
