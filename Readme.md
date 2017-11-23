@@ -2,10 +2,10 @@
 
 ![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg) ![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](https://img.shields.io/github/release/inkrement/clckhs.svg) [![Build Status](https://travis-ci.org/inkrement/clckhs.svg?branch=master)](https://travis-ci.org/inkrement/clckhs)
 
-This R package is a DBI interface and dplyr SQL-backend for the [clickhouse database](https://clickhouse.yandex). It is based on the [C++ Clickhouse Client](https://github.com/artpaul/clickhouse-cpp) and uses compression for data transfer.
+This R package is a DBI interface for the [Yandex clickhouse database](https://clickhouse.yandex). It provides basic dbplyr support and is based on the official [C++ Clickhouse Client](https://github.com/artpaul/clickhouse-cpp).
 
 ## Requirements & Installation
-You need a C++ compiler and for Windows Rtools is required. This package is currently not available on CRAN so you have to install it using devtools:
+A C++ compiler and for Windows Rtools are required. The latest version can be installed directly from github using devtools like this:
 
 ```R
 devtools::install_github("IMSMWU/RClickhouse")
@@ -14,7 +14,7 @@ devtools::install_github("IMSMWU/RClickhouse")
 ## Usage
 ```R
 # create a DBI Connection
-con <- DBI::dbConnect(RClickhouse::clickhouse(),host="example-db.com")
+con <- DBI::dbConnect(RClickhouse::clickhouse(), host="example-db.com")
 
 # now you can write data to the db
 DBI::dbWriteTable(con, "mtcars", mtcars)
