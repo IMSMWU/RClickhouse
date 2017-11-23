@@ -1,0 +1,4 @@
+include Makevars.common
+
+SYS_FLAGS = -D_WIN32_WINNT=0x0600
+SYS_LIBS = -lws2_32
