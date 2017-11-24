@@ -10,6 +10,8 @@ matrix:
       sudo: required
       before_script:
         - ln -s /var/lock /run/lock
+        - netstat -l --numeric-ports -p
+        - ps aux | grep clickhouse
       addons:
         apt:
           packages:
