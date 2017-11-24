@@ -10,8 +10,10 @@ matrix:
       sudo: required
       before_script:
         - ln -s /var/lock /run/lock
-        - netstat -l --numeric-ports -p
+        - sudo netstat -l --numeric-ports -p
         - ps aux | grep clickhouse
+        - cat /etc/clickhouse-server/config.xml
+        - tail -n 100 /var/log/clickhouse-server/clickhouse-server.log /var/log/clickhouse-server/clickhouse-server.err.log
       addons:
         apt:
           packages:
