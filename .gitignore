@@ -11,3 +11,6 @@ CMakeCache.txt
 # ignore build files
 *.Rcheck
 RClickhouse_*.tar.gz
+
+# mac specific files
+.DS_Store
