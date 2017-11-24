@@ -62,6 +62,7 @@ sql_translate_env.ClickhouseConnection <- function(x) {
 }
 
 # DBIConnection fork without transactions
+#' @importFrom dbplyr db_copy_to
 #' @export
 db_copy_to.ClickhouseConnection <- function(con, table, values,
                                      overwrite = FALSE, types = NULL, temporary = TRUE,

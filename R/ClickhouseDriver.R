@@ -64,9 +64,9 @@ setMethod("dbUnloadDriver", "ClickhouseDriver", function(drv, ...) {
 #' conn <- dbConnect(RClickhouse::clickhouse(), host="localhost")
 #' }
 setMethod("dbConnect", "ClickhouseDriver", function(drv, host="localhost", port = 9000, db = "default", user = "default", password = "", compression = "lz4", ...) {
-  ptr <- RClickhouse::connect(host, port, db, user, password, compression)
+  ptr <- connect(host, port, db, user, password, compression)
   reg.finalizer(ptr, function(p) {
-    if (RClickhouse::validPtr(p))
+    if (validPtr(p))
       warning("connection was garbage collected without being disconnected")
   })
   new("ClickhouseConnection", ptr = ptr, port = port, host = host, user = user)

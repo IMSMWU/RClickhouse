@@ -23,16 +23,16 @@ setMethod("dbFetch", signature = "ClickhouseResult", definition = function(res, 
   if (n != as.integer(n) || (n < 0 && n != -1)) {
     stop("n must be a positive integer, -1 or Inf")
   }
-  return(RClickhouse::fetch(res@ptr, n))
+  return(fetch(res@ptr, n))
 })
 
 #' @rdname ClickhouseResult-class
 #' @export
 setMethod("dbClearResult", "ClickhouseResult", definition = function(res, ...) {
-  if (!RClickhouse::validPtr(res@ptr)) {
+  if (!validPtr(res@ptr)) {
     warning("Result has already been cleared.")
   } else {
-    RClickhouse::clearResult(res@ptr)
+    clearResult(res@ptr)
   }
   invisible(TRUE)
 })
@@ -40,33 +40,33 @@ setMethod("dbClearResult", "ClickhouseResult", definition = function(res, ...) {
 #' @rdname ClickhouseResult-class
 #' @export
 setMethod("dbHasCompleted", "ClickhouseResult", definition = function(res, ...) {
-  RClickhouse::hasCompleted(res@ptr)
+  hasCompleted(res@ptr)
 })
 
 #' @rdname ClickhouseResult-class
 #' @inheritParams DBI::dbGetStatement
 #' @export
 setMethod("dbGetStatement", "ClickhouseResult", function(res, ...) {
-  RClickhouse::getStatement(res@ptr)
+  getStatement(res@ptr)
 })
 
 #' @rdname ClickhouseResult-class
 #' @export
 setMethod("dbIsValid", "ClickhouseResult", function(dbObj, ...) {
-  RClickhouse::validPtr(dbObj@ptr)
+  validPtr(dbObj@ptr)
 })
 
 #' @rdname ClickhouseResult-class
 #' @inheritParams DBI::dbGetRowCount
 #' @export
 setMethod("dbGetRowCount", "ClickhouseResult", function(res, ...) {
-  RClickhouse::getRowCount(res@ptr)
+  getRowCount(res@ptr)
 })
 
 #' @rdname ClickhouseResult-class
 #' @export
 setMethod("dbGetRowsAffected", "ClickhouseResult", definition = function(res, ...) {
-  RClickhouse::getRowsAffected(res@ptr)
+  getRowsAffected(res@ptr)
 })
 
 #' @rdname ClickhouseResult-class
@@ -75,7 +75,7 @@ setMethod("dbColumnInfo", "ClickhouseResult", definition = function(res, ...) {
   df <- dbFetch(res, 0)
   data.frame(
     name = colnames(df),
-    field.type = RClickhouse::resultTypes(res@ptr),
+    field.type = resultTypes(res@ptr),
     data.type = sapply(df, class)
   )
 })

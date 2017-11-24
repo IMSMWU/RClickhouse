@@ -9,43 +9,36 @@
 using namespace Rcpp;
 using namespace clickhouse;
 
-//' @export
 // [[Rcpp::export]]
 DataFrame fetch(XPtr<Result> res, ssize_t n) {
   return res->fetchFrame(n);
 }
 
-//' @export
 // [[Rcpp::export]]
 void clearResult(XPtr<Result> res) {
   res.release();
 }
 
-//' @export
 // [[Rcpp::export]]
 bool hasCompleted(XPtr<Result> res) {
   return res->isComplete();
 }
 
-//' @export
 // [[Rcpp::export]]
 size_t getRowCount(XPtr<Result> res) {
   return res->numFetchedRows();
 }
 
-//' @export
 // [[Rcpp::export]]
 size_t getRowsAffected(XPtr<Result> res) {
   return res->numRowsAffected();
 }
 
-//' @export
 // [[Rcpp::export]]
 std::string getStatement(XPtr<Result> res) {
   return res->getStatement();
 }
 
-//' @export
 // [[Rcpp::export]]
 std::vector<std::string> resultTypes(XPtr<Result> res) {
   auto colTypes = res->getColTypes();
@@ -54,7 +47,6 @@ std::vector<std::string> resultTypes(XPtr<Result> res) {
   return r;
 }
 
-//' @export
 // [[Rcpp::export]]
 XPtr<Client> connect(String host, int port, String db, String user, String password, String compression) {
   CompressionMethod comprMethod = CompressionMethod::None;
@@ -77,13 +69,11 @@ XPtr<Client> connect(String host, int port, String db, String user, String passw
   return p;
 }
 
-//' @export
 // [[Rcpp::export]]
 void disconnect(XPtr<Client> conn) {
   conn.release();
 }
 
-//' @export
 // [[Rcpp::export]]
 XPtr<Result> select(XPtr<Client> conn, String query) {
   Result *r = new Result(query);
@@ -302,7 +292,6 @@ ColumnRef vecToColumn(TypeRef t, SEXP v, std::shared_ptr<ColumnUInt8> nullCol = 
   }
 }
 
-//' @export
 // [[Rcpp::export]]
 void insert(XPtr<Client> conn, String tableName, DataFrame df) {
   StringVector names(df.names());
@@ -331,7 +320,6 @@ void insert(XPtr<Client> conn, String tableName, DataFrame df) {
   conn->Insert(tableName, block);
 }
 
-//' @export
 // [[Rcpp::export]]
 bool validPtr(SEXP ptr) {
   return R_ExternalPtrAddr(ptr);
