@@ -13,7 +13,7 @@ matrix:
         - sudo netstat -l --numeric-ports -p
         - ps aux | grep clickhouse
         - cat /etc/clickhouse-server/config.xml
-        - tail -n 100 /var/log/clickhouse-server/clickhouse-server.log /var/log/clickhouse-server/clickhouse-server.err.log
+        - sudo tail -n 100 /var/log/clickhouse-server/clickhouse-server.log /var/log/clickhouse-server/clickhouse-server.err.log
       addons:
         apt:
           packages:
