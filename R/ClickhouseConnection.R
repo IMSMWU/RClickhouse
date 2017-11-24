@@ -47,7 +47,7 @@ setMethod("dbGetInfo", "ClickhouseConnection", def=function(dbObj, ...) {
 #' @export
 #' @rdname ClickhouseConnection-class
 setMethod("dbIsValid", "ClickhouseConnection", function(dbObj, ...) {
-  if (!RClickhouse::validPtr(dbObj@ptr)) {
+  if (!validPtr(dbObj@ptr)) {
     FALSE
   } else {
     tryCatch({
@@ -123,7 +123,7 @@ setMethod("dbListFields", c("ClickhouseConnection", "character"), function(conn,
 #' @export
 #' @rdname ClickhouseConnection-class
 setMethod("dbSendQuery", c("ClickhouseConnection", "character"), function(conn, statement, ...) {
-  res <- RClickhouse::select(conn@ptr, statement);
+  res <- select(conn@ptr, statement);
   return(new("ClickhouseResult",
       sql = statement,
       env = new.env(parent = emptyenv()),   #TODO: set env
@@ -192,7 +192,7 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
       levels(value[[c]]) <- enc2utf8(levels(value[[c]]))
     }
 
-    RClickhouse::insert(conn@ptr, qname, value);
+    insert(conn@ptr, qname, value);
   }
 
   return(invisible(TRUE))
@@ -262,10 +262,10 @@ setMethod("dbRollback", "ClickhouseConnection", definition = function(conn, ...)
 #' @export
 #' @rdname ClickhouseConnection-class
 setMethod("dbDisconnect", "ClickhouseConnection", function(conn, ...) {
-  if (!RClickhouse::validPtr(conn@ptr)) {
+  if (!validPtr(conn@ptr)) {
     warning("Connection is already disconnected.")
   } else {
-    RClickhouse::disconnect(conn@ptr)
+    disconnect(conn@ptr)
   }
   invisible(TRUE)
 })
