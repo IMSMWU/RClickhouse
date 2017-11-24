@@ -18,7 +18,3 @@ matrix:
             - clickhouse-server-common
           sources:
           - sourceline: 'deb http://repo.yandex.ru/clickhouse/trusty stable main'
-
-r_github_packages:
-  - rstats-db/DBI
-  - hadley/dbplyr
