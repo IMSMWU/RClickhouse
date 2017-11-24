@@ -7,3 +7,7 @@ packrat/lib*/
 *_RcppExports.h
 CMakeFiles/
 CMakeCache.txt
+
+# ignore build files
+*.Rcheck
+RClickhouse_*.tar.gz
