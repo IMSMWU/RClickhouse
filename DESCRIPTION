@@ -7,8 +7,9 @@ Authors@R: c(
     person("Christian", "Hotz-Behofsits", email = "christian.hotz-behofsits@wu.ac.at", role = c("aut", "cre")),
     person("Clemens", "Danninger", role = c("aut"))
     )
-Description: Dplyr 0.6-ready DBI Interface for ClickhouseDB 
+Description: Dplyr 0.6-ready DBI Interface for ClickhouseDB
 License: GPL-3
+SystemRequirements: C++11
 Imports:
     dplyr (>= 0.5.0.9004),
     dbplyr (>= 0.0.0.9001),
