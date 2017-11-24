@@ -1,6 +1,6 @@
 Package: RClickhouse
 Type: Package
-Title: A 'DBI' interface to the Yandex Clickhouse database providing basic 'dplyr' support.
+Title: A 'DBI' interface to the Yandex Clickhouse database providing basic 'dplyr' support
 Version: 0.3.0
 Encoding: UTF-8
 Authors@R: c(
