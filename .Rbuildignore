@@ -6,3 +6,6 @@
 .*\.o$
 ^src/vendor/clickhouse-cpp/.buckconfig$
 ^src/vendor/clickhouse-cpp/.travis.yml$
+^RClickhouse_.*.tar.gz$
+^Readme.md$
+^cran-comments.md$
