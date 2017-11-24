@@ -9,10 +9,12 @@ matrix:
       dist: trusty
       sudo: required
       before_script:
+        - sudo sed -i '/<listen_host>::1/d' /etc/clickhouse-server/config.xml
+        - cat /etc/clickhouse-server/config.xml
+        - sudo service clickhouse-server start    # not using builtin service directive, so that the steps are executed in the correct order
         - ln -s /var/lock /run/lock
         - sudo netstat -l --numeric-ports -p
         - ps aux | grep clickhouse
-        - cat /etc/clickhouse-server/config.xml
         - sudo tail -n 100 /var/log/clickhouse-server/clickhouse-server.log /var/log/clickhouse-server/clickhouse-server.err.log
       addons:
         apt:
@@ -21,7 +23,6 @@ matrix:
             - clickhouse-server-common
           sources:
           - sourceline: 'deb http://repo.yandex.ru/clickhouse/trusty stable main'
-      services: clickhouse-server
 
 r_github_packages:
   - rstats-db/DBI
