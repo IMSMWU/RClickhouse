@@ -11,7 +11,7 @@ Authors@R: c(
     person("Keith", "Ray", email = "keith.ray@gmail.com", role = c("aut")),
     person("Zhanyong", "Wan", email = "wan@google.com", role = c("aut")),
     person("Markus", "Heule", email = "mheule@google.com", role = c("aut")),
-    person("Google", role = c("cph")),
+    person(family = "Google", role = c("cph")),
     person("Yann", "Collet", role = c("cph"))
     )
 Description: 'Yandex Clickhouse' (<https://clickhouse.yandex/>) is a high-performance relational column-store database to enable
