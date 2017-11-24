@@ -1,6 +1,6 @@
 Package: RClickhouse
 Type: Package
-Title: A 'DBI' Interface to the Yandex Clickhouse Database Providing Basic 'dplyr' Support
+Title: A 'DBI' Interface to the 'Yandex Clickhouse' Database Providing Basic 'dplyr' Support
 Version: 0.3.0
 Encoding: UTF-8
 Authors@R: c(
@@ -9,7 +9,7 @@ Authors@R: c(
     )
 Description: 'Yandex Clickhouse' is a high-performance relational column-store database to enable
     big data exploration and 'analytics' scaling to petabytes of data. Methods are
-    provided that enable working with 'Yandex' 'Clickhouse' databases via
+    provided that enable working with 'Yandex Clickhouse' databases via
     'DBI' 'methods' and using 'dplyr'/'dbplyr' idioms.
 License: GPL-3
 SystemRequirements: C++11
