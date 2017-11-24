@@ -1,20 +1,24 @@
 language: r
 cache: packages
-dist: trusty
-sudo: false
+latex: false
 warnings_are_errors: false
 
-addons:
-  apt:
-    packages:
-      - clickhouse-server-base
-      - clickhouse-server-common
-    sources:
-    - sourceline: 'deb http://repo.yandex.ru/clickhouse/trusty stable main'
-
-services: clickhouse-server
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+      before_script:
+        - ln -s /var/lock /run/lock
+      addons:
+        apt:
+          packages:
+            - clickhouse-server-base
+            - clickhouse-server-common
+          sources:
+          - sourceline: 'deb http://repo.yandex.ru/clickhouse/trusty stable main'
+      services: clickhouse-server
 
 r_github_packages:
   - rstats-db/DBI
   - hadley/dbplyr
-
