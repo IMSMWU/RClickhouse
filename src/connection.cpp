@@ -78,8 +78,6 @@ void disconnect(XPtr<Client> conn) {
 XPtr<Result> select(XPtr<Client> conn, String query) {
   Result *r = new Result(query);
   //TODO: async?
-  Rcpp::Rcout << "query: " << std::string(query) << std::endl;
-
   conn->SelectCancelable(query, [&r] (const Block& block) {
     r->addBlock(block);
     return R_ToplevelExec(checkInterruptFn, NULL) != FALSE;
