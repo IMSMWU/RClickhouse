@@ -1,4 +1,4 @@
-PKG_CPPFLAGS = $(SYS_FLAGS) -g -O0 -I. -I../inst/include -I./vendor/clickhouse-cpp -I./vendor/clickhouse-cpp/contrib
+PKG_CPPFLAGS = $(SYS_FLAGS) -I. -I../inst/include -I./vendor/clickhouse-cpp -I./vendor/clickhouse-cpp/contrib
 CXX_STD = CXX11
 
 OBJ_FILES = \
@@ -25,6 +25,6 @@ vendor/clickhouse-cpp/contrib/cityhash/city.o \
 vendor/clickhouse-cpp/contrib/lz4/lz4.o \
 vendor/clickhouse-cpp/contrib/lz4/lz4hc.o
 
-PKG_LIBS = -g -std=c++11 -fPIC $(OBJ_FILES) -lpthread $(SYS_LIBS)
+PKG_LIBS = -fPIC $(OBJ_FILES) -lpthread $(SYS_LIBS)
 
 $(SHLIB): $(OBJ_FILES)
