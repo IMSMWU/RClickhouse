@@ -5,5 +5,5 @@
 #' @name RClickhouse
 #' @docType package
 #' @importFrom Rcpp evalCpp
-#' @useDynLib RClickhouse
+#' @useDynLib RClickhouse, .registration=TRUE
 NULL
