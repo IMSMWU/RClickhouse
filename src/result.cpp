@@ -103,6 +103,7 @@ class ScalarConverter : public Converter {
       convertEntries<CT,RT>(in, nullCol, out, offset, start, end);
     });
   }
+
   void processCol(ch::ColumnRef col, Rcpp::List &target, size_t targetIdx,
       NullCol nullCol) {
     auto typedCol = col->As<CT>();
@@ -126,7 +127,7 @@ public:
 
   void processCol(ch::ColumnRef col, Rcpp::List &target, size_t targetIdx, NullCol) {
     auto typedCol = col->As<CT>();
-    processCol(typedCol->Nested(), target, targetIdx, typedCol);
+    elemConverter->processCol(typedCol->Nested(), target, targetIdx, typedCol);
   }
 };
 
