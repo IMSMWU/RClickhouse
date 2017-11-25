@@ -4,6 +4,8 @@ library(DBI, warn.conflicts=F)
 library(dplyr, warn.conflicts=F)
 library(dbplyr, warn.conflicts=F)
 
+source("utils.R")
+
 test_that("correct conversion of logical values in dplyr (#15)", {
   skip_on_cran()
   conn <- dbConnect(RClickhouse::clickhouse(), host=serveraddr)
