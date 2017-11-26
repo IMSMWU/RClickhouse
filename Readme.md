@@ -13,7 +13,7 @@ This package is available on CRAN, and thus installable by running:
 install.packages("RClickhouse")
 ```
 
-But you can also install the latest development version directly from github using devtools like this:
+You can install the latest development version directly from github using devtools like this:
 
 ```R
 devtools::install_github("IMSMWU/RClickhouse")
