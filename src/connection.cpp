@@ -94,8 +94,9 @@ void toColumn(SEXP v, std::shared_ptr<CT> col, std::shared_ptr<ColumnUInt8> null
   RT cv = as<RT>(v);
   if(nullCol) {
     for(typename RT::stored_type e : cv) {
-      col->Append(convertFn(e));
-      nullCol->Append(RT::is_na(e));
+      bool isNA = RT::is_na(e);
+      col->Append(isNA ? 0 : convertFn(e));
+      nullCol->Append(isNA);
     }
   } else {
     for(typename RT::stored_type e : cv) {
