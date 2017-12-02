@@ -17,7 +17,7 @@ Authors@R: c(
 Description: 'Yandex Clickhouse' (<https://clickhouse.yandex/>) is a high-performance relational column-store database to enable
     big data exploration and 'analytics' scaling to petabytes of data. Methods are
     provided that enable working with 'Yandex Clickhouse' databases via
-    'DBI' 'methods' and using 'dplyr'/'dbplyr' idioms.
+    'DBI' methods and using 'dplyr'/'dbplyr' idioms.
 License: GPL-3
 SystemRequirements: C++11
 Imports:
