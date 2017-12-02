@@ -163,9 +163,9 @@ class EnumConverter : public Converter {
                             // level indices in the R factor to be created
 
   void genLevelMap(LevelMapT<VT> &levelMap, Rcpp::CharacterVector &levels) {
-    for (auto ei : type.GetValueToNameMap()) {
-      levels.push_back(ei.second);
-      levelMap[ei.first] = levels.size();  // note: R factor level indices start at 1
+    for (auto it = type.BeginValueToName(); it != type.EndValueToName(); it++) {
+      levels.push_back(it->second);
+      levelMap[it->first] = levels.size();  // note: R factor level indices start at 1
     }
   }
 
