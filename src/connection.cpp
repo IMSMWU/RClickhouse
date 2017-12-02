@@ -162,6 +162,53 @@ std::shared_ptr<ColumnDate> vecToScalar<ColumnDate, const std::time_t>(SEXP v,
   return col;
 }
 
+UInt128 parseUUID(const std::string &str) {
+  unsigned long long p1, p2, p3, p4, p5;
+  int ret = std::sscanf(str.c_str(), "%8llx-%4llx-%4llx-%4llx-%012llx", &p1, &p2, &p3, &p4, &p5);
+  if(ret != 5 || str.length() > 36) {
+    stop("invalid UUID "+str+"; must be xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx where x are hexadecimal characters");
+  }
+
+  uint64_t hi = (p1<<32) | (p2<<16) | p3,
+           lo = (p4<<48) | p5;
+  return UInt128(hi, lo);
+}
+
+template<>
+std::shared_ptr<ColumnUUID> vecToScalar<ColumnUUID, UInt128>(SEXP v,
+    std::shared_ptr<ColumnUInt8> nullCol) {
+  auto col = std::make_shared<ColumnUUID>();
+  switch(TYPEOF(v)) {
+    case INTSXP:
+    case STRSXP: {
+      auto sv = as<StringVector>(v);
+      if(nullCol) {
+        for(auto e : sv) {
+          bool isNA = StringVector::is_na(e);
+          col->Append(isNA ? ch::UInt128(0, 0) : parseUUID(std::string(e)));
+          nullCol->Append(isNA);
+        }
+      } else {
+        for(auto e : sv) {
+          if(StringVector::is_na(e)) {
+            stop("cannot write NA into a non-nullable column of type "+
+                col->Type()->GetName());
+          }
+          col->Append(parseUUID(std::string(e)));
+        }
+      }
+      break;
+    }
+    case NILSXP:
+      // treated as an empty column
+      break;
+    default:
+      stop("cannot write R type "+std::to_string(TYPEOF(v))+
+          " to column of type UUID");
+  }
+  return col;
+}
+
 template<typename CT, typename VT>
 std::shared_ptr<CT> vecToString(SEXP v, std::shared_ptr<ColumnUInt8> nullCol = nullptr) {
   auto col = std::make_shared<CT>();
@@ -251,6 +298,8 @@ ColumnRef vecToColumn(TypeRef t, SEXP v, std::shared_ptr<ColumnUInt8> nullCol = 
       return vecToScalar<ColumnUInt32, uint32_t>(v, nullCol);
     case TC::UInt64:
       return vecToScalar<ColumnUInt64, uint64_t>(v, nullCol);
+    case TC::UUID:
+      return vecToScalar<ColumnUUID, UInt128>(v, nullCol);
     case TC::Float32:
       return vecToScalar<ColumnFloat32, float>(v, nullCol);
     case TC::Float64:

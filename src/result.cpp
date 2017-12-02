@@ -76,6 +76,31 @@ void convertEntries<ch::ColumnDate, Rcpp::DateVector>(std::shared_ptr<const ch::
   }
 }
 
+std::string formatUUID(const ch::UInt128 &v) {
+  const size_t bufsize = 128/4 + 4 + 1;  // 128 bit in hexadecimal + 4 dashes + null terminator
+  char buf[bufsize];
+
+  std::snprintf(&buf[0], bufsize, "%08llx-%04llx-%04llx-%04llx-%012llx",
+      static_cast<unsigned long long>(v.first>>32),
+      (v.first>>16)&0xFFFFllu,
+      v.first&0xFFFFllu,
+      static_cast<unsigned long long>(v.second>>48),
+      v.second&0xFFFFFFFFFFFFllu);
+  return std::string(buf);
+}
+
+template<>
+void convertEntries<ch::ColumnUUID, Rcpp::StringVector>(std::shared_ptr<const ch::ColumnUUID> in,
+    NullCol nullCol, Rcpp::StringVector &out, size_t offset, size_t start, size_t end) {
+  for(size_t j = start; j < end; j++) {
+    if(nullCol && nullCol->IsNull(j)) {
+      out[offset+j-start] = Rcpp::StringVector::get_na();
+    } else {
+      out[offset+j-start] = formatUUID(in->At(j));
+    }
+  }
+}
+
 template<typename VT>
 using LevelMapT = std::map<VT, unsigned>;
 
@@ -225,6 +250,8 @@ std::unique_ptr<Converter> Result::buildConverter(std::string name, ch::TypeRef 
       warn("column "+name+" converted from UInt64 to Numeric");
       return std::unique_ptr<ScalarConverter<ch::ColumnUInt64, Rcpp::NumericVector>>(new ScalarConverter<ch::ColumnUInt64, Rcpp::NumericVector>);
     }
+    case TC::UUID:
+      return std::unique_ptr<ScalarConverter<ch::ColumnUUID, Rcpp::StringVector>>(new ScalarConverter<ch::ColumnUUID, Rcpp::StringVector>);
     case TC::Float32:
       return std::unique_ptr<ScalarConverter<ch::ColumnFloat32, Rcpp::NumericVector>>(new ScalarConverter<ch::ColumnFloat32, Rcpp::NumericVector>);
     case TC::Float64:
