@@ -68,6 +68,8 @@ std::string Type::GetName() const {
             return "UInt32";
         case UInt64:
             return "UInt64";
+        case UUID:
+            return "UUID";
         case Float32:
             return "Float32";
         case Float64:
@@ -182,6 +184,10 @@ TypeRef Type::CreateEnum16(const std::vector<EnumItem>& enum_items) {
     return type;
 }
 
+TypeRef Type::CreateUUID() {
+    return TypeRef(new Type(Type::UUID));
+}
+
 
 EnumType::EnumType(const TypeRef& type)
     : type_(type)
@@ -206,8 +212,12 @@ bool EnumType::HasEnumValue(int16_t value) const {
     return type_->enum_->value_to_name.find(value) != type_->enum_->value_to_name.end();
 }
 
-std::map<int16_t, std::string>& EnumType::GetValueToNameMap() const {
-    return type_->enum_->value_to_name;
+EnumType::ValueToNameIterator EnumType::BeginValueToName() const {
+    return type_->enum_->value_to_name.begin();
+}
+
+EnumType::ValueToNameIterator EnumType::EndValueToName() const {
+    return type_->enum_->value_to_name.end();
 }
 
 }

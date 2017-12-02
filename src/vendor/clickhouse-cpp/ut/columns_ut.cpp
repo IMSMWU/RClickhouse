@@ -1,8 +1,10 @@
 #include <clickhouse/columns/array.h>
 #include <clickhouse/columns/date.h>
 #include <clickhouse/columns/enum.h>
+#include <clickhouse/columns/nullable.h>
 #include <clickhouse/columns/numeric.h>
 #include <clickhouse/columns/string.h>
+#include <clickhouse/columns/uuid.h>
 
 #include <contrib/gtest/gtest.h>
 
@@ -13,6 +15,11 @@ static std::vector<uint32_t> MakeNumbers() {
         {1, 2, 3, 7, 11, 13, 17, 19, 23, 29, 31};
 }
 
+static std::vector<uint8_t> MakeBools() {
+    return std::vector<uint8_t>
+        {1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0};
+}
+
 static std::vector<std::string> MakeFixedStrings() {
     return std::vector<std::string>
         {"aaa", "bbb", "ccc", "ddd"};
@@ -21,6 +28,13 @@ static std::vector<std::string> MakeFixedStrings() {
 static std::vector<std::string> MakeStrings() {
     return std::vector<std::string>
         {"a", "ab", "abc", "abcd"};
+}
+
+static std::vector<uint64_t> MakeUUIDs() {
+    return std::vector<uint64_t>
+        {0xbb6a8c699ab2414cllu, 0x86697b7fd27f0825llu,
+         0x84b9f24bc26b49c6llu, 0xa03b4ab723341951llu,
+         0x3507213c178649f9llu, 0x9faf035d662f60aellu};
 }
 
 
@@ -114,4 +128,36 @@ TEST(ColumnsCase, EnumTest) {
 
     auto col16 = std::make_shared<ColumnEnum16>(Type::CreateEnum16(enum_items));
     ASSERT_TRUE(col16->Type()->IsEqual(Type::CreateEnum16(enum_items)));
+}
+
+TEST(ColumnsCase, NullableSlice) {
+    auto data = std::make_shared<ColumnUInt32>(MakeNumbers());
+    auto nulls = std::make_shared<ColumnUInt8>(MakeBools());
+    auto col = std::make_shared<ColumnNullable>(data, nulls);
+    auto sub = col->Slice(3, 4)->As<ColumnNullable>();
+    auto subData = sub->Nested()->As<ColumnUInt32>();
+
+    ASSERT_EQ(sub->Size(), 4u);
+    ASSERT_FALSE(sub->IsNull(0));
+    ASSERT_EQ(subData->At(0),  7u);
+    ASSERT_TRUE(sub->IsNull(1));
+    ASSERT_FALSE(sub->IsNull(3));
+    ASSERT_EQ(subData->At(3), 17u);
+}
+
+TEST(ColumnsCase, UUIDInit) {
+    auto col = std::make_shared<ColumnUUID>(std::make_shared<ColumnUInt64>(MakeUUIDs()));
+
+    ASSERT_EQ(col->Size(), 3u);
+    ASSERT_EQ(col->At(0), UInt128(0xbb6a8c699ab2414cllu, 0x86697b7fd27f0825llu));
+    ASSERT_EQ(col->At(2), UInt128(0x3507213c178649f9llu, 0x9faf035d662f60aellu));
+}
+
+TEST(ColumnsCase, UUIDSlice) {
+    auto col = std::make_shared<ColumnUUID>(std::make_shared<ColumnUInt64>(MakeUUIDs()));
+    auto sub = col->Slice(1, 2)->As<ColumnUUID>();
+
+    ASSERT_EQ(sub->Size(), 2u);
+    ASSERT_EQ(sub->At(0), UInt128(0x84b9f24bc26b49c6llu, 0xa03b4ab723341951llu));
+    ASSERT_EQ(sub->At(1), UInt128(0x3507213c178649f9llu, 0x9faf035d662f60aellu));
 }
