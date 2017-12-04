@@ -71,7 +71,7 @@ void convertEntries<ch::ColumnDate, Rcpp::DateVector>(std::shared_ptr<const ch::
     if(nullCol && nullCol->IsNull(j)) {
       out[offset+j-start] = Rcpp::DateVector::get_na();
     } else {
-      out[offset+j-start] = in->At(j);
+      out[offset+j-start] = static_cast<int>(in->At(j)/(60*60*24));
     }
   }
 }
