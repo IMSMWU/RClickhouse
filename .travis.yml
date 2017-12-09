@@ -18,3 +18,11 @@ matrix:
             - clickhouse-server-common
           sources:
           - sourceline: 'deb http://repo.yandex.ru/clickhouse/trusty stable main'
+    - os: osx
+      osx_image: xcode9.2
+      before_install:
+        - brew tap hatarist/clickhouse
+      install:
+        - brew install clickhouse
+      before_script:
+        - brew services start clickhouse
