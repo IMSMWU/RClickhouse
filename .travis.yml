@@ -23,6 +23,6 @@ matrix:
       before_install:
         - brew tap hatarist/clickhouse
       install:
-        - brew install clickhouse
+        - travis_wait 30 brew install clickhouse
       before_script:
         - brew services start clickhouse
