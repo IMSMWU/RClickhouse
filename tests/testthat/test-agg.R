@@ -2,6 +2,7 @@ context("aggregation")
 
 library(DBI, warn.conflicts=F)
 library(dplyr, warn.conflicts=F)
+library(dbplyr, warn.conflicts=F)
 
 test <- data.frame(values = c(1,4,30,23.2,12,4,7,4,1,0,12,3))
 
