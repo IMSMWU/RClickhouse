@@ -50,12 +50,19 @@ sql_translate_env.ClickhouseConnection <- function(x) {
       as.integer = dbplyr::sql_prefix("toInt64"),
       as.character = dbplyr::sql_prefix("toString"),
 
+      # Comparison
+      is.null = function(x) build_sql("isNull(",x, ")"),
+      is.na   = function(x) build_sql("isNull(",x, ")"),
+
       # Date/time
       Sys.date = dbplyr::sql_prefix("today"),
       Sys.time = dbplyr::sql_prefix("now")
     ),
-    dbplyr::sql_translator(.parent = dbplyr::base_agg,
-      "%||%" = dbplyr::sql_prefix("concat")
+    dbplyr::sql_translator(
+      .parent = dbplyr::base_agg,
+      "%||%" = dbplyr::sql_prefix("concat"),
+      var    = dbplyr::sql_prefix("varSamp"),
+      sd     = dbplyr::sql_prefix("stddevSamp")
     ),
     dbplyr::base_no_win
   )
