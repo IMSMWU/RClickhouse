@@ -23,7 +23,7 @@ getRealConnection <- function(){
 simulate_clickhouse <- function(type = NULL) {
   structure(
     list(),
-    class = c(type, "DBITestConnection", "DBIConnection")
+    class = c(type, "ClickhouseConnection", "DBITestConnection", "DBIConnection")
   )
 }
 
