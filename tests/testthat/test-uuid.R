@@ -25,7 +25,7 @@ test_that("reading & writing Nullable UUID columns", {
 
 test_that("error on incorrect UUID format", {
   skip_on_cran()
-  conn <- dbConnect(RClickhouse::clickhouse(), host=serveraddr)
+  conn <- getRealConnection()
   input <- c("049b9423-38e3-4722-a9f6-b98c0dc87190", "0123def")
   expect_error(dbWriteTable(conn, tblname, input, overwrite=T, field.types=c("UUID")))
   dbDisconnect(conn)
