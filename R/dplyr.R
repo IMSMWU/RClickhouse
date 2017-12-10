@@ -21,6 +21,16 @@ sql_escape_ident.ClickhouseConnection <- function(con, x) {
   encodeString(x, na.encode = FALSE, quote = "`")
 }
 
+# As opposed to the original sql_prefix, do NOT convert the function
+# name to upper case (function names are case-sensitive in
+# Clickhouse)
+#' @importFrom dbplyr sql_prefix
+ch_sql_prefix <- function(f) {
+  function(..., na.rm) {
+    build_sql(sql(f), list(...))
+  }
+}
+
 #' @export
 #' @importFrom dplyr db_explain
 db_explain.ClickhouseConnection <- function(con, sql, ...) {
@@ -41,28 +51,28 @@ db_analyze.ClickhouseConnection <- function(con, sql, ...) {
 sql_translate_env.ClickhouseConnection <- function(x) {
   dbplyr::sql_variant(
     dbplyr::sql_translator(.parent = dbplyr::base_scalar,
-      "^" = dbplyr::sql_prefix("pow"),
+      "^" = ch_sql_prefix("pow"),
 
       # Casting
-      as.logical = dbplyr::sql_prefix("toUInt8"),
-      as.numeric = dbplyr::sql_prefix("toFloat64"),
-      as.double = dbplyr::sql_prefix("toFloat64"),
-      as.integer = dbplyr::sql_prefix("toInt64"),
-      as.character = dbplyr::sql_prefix("toString"),
+      as.logical = ch_sql_prefix("toUInt8"),
+      as.numeric = ch_sql_prefix("toFloat64"),
+      as.double = ch_sql_prefix("toFloat64"),
+      as.integer = ch_sql_prefix("toInt64"),
+      as.character = ch_sql_prefix("toString"),
 
       # Comparison
-      is.null = function(x) build_sql("isNull(",x, ")"),
-      is.na   = function(x) build_sql("isNull(",x, ")"),
+      is.null = ch_sql_prefix("isNull"),
+      is.na   = ch_sql_prefix("isNull"),
 
       # Date/time
-      Sys.date = dbplyr::sql_prefix("today"),
-      Sys.time = dbplyr::sql_prefix("now")
+      Sys.date = ch_sql_prefix("today"),
+      Sys.time = ch_sql_prefix("now")
     ),
     dbplyr::sql_translator(
       .parent = dbplyr::base_agg,
-      "%||%" = dbplyr::sql_prefix("concat"),
-      var    = dbplyr::sql_prefix("varSamp"),
-      sd     = dbplyr::sql_prefix("stddevSamp")
+      "%||%" = ch_sql_prefix("concat"),
+      var    = ch_sql_prefix("varSamp"),
+      sd     = ch_sql_prefix("stddevSamp")
     ),
     dbplyr::base_no_win
   )
