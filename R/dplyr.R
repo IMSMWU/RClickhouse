@@ -27,7 +27,7 @@ sql_escape_ident.ClickhouseConnection <- function(con, x) {
 #' @importFrom dbplyr sql_prefix
 ch_sql_prefix <- function(f) {
   function(..., na.rm) {
-    build_sql(sql(f), list(...))
+    dbplyr::build_sql(dbplyr::sql(f), list(...))
   }
 }
 

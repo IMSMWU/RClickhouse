@@ -1,10 +1,14 @@
 
 #' adapted from dbplyr
 #' @rdname sql_variant
+#' @param f SQL function name
 sql_aggregate <- function(f) {
   function(x, na.rm = FALSE) {
-    check_na_rm(f, na.rm)
-    build_sql(sql(f), list(x))
+    if (!identical(na.rm, TRUE)) {
+      warning("Missing values are always removed in SQL.\n",
+              "Use `", f, "(x, na.rm = TRUE)` to silence this warning.", call.=F)
+    }
+    dbplyr::build_sql(dbplyr::sql(f), list(x))
   }
 }
 
@@ -12,6 +16,6 @@ sql_aggregate <- function(f) {
 #' @rdname sql_variant
 sql_aggregate_2 <- function(f) {
   function(x, y) {
-    build_sql(sql(f), list(x, y))
+    dbplyr::build_sql(dbplyr::sql(f), list(x, y))
   }
 }
