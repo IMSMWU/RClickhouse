@@ -25,7 +25,8 @@ Imports:
     dbplyr (>= 1.0.0),
     methods (>= 3.3.2),
     DBI (>= 0.6.0),
-    Rcpp (>= 0.11.0)
+    Rcpp (>= 0.11.0),
+    yaml (>= 2.1.15)
 LazyData: true
 RoxygenNote: 6.0.1
 NeedsCompilation: yes
@@ -39,7 +40,6 @@ Collate:
   'ClickhouseDriver.R'
   'ClickhouseConnection.R'
   'ClickhouseResult.R'
-  'dbplyr-helpers.R'
   'dplyr.R'
   'zzz.R'
 URL: https://github.com/IMSMWU/RClickhouse
