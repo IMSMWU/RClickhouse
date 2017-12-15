@@ -40,6 +40,7 @@ Collate:
   'ClickhouseDriver.R'
   'ClickhouseConnection.R'
   'ClickhouseResult.R'
+  'dbplyr-helpers.R'
   'dplyr.R'
   'zzz.R'
 URL: https://github.com/IMSMWU/RClickhouse
