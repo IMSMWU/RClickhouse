@@ -116,6 +116,8 @@ setMethod("dbConnect", "ClickhouseDriver", function(drv, host="localhost", port 
   input_params <- c(host=host, port=port, db=db, user=user, password=password, compression=compression)
   default_input_diff <- c(input_params[!(input_params %in% DEFAULT_PARAMS)])
   
+  config <- loadConfig(CONFIG_PATHS, DEFAULT_PARAMS, default_input_diff)
+  
   ptr <- connect(config[['host']], strtoi(config[['port']]), config[['db']], config[['user']], config[['password']], config[['compression']])
   reg.finalizer(ptr, function(p) {
     if (validPtr(p))
