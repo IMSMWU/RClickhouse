@@ -1,0 +1,2 @@
+port: 6666
+db: 'non-default-db'

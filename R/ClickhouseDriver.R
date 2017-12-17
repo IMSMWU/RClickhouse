@@ -48,6 +48,53 @@ setMethod("dbUnloadDriver", "ClickhouseDriver", function(drv, ...) {
   invisible(TRUE)
 })
 
+
+complementList <- function(config, config_temp) {
+  diff_params <- checkParameters(config, config_temp)
+  for (param in diff_params) {
+    param_temp <- c(param_name=config_temp[[param]])
+    names(param_temp) <- param
+    config <- c(config, param_temp)
+  }
+  return(config)
+}
+
+
+checkParameters <- function(add_params, comp_params) {
+  diff_params = c()
+  for (name in names(comp_params)) {
+    if (exists(name, where=as.list(add_params)) == FALSE) {
+      diff_params <- c(diff_params, name)
+    }
+  }
+  return(diff_params)
+}
+
+#' @export
+#' @importFrom yaml read_yaml
+loadConfig <- function(CONFIG_PATHS, DEFAULT_PARAMS, pre_config) {
+  config = pre_config
+  config_found <- FALSE
+  
+  for (path in CONFIG_PATHS) {
+    if (file.exists(path) == TRUE) {
+      config_temp <- yaml::read_yaml(path)
+      config <- complementList(config, config_temp)
+      config_found <- TRUE
+    }
+  }
+  
+  if (config_found == TRUE) {
+    warning('We have found a config file/multiple config files that will be loaded.')
+  }
+  
+  if (all(names(DEFAULT_PARAMS) %in% names(config)) == FALSE){
+    config <- complementList(config, DEFAULT_PARAMS)
+  }
+  return(config)
+}
+
+
 #' Connect to a ClickHouse database.
 #' @export
 #' @rdname ClickhouseDriver-class
@@ -63,8 +110,14 @@ setMethod("dbUnloadDriver", "ClickhouseDriver", function(drv, ...) {
 #' \dontrun{
 #' conn <- dbConnect(RClickhouse::clickhouse(), host="localhost")
 #' }
-setMethod("dbConnect", "ClickhouseDriver", function(drv, host="localhost", port = 9000, db = "default", user = "default", password = "", compression = "lz4", ...) {
-  ptr <- connect(host, port, db, user, password, compression)
+setMethod("dbConnect", "ClickhouseDriver", function(drv, host="localhost", port = 9000, db = "default", user = "default", password = "", compression = "lz4", config_paths = c('./RClickhouse.yaml', '~/.R/RClickhouse.yaml', '/etc/RClickhouse.yaml'), ...) {
+  DEFAULT_PARAMS <- c(host='localhost', port=9000, db='default', user='default', password='', compression='lz4')
+  input_params <- c(host=host, port=port, db=db, user=user, password=password, compression=compression)
+  default_input_diff <- c(input_params[!(input_params %in% DEFAULT_PARAMS)])
+  
+  config <- loadConfig(config_paths, DEFAULT_PARAMS, default_input_diff)
+  
+  ptr <- connect(config[['host']], strtoi(config[['port']]), config[['db']], config[['user']], config[['password']], config[['compression']])
   reg.finalizer(ptr, function(p) {
     if (validPtr(p))
       warning("connection was garbage collected without being disconnected")
