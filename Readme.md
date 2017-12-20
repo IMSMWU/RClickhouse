@@ -4,7 +4,7 @@
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/RClickhouse)](https://cran.r-project.org/package=RClickhouse)
 [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/RClickhouse)](https://cran.r-project.org/package=RClickhouse)
 
-This R package is a DBI interface for the [Yandex Clickhouse](https://clickhouse.yandex) database. It provides basic dplyr support by auto-generating SQL-commands using dbplyr and is based on the official [C++ Clickhouse Client](https://github.com/artpaul/clickhouse-cpp).
+This R package is a DBI interface for the [Yandex Clickhouse](https://clickhouse.yandex) database. It provides basic dplyr support by auto-generating SQL-commands using dbplyr and is based on the official [C++ Clickhouse Client](https://github.com/artpaul/clickhouse-cpp). Please, use the BibTeX entry provided in CITATION to cite this library.
 
 ## Requirements & Installation
 This package is available on CRAN, and thus installable by running:
