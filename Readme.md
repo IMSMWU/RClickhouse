@@ -32,6 +32,20 @@ library(dplyr)
 
 tbl(con, "mtcars") %>% group_by(cyl) %>% summarise(smpg=sum(mpg))
 ```
+### Config File
+You may use a config file that is looked up for automatic initialization of the dbConnect parameters.
+
+To do so, create a yaml file (default ```RClickhouse.yaml```), in at least one directory (default lookup paths of parameter config_paths: ```./RClickhouse.yaml, ~/.R/RClickhouse.yaml, /etc/RClickhouse.yaml```), e.g. ```~/.R/configs/RClickhouse.yaml``` and pass a vector of the corresponding file paths to ```dbConnect``` as ```config_paths``` parameter.
+In ```RClickhouse.yaml```, you may specify a variable number of parameters (```host, port, db, user, password, compression```) to be initialized using the following format (example):
+```YAML
+host: example-db.com
+port: 1111
+```
+The actual initialization of the parameters of ```dbConnect``` follows a hierarchical structure with varying priorities (1 to 3, where 1 is highest):
+ 1. Specified input parameters when calling ```dbConnect```. If parameters are unspecified, fall back to (2)
+ 2. Parameters specified in ```RClickhouse.yaml```, where the level of priority depends on the position of the path in the config_path input vector (first position, highest priority etc.). If parameters are unspecified, fall back to (3).
+ 3. Default parameters (```host="localhost", port = 9000, db = "default", user = "default", password = "", compression = "lz4"```).
+
 
 ## Acknowledgements
 Big thanks to Kirill Müller, Maxwell Peterson, Artemkin Pavel and Hannes Mühleisen.
