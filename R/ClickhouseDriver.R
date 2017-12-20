@@ -105,6 +105,7 @@ loadConfig <- function(CONFIG_PATHS, DEFAULT_PARAMS, pre_config) {
 #' @param user name of the user to connect as.
 #' @param password the user's password.
 #' @param compression the compression method for the connection (lz4 by default).
+#' @param config_paths paths where config files are searched for; order of paths denotes hierarchy (first string has highest priority etc.).
 #' @return A database connection.
 #' @examples
 #' \dontrun{
