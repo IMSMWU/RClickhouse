@@ -1,0 +1,8 @@
+@misc{HotzBehofsits2017,
+  author = {Hotz-Behofsits, C. and Danninger, C. and Stiebellehner, S.},
+  title = {RClickhouse},
+  year = {2017},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/IMSMWU/RClickhouse}}
+}
