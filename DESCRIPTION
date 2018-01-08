@@ -19,7 +19,7 @@ Description: 'Yandex Clickhouse' (<https://clickhouse.yandex/>) is a high-perfor
     big data exploration and 'analytics' scaling to petabytes of data. Methods are
     provided that enable working with 'Yandex Clickhouse' databases via
     'DBI' methods and using 'dplyr'/'dbplyr' idioms.
-License: GNU General Public License v2.0
+License: GPL-2
 SystemRequirements: C++11
 Imports:
     dplyr (>= 0.7.0),
