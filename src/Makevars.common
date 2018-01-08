@@ -26,6 +26,6 @@ vendor/clickhouse-cpp/contrib/cityhash/city.o \
 vendor/clickhouse-cpp/contrib/lz4/lz4.o \
 vendor/clickhouse-cpp/contrib/lz4/lz4hc.o
 
-PKG_LIBS = -fPIC $(OBJ_FILES) -lpthread $(SYS_LIBS)
+PKG_LIBS = $(OBJ_FILES) -lpthread $(SYS_LIBS)
 
 $(SHLIB): $(OBJ_FILES)
