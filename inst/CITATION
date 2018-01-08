@@ -1,0 +1,10 @@
+citEntry(
+  entry = "misc",
+  author = c("Christian Hotz-Behofsits", "Clemens Danninger", "Simon Stiebellehner"),
+  title = "RClickhouse",
+  year = "2017",
+  publisher = "GitHub",
+  journal = "GitHub repository",
+  howpublished = "\\url{https://github.com/IMSMWU/RClickhouse}",
+  textVersion = "C. Hotz-Behofsits, C. Danninger, S. Stiebellehner. RClickhouse. URL https://github.com/IMSMWU/RClickhouse."
+)
