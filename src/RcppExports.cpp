@@ -10,7 +10,7 @@ using namespace Rcpp;
 
 // fetch
 DataFrame fetch(XPtr<Result> res, ssize_t n);
-static SEXP RClickhouse_fetch_try(SEXP resSEXP, SEXP nSEXP) {
+static SEXP _RClickhouse_fetch_try(SEXP resSEXP, SEXP nSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< XPtr<Result> >::type res(resSEXP);
@@ -19,11 +19,11 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP RClickhouse_fetch(SEXP resSEXP, SEXP nSEXP) {
+RcppExport SEXP _RClickhouse_fetch(SEXP resSEXP, SEXP nSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(RClickhouse_fetch_try(resSEXP, nSEXP));
+        rcpp_result_gen = PROTECT(_RClickhouse_fetch_try(resSEXP, nSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -41,18 +41,18 @@ RcppExport SEXP RClickhouse_fetch(SEXP resSEXP, SEXP nSEXP) {
 }
 // clearResult
 void clearResult(XPtr<Result> res);
-static SEXP RClickhouse_clearResult_try(SEXP resSEXP) {
+static SEXP _RClickhouse_clearResult_try(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::traits::input_parameter< XPtr<Result> >::type res(resSEXP);
     clearResult(res);
     return R_NilValue;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP RClickhouse_clearResult(SEXP resSEXP) {
+RcppExport SEXP _RClickhouse_clearResult(SEXP resSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(RClickhouse_clearResult_try(resSEXP));
+        rcpp_result_gen = PROTECT(_RClickhouse_clearResult_try(resSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -70,7 +70,7 @@ RcppExport SEXP RClickhouse_clearResult(SEXP resSEXP) {
 }
 // hasCompleted
 bool hasCompleted(XPtr<Result> res);
-static SEXP RClickhouse_hasCompleted_try(SEXP resSEXP) {
+static SEXP _RClickhouse_hasCompleted_try(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< XPtr<Result> >::type res(resSEXP);
@@ -78,11 +78,11 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP RClickhouse_hasCompleted(SEXP resSEXP) {
+RcppExport SEXP _RClickhouse_hasCompleted(SEXP resSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(RClickhouse_hasCompleted_try(resSEXP));
+        rcpp_result_gen = PROTECT(_RClickhouse_hasCompleted_try(resSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -100,7 +100,7 @@ RcppExport SEXP RClickhouse_hasCompleted(SEXP resSEXP) {
 }
 // getRowCount
 size_t getRowCount(XPtr<Result> res);
-static SEXP RClickhouse_getRowCount_try(SEXP resSEXP) {
+static SEXP _RClickhouse_getRowCount_try(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< XPtr<Result> >::type res(resSEXP);
@@ -108,11 +108,11 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP RClickhouse_getRowCount(SEXP resSEXP) {
+RcppExport SEXP _RClickhouse_getRowCount(SEXP resSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(RClickhouse_getRowCount_try(resSEXP));
+        rcpp_result_gen = PROTECT(_RClickhouse_getRowCount_try(resSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -130,7 +130,7 @@ RcppExport SEXP RClickhouse_getRowCount(SEXP resSEXP) {
 }
 // getRowsAffected
 size_t getRowsAffected(XPtr<Result> res);
-static SEXP RClickhouse_getRowsAffected_try(SEXP resSEXP) {
+static SEXP _RClickhouse_getRowsAffected_try(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< XPtr<Result> >::type res(resSEXP);
@@ -138,11 +138,11 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP RClickhouse_getRowsAffected(SEXP resSEXP) {
+RcppExport SEXP _RClickhouse_getRowsAffected(SEXP resSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(RClickhouse_getRowsAffected_try(resSEXP));
+        rcpp_result_gen = PROTECT(_RClickhouse_getRowsAffected_try(resSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -160,7 +160,7 @@ RcppExport SEXP RClickhouse_getRowsAffected(SEXP resSEXP) {
 }
 // getStatement
 std::string getStatement(XPtr<Result> res);
-static SEXP RClickhouse_getStatement_try(SEXP resSEXP) {
+static SEXP _RClickhouse_getStatement_try(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< XPtr<Result> >::type res(resSEXP);
@@ -168,11 +168,11 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP RClickhouse_getStatement(SEXP resSEXP) {
+RcppExport SEXP _RClickhouse_getStatement(SEXP resSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(RClickhouse_getStatement_try(resSEXP));
+        rcpp_result_gen = PROTECT(_RClickhouse_getStatement_try(resSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -190,7 +190,7 @@ RcppExport SEXP RClickhouse_getStatement(SEXP resSEXP) {
 }
 // resultTypes
 std::vector<std::string> resultTypes(XPtr<Result> res);
-static SEXP RClickhouse_resultTypes_try(SEXP resSEXP) {
+static SEXP _RClickhouse_resultTypes_try(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< XPtr<Result> >::type res(resSEXP);
@@ -198,11 +198,11 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP RClickhouse_resultTypes(SEXP resSEXP) {
+RcppExport SEXP _RClickhouse_resultTypes(SEXP resSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(RClickhouse_resultTypes_try(resSEXP));
+        rcpp_result_gen = PROTECT(_RClickhouse_resultTypes_try(resSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -220,7 +220,7 @@ RcppExport SEXP RClickhouse_resultTypes(SEXP resSEXP) {
 }
 // connect
 XPtr<Client> connect(String host, int port, String db, String user, String password, String compression);
-static SEXP RClickhouse_connect_try(SEXP hostSEXP, SEXP portSEXP, SEXP dbSEXP, SEXP userSEXP, SEXP passwordSEXP, SEXP compressionSEXP) {
+static SEXP _RClickhouse_connect_try(SEXP hostSEXP, SEXP portSEXP, SEXP dbSEXP, SEXP userSEXP, SEXP passwordSEXP, SEXP compressionSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< String >::type host(hostSEXP);
@@ -233,11 +233,11 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP RClickhouse_connect(SEXP hostSEXP, SEXP portSEXP, SEXP dbSEXP, SEXP userSEXP, SEXP passwordSEXP, SEXP compressionSEXP) {
+RcppExport SEXP _RClickhouse_connect(SEXP hostSEXP, SEXP portSEXP, SEXP dbSEXP, SEXP userSEXP, SEXP passwordSEXP, SEXP compressionSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(RClickhouse_connect_try(hostSEXP, portSEXP, dbSEXP, userSEXP, passwordSEXP, compressionSEXP));
+        rcpp_result_gen = PROTECT(_RClickhouse_connect_try(hostSEXP, portSEXP, dbSEXP, userSEXP, passwordSEXP, compressionSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -255,18 +255,18 @@ RcppExport SEXP RClickhouse_connect(SEXP hostSEXP, SEXP portSEXP, SEXP dbSEXP, S
 }
 // disconnect
 void disconnect(XPtr<Client> conn);
-static SEXP RClickhouse_disconnect_try(SEXP connSEXP) {
+static SEXP _RClickhouse_disconnect_try(SEXP connSEXP) {
 BEGIN_RCPP
     Rcpp::traits::input_parameter< XPtr<Client> >::type conn(connSEXP);
     disconnect(conn);
     return R_NilValue;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP RClickhouse_disconnect(SEXP connSEXP) {
+RcppExport SEXP _RClickhouse_disconnect(SEXP connSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(RClickhouse_disconnect_try(connSEXP));
+        rcpp_result_gen = PROTECT(_RClickhouse_disconnect_try(connSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -284,7 +284,7 @@ RcppExport SEXP RClickhouse_disconnect(SEXP connSEXP) {
 }
 // select
 XPtr<Result> select(XPtr<Client> conn, String query);
-static SEXP RClickhouse_select_try(SEXP connSEXP, SEXP querySEXP) {
+static SEXP _RClickhouse_select_try(SEXP connSEXP, SEXP querySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< XPtr<Client> >::type conn(connSEXP);
@@ -293,11 +293,11 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP RClickhouse_select(SEXP connSEXP, SEXP querySEXP) {
+RcppExport SEXP _RClickhouse_select(SEXP connSEXP, SEXP querySEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(RClickhouse_select_try(connSEXP, querySEXP));
+        rcpp_result_gen = PROTECT(_RClickhouse_select_try(connSEXP, querySEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -315,7 +315,7 @@ RcppExport SEXP RClickhouse_select(SEXP connSEXP, SEXP querySEXP) {
 }
 // insert
 void insert(XPtr<Client> conn, String tableName, DataFrame df);
-static SEXP RClickhouse_insert_try(SEXP connSEXP, SEXP tableNameSEXP, SEXP dfSEXP) {
+static SEXP _RClickhouse_insert_try(SEXP connSEXP, SEXP tableNameSEXP, SEXP dfSEXP) {
 BEGIN_RCPP
     Rcpp::traits::input_parameter< XPtr<Client> >::type conn(connSEXP);
     Rcpp::traits::input_parameter< String >::type tableName(tableNameSEXP);
@@ -324,11 +324,11 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP RClickhouse_insert(SEXP connSEXP, SEXP tableNameSEXP, SEXP dfSEXP) {
+RcppExport SEXP _RClickhouse_insert(SEXP connSEXP, SEXP tableNameSEXP, SEXP dfSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(RClickhouse_insert_try(connSEXP, tableNameSEXP, dfSEXP));
+        rcpp_result_gen = PROTECT(_RClickhouse_insert_try(connSEXP, tableNameSEXP, dfSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -346,7 +346,7 @@ RcppExport SEXP RClickhouse_insert(SEXP connSEXP, SEXP tableNameSEXP, SEXP dfSEX
 }
 // validPtr
 bool validPtr(SEXP ptr);
-static SEXP RClickhouse_validPtr_try(SEXP ptrSEXP) {
+static SEXP _RClickhouse_validPtr_try(SEXP ptrSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< SEXP >::type ptr(ptrSEXP);
@@ -354,11 +354,11 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP RClickhouse_validPtr(SEXP ptrSEXP) {
+RcppExport SEXP _RClickhouse_validPtr(SEXP ptrSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(RClickhouse_validPtr_try(ptrSEXP));
+        rcpp_result_gen = PROTECT(_RClickhouse_validPtr_try(ptrSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -376,7 +376,7 @@ RcppExport SEXP RClickhouse_validPtr(SEXP ptrSEXP) {
 }
 
 // validate (ensure exported C++ functions exist before calling them)
-static int RClickhouse_RcppExport_validate(const char* sig) { 
+static int _RClickhouse_RcppExport_validate(const char* sig) { 
     static std::set<std::string> signatures;
     if (signatures.empty()) {
         signatures.insert("DataFrame(*fetch)(XPtr<Result>,ssize_t)");
@@ -396,19 +396,19 @@ static int RClickhouse_RcppExport_validate(const char* sig) {
 }
 
 // registerCCallable (register entry points for exported C++ functions)
-RcppExport SEXP RClickhouse_RcppExport_registerCCallable() { 
-    R_RegisterCCallable("RClickhouse", "RClickhouse_fetch", (DL_FUNC)RClickhouse_fetch_try);
-    R_RegisterCCallable("RClickhouse", "RClickhouse_clearResult", (DL_FUNC)RClickhouse_clearResult_try);
-    R_RegisterCCallable("RClickhouse", "RClickhouse_hasCompleted", (DL_FUNC)RClickhouse_hasCompleted_try);
-    R_RegisterCCallable("RClickhouse", "RClickhouse_getRowCount", (DL_FUNC)RClickhouse_getRowCount_try);
-    R_RegisterCCallable("RClickhouse", "RClickhouse_getRowsAffected", (DL_FUNC)RClickhouse_getRowsAffected_try);
-    R_RegisterCCallable("RClickhouse", "RClickhouse_getStatement", (DL_FUNC)RClickhouse_getStatement_try);
-    R_RegisterCCallable("RClickhouse", "RClickhouse_resultTypes", (DL_FUNC)RClickhouse_resultTypes_try);
-    R_RegisterCCallable("RClickhouse", "RClickhouse_connect", (DL_FUNC)RClickhouse_connect_try);
-    R_RegisterCCallable("RClickhouse", "RClickhouse_disconnect", (DL_FUNC)RClickhouse_disconnect_try);
-    R_RegisterCCallable("RClickhouse", "RClickhouse_select", (DL_FUNC)RClickhouse_select_try);
-    R_RegisterCCallable("RClickhouse", "RClickhouse_insert", (DL_FUNC)RClickhouse_insert_try);
-    R_RegisterCCallable("RClickhouse", "RClickhouse_validPtr", (DL_FUNC)RClickhouse_validPtr_try);
-    R_RegisterCCallable("RClickhouse", "RClickhouse_RcppExport_validate", (DL_FUNC)RClickhouse_RcppExport_validate);
+RcppExport SEXP _RClickhouse_RcppExport_registerCCallable() { 
+    R_RegisterCCallable("RClickhouse", "_RClickhouse_fetch", (DL_FUNC)_RClickhouse_fetch_try);
+    R_RegisterCCallable("RClickhouse", "_RClickhouse_clearResult", (DL_FUNC)_RClickhouse_clearResult_try);
+    R_RegisterCCallable("RClickhouse", "_RClickhouse_hasCompleted", (DL_FUNC)_RClickhouse_hasCompleted_try);
+    R_RegisterCCallable("RClickhouse", "_RClickhouse_getRowCount", (DL_FUNC)_RClickhouse_getRowCount_try);
+    R_RegisterCCallable("RClickhouse", "_RClickhouse_getRowsAffected", (DL_FUNC)_RClickhouse_getRowsAffected_try);
+    R_RegisterCCallable("RClickhouse", "_RClickhouse_getStatement", (DL_FUNC)_RClickhouse_getStatement_try);
+    R_RegisterCCallable("RClickhouse", "_RClickhouse_resultTypes", (DL_FUNC)_RClickhouse_resultTypes_try);
+    R_RegisterCCallable("RClickhouse", "_RClickhouse_connect", (DL_FUNC)_RClickhouse_connect_try);
+    R_RegisterCCallable("RClickhouse", "_RClickhouse_disconnect", (DL_FUNC)_RClickhouse_disconnect_try);
+    R_RegisterCCallable("RClickhouse", "_RClickhouse_select", (DL_FUNC)_RClickhouse_select_try);
+    R_RegisterCCallable("RClickhouse", "_RClickhouse_insert", (DL_FUNC)_RClickhouse_insert_try);
+    R_RegisterCCallable("RClickhouse", "_RClickhouse_validPtr", (DL_FUNC)_RClickhouse_validPtr_try);
+    R_RegisterCCallable("RClickhouse", "_RClickhouse_RcppExport_validate", (DL_FUNC)_RClickhouse_RcppExport_validate);
     return R_NilValue;
 }

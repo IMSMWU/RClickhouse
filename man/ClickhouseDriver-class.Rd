@@ -24,7 +24,8 @@ clickhouse()
 
 \S4method{dbConnect}{ClickhouseDriver}(drv, host = "localhost", port = 9000,
   db = "default", user = "default", password = "", compression = "lz4",
-  ...)
+  config_paths = c("./RClickhouse.yaml", "~/.R/RClickhouse.yaml",
+  "/etc/RClickhouse.yaml"), ...)
 
 \S4method{dbDataType}{ClickhouseDriver}(dbObj, obj, ...)
 }
@@ -42,6 +43,8 @@ clickhouse()
 \item{password}{the user's password.}
 
 \item{compression}{the compression method for the connection (lz4 by default).}
+
+\item{config_paths}{paths where config files are searched for; order of paths denotes hierarchy (first string has highest priority etc.).}
 }
 \value{
 A database connection.
