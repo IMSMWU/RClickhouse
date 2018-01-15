@@ -1,7 +1,7 @@
 Package: RClickhouse
 Type: Package
 Title: A 'DBI' Interface to the 'Yandex Clickhouse' Database Providing Basic 'dplyr' Support
-Version: 0.3.0
+Version: 0.4.0
 Encoding: UTF-8
 Authors@R: c(
     person("Christian", "Hotz-Behofsits", email = "christian.hotz-behofsits@wu.ac.at", role = c("aut", "cre")),
@@ -27,12 +27,12 @@ Imports:
     methods (>= 3.3.2),
     DBI (>= 0.6.0),
     Rcpp (>= 0.11.0),
-    yaml (>= 2.1.15)
+    yaml (>= 2.1.14)
 LazyData: true
 RoxygenNote: 6.0.1
 NeedsCompilation: yes
 Depends:
-    R (>= 3.3.2)
+    R (>= 3.3)
 Suggests:
     testthat
 Collate:
