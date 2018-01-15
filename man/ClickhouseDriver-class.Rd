@@ -8,6 +8,7 @@
 \alias{dbGetInfo,ClickhouseDriver-method}
 \alias{dbIsValid,ClickhouseDriver-method}
 \alias{dbUnloadDriver,ClickhouseDriver-method}
+\alias{loadConfig}
 \alias{dbConnect,ClickhouseDriver-method}
 \alias{dbDataType,ClickhouseDriver-method}
 \title{Class ClickhouseDriver}
@@ -22,6 +23,8 @@ clickhouse()
 
 \S4method{dbUnloadDriver}{ClickhouseDriver}(drv, ...)
 
+loadConfig(CONFIG_PATHS, DEFAULT_PARAMS, pre_config)
+
 \S4method{dbConnect}{ClickhouseDriver}(drv, host = "localhost", port = 9000,
   db = "default", user = "default", password = "", compression = "lz4",
   config_paths = c("./RClickhouse.yaml", "~/.R/RClickhouse.yaml",
@@ -31,6 +34,12 @@ clickhouse()
 }
 \arguments{
 \item{drv}{ClickHouse database driver.}
+
+\item{CONFIG_PATHS}{a list of configuration paths}
+
+\item{DEFAULT_PARAMS}{a list of configuration defaults}
+
+\item{pre_config}{initialization set}
 
 \item{host}{name of the host on which the database is running.}
 
@@ -47,6 +56,8 @@ clickhouse()
 \item{config_paths}{paths where config files are searched for; order of paths denotes hierarchy (first string has highest priority etc.).}
 }
 \value{
+a merged configuration
+
 A database connection.
 }
 \description{

@@ -70,12 +70,17 @@ checkParameters <- function(add_params, comp_params) {
   return(diff_params)
 }
 
+#' @rdname ClickhouseDriver-class
 #' @export
+#' @param CONFIG_PATHS a list of configuration paths
+#' @param DEFAULT_PARAMS a list of configuration defaults
+#' @param pre_config initialization set
+#' @return a merged configuration
 #' @importFrom yaml read_yaml
 loadConfig <- function(CONFIG_PATHS, DEFAULT_PARAMS, pre_config) {
   config = pre_config
   config_found <- FALSE
-  
+
   for (path in CONFIG_PATHS) {
     if (file.exists(path) == TRUE) {
       config_temp <- yaml::read_yaml(path)
@@ -83,11 +88,11 @@ loadConfig <- function(CONFIG_PATHS, DEFAULT_PARAMS, pre_config) {
       config_found <- TRUE
     }
   }
-  
+
   if (config_found == TRUE) {
     warning('We have found a config file/multiple config files that will be loaded.')
   }
-  
+
   if (all(names(DEFAULT_PARAMS) %in% names(config)) == FALSE){
     config <- complementList(config, DEFAULT_PARAMS)
   }
@@ -115,9 +120,9 @@ setMethod("dbConnect", "ClickhouseDriver", function(drv, host="localhost", port 
   DEFAULT_PARAMS <- c(host='localhost', port=9000, db='default', user='default', password='', compression='lz4')
   input_params <- c(host=host, port=port, db=db, user=user, password=password, compression=compression)
   default_input_diff <- c(input_params[!(input_params %in% DEFAULT_PARAMS)])
-  
+
   config <- loadConfig(config_paths, DEFAULT_PARAMS, default_input_diff)
-  
+
   ptr <- connect(config[['host']], strtoi(config[['port']]), config[['db']], config[['user']], config[['password']], config[['compression']])
   reg.finalizer(ptr, function(p) {
     if (validPtr(p))
