@@ -1,18 +1,19 @@
 
 # basic set-if-unset operator
 "%||=%" <- function(x, y){
-   Var <- deparse(substitute(x))
-   if (!exists(Var))
-     assign(Var, y, parent.frame())
+  Var <- deparse(substitute(x))
+  if (!exists(Var))
+    assign(Var, y, parent.frame())
 }
 
-# set variables if not set yet
-serveraddr %||=% "127.0.0.1"
-user       %||=% "default"
-password   %||=% ""
 tblname    %||=% "test"
 
 getRealConnection <- function(){
+  # set variables if not set yet
+  serveraddr %||=% "localhost"
+  user       %||=% "default"
+  password   %||=% ''
+
   # TODO: recycle connection by using singleton?
   conn <- dbConnect(RClickhouse::clickhouse(), host=serveraddr, user=user, password=password)
   return (conn)

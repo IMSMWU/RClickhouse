@@ -24,6 +24,10 @@ test_that("correct loading of and merging of different parameter sources", {
   DEFAULT_PARAMS <- c(host='localhost', port=9000, db='default', user='default', password='', compression='lz4')
   input_params <- c(host='customhost', db='input-db')
   default_input_diff <- c(input_params[!(input_params %in% DEFAULT_PARAMS)])
-  config <- loadConfig(CONFIG_PATHS, DEFAULT_PARAMS, default_input_diff)
+
+  expect_warning({
+      config <- loadConfig(CONFIG_PATHS, DEFAULT_PARAMS, default_input_diff)
+    })
+
   expect_equal(config, c(host='customhost', db='input-db', port=6666, user='default', password='', compression='lz4'))
 })
