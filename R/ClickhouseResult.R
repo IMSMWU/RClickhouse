@@ -11,7 +11,8 @@ setClass("ClickhouseResult",
     sql = "character",
     env = "environment",
     conn = "ClickhouseConnection",
-    ptr = "externalptr"
+    ptr = "externalptr",
+    bigint = "character"
   )
 )
 
