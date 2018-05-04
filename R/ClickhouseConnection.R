@@ -13,7 +13,7 @@ setClass("ClickhouseConnection",
     host = "character",
     port = "numeric",
     user = "character",
-    bigint = "character"
+    Int64 = "character"
   )
 )
 
@@ -130,7 +130,7 @@ setMethod("dbSendQuery", c("ClickhouseConnection", "character"), function(conn, 
       env = new.env(parent = emptyenv()),   #TODO: set env
       conn = conn,
       ptr = res,
-      bigint = conn@bigint
+      Int64 = conn@Int64
   ))
 })
 
