@@ -24,8 +24,26 @@ setMethod("dbFetch", signature = "ClickhouseResult", definition = function(res, 
   if (n != as.integer(n) || (n < 0 && n != -1)) {
     stop("n must be a positive integer, -1 or Inf")
   }
-  return(fetch(res@ptr, n))
+  ret <- fetch(res@ptr, n)
+  ret <- convert_bigint(ret, res@bigint)
+  return(ret)
 })
+
+convert_bigint <- function(df, bigint) {
+  if (bigint == "integer64") return(df)
+  is_int64 <- which(vlapply(df, inherits, "integer64"))
+  if (length(is_int64) == 0) return(df)
+
+  as_bigint <- switch(bigint,
+                      integer = as.integer,
+                      numeric = as.numeric,
+                      character = as.character
+  )
+
+  df[is_int64] <- suppressWarnings(lapply(df[is_int64], as_bigint))
+  df
+}
+
 
 #' @rdname ClickhouseResult-class
 #' @export
