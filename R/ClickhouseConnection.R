@@ -6,6 +6,7 @@
 #' @export
 #' @keywords internal
 #' @import methods DBI
+#' @importFrom bit64 integer64
 setClass("ClickhouseConnection",
   contains = "DBIConnection",
   slots = list(
