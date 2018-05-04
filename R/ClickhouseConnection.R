@@ -12,7 +12,8 @@ setClass("ClickhouseConnection",
     ptr  = "externalptr",
     host = "character",
     port = "numeric",
-    user = "character"
+    user = "character",
+    bigint = "character"
   )
 )
 

@@ -111,25 +111,34 @@ loadConfig <- function(CONFIG_PATHS, DEFAULT_PARAMS, pre_config) {
 #' @param password the user's password.
 #' @param compression the compression method for the connection (lz4 by default).
 #' @param config_paths paths where config files are searched for; order of paths denotes hierarchy (first string has highest priority etc.).
+#' @param bigint The R type that 64-bit integer types should be mapped to,
+#'   default is [bit64::integer64], which allows the full range of 64 bit
+#'   integers.
 #' @return A database connection.
 #' @examples
 #' \dontrun{
 #' conn <- dbConnect(RClickhouse::clickhouse(), host="localhost")
 #' }
-setMethod("dbConnect", "ClickhouseDriver", function(drv, host="localhost", port = 9000, db = "default", user = "default", password = "", compression = "lz4", config_paths = c('./RClickhouse.yaml', '~/.R/RClickhouse.yaml', '/etc/RClickhouse.yaml'), ...) {
-  DEFAULT_PARAMS <- c(host='localhost', port=9000, db='default', user='default', password='', compression='lz4')
-  input_params <- c(host=host, port=port, db=db, user=user, password=password, compression=compression)
-  default_input_diff <- c(input_params[!(input_params %in% DEFAULT_PARAMS)])
+setMethod("dbConnect", "ClickhouseDriver",
+          function(drv, host="localhost", port = 9000, db = "default",
+                   user = "default", password = "", compression = "lz4",
+                   config_paths = c('./RClickhouse.yaml', '~/.R/RClickhouse.yaml', '/etc/RClickhouse.yaml'),
+                   bigint = c("integer64", "integer", "numeric", "character"), ...) {
+            DEFAULT_PARAMS <- c(host='localhost', port=9000, db='default', user='default', password='', compression='lz4')
+            input_params <- c(host=host, port=port, db=db, user=user, password=password, compression=compression)
+            default_input_diff <- c(input_params[!(input_params %in% DEFAULT_PARAMS)])
 
-  config <- loadConfig(config_paths, DEFAULT_PARAMS, default_input_diff)
+            config <- loadConfig(config_paths, DEFAULT_PARAMS, default_input_diff)
 
-  ptr <- connect(config[['host']], strtoi(config[['port']]), config[['db']], config[['user']], config[['password']], config[['compression']])
-  reg.finalizer(ptr, function(p) {
-    if (validPtr(p))
-      warning("connection was garbage collected without being disconnected")
-  })
-  new("ClickhouseConnection", ptr = ptr, port = port, host = host, user = user)
-})
+            bigint <- match.arg(bigint)
+
+            ptr <- connect(config[['host']], strtoi(config[['port']]), config[['db']], config[['user']], config[['password']], config[['compression']])
+            reg.finalizer(ptr, function(p) {
+              if (validPtr(p))
+                warning("connection was garbage collected without being disconnected")
+            })
+            new("ClickhouseConnection", ptr = ptr, port = port, host = host, user = user, bigint = bigint)
+          })
 
 buildEnumType <- function(obj) {
   lvls <- levels(obj)
