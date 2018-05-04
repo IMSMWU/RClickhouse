@@ -129,7 +129,8 @@ setMethod("dbSendQuery", c("ClickhouseConnection", "character"), function(conn, 
       sql = statement,
       env = new.env(parent = emptyenv()),   #TODO: set env
       conn = conn,
-      ptr = res
+      ptr = res,
+      bigint = conn@bigint
   ))
 })
 
