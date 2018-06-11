@@ -51,7 +51,7 @@ db_analyze.ClickhouseConnection <- function(con, sql, ...) {
 sql_translate_env.ClickhouseConnection <- function(x) {
   dbplyr::sql_variant(
     dbplyr::sql_translator(.parent = dbplyr::base_scalar,
-      "^" = ch_sql_prefix("pow"),
+      `^` = ch_sql_prefix("pow"),
 
       # Casting
       as.logical = ch_sql_prefix("toUInt8"),
@@ -70,7 +70,8 @@ sql_translate_env.ClickhouseConnection <- function(x) {
     ),
     dbplyr::sql_translator(
       .parent = dbplyr::base_agg,
-      "%||%" = ch_sql_prefix("concat"),
+      #`%||%` = ch_sql_prefix("concat"),
+      cat = ch_sql_prefix("concat"),
       var    = ch_sql_prefix("varSamp"),
       sd     = ch_sql_prefix("stddevSamp")
     ),
