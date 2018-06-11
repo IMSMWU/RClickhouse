@@ -71,6 +71,7 @@ sql_translate_env.ClickhouseConnection <- function(x) {
     dbplyr::sql_translator(
       .parent = dbplyr::base_agg,
       #`%||%` = ch_sql_prefix("concat"),
+      # TODO cat pastes with space. Is this expected? Change to paste0?
       cat     = ch_sql_prefix("concat"),
       var     = ch_sql_prefix("varSamp"),
       sd      = ch_sql_prefix("stddevSamp")
