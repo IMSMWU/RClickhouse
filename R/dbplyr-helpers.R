@@ -19,35 +19,3 @@ sql_aggregate_2 <- function(f) {
     dbplyr::build_sql(dbplyr::sql(f), list(x, y))
   }
 }
-
-#' adapted from dbplyr
-#' @rdname sql_variant
-sql_infix <- function(f) {
-  # TODO should we add assertthat and rlang to depends?
-  # assert_that(is_string(f))
-  stopifnot(is.character(f)) # base version, less verbose in errors
-  function(x, y) {
-    dbplyr::build_sql(x, " ", dbplyr::sql(f), " ", y)
-  }
-}
-
-#' adapted from dbplyr
-#' @rdname sql_variant
-sql_prefix <- function(f, n = NULL) {
-  # TODO should we add assertthat and rlang to depends?
-  # assert_that(is_string(f))
-  stopifnot(is.character(f))
-  function(...) {
-    args <- list(...)
-    if (!is.null(n) && length(args) != n) {
-      stop(
-        "Invalid number of args to SQL ", f, ". Expecting ", n,
-        call. = FALSE
-      )
-    }
-    if (any(names2(args) != "")) {
-      warning("Named arguments ignored for SQL ", f, call. = FALSE)
-    }
-    dbplyr::build_sql(dbplyr::sql(f), args)
-  }
-}
