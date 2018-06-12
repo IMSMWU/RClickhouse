@@ -26,7 +26,6 @@ sql_aggregate_2 <- function(f) {
 #' unknown functions to upper case.
 #' @rdname fix_dbplyr
 fix_dbplyr <- function(){
-
   utils::assignInNamespace("sql_prefix", curSQLprefix,
                            ns = "dbplyr", envir = dbpenv)
 }
