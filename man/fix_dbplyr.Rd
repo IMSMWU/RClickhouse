@@ -2,10 +2,7 @@
 % Please edit documentation in R/dbplyr-helpers.R
 \name{fix_dbplyr}
 \alias{fix_dbplyr}
-\title{Since Clickhouse functions are case sensitive dbplyr
-behavior was altered to reflect that. This function
-will set dbplyr back to its original state of converting
-unknown functions to upper case.}
+\title{Return to dbplyrs original behavior}
 \usage{
 fix_dbplyr()
 }

@@ -20,6 +20,8 @@ sql_aggregate_2 <- function(f) {
   }
 }
 
+#' Return to dbplyrs original behavior
+#'
 #' Since Clickhouse functions are case sensitive dbplyr
 #' behavior was altered to reflect that. This function
 #' will set dbplyr back to its original state of converting
