@@ -34,7 +34,6 @@ ch_sql_prefix <- function(f) {
 # Overwrite sql_prefix
 # Adapted from R.utils' "reassignInPackage" function
 curSQLprefix <- dbplyr::sql_prefix
-whereToUpper <- grep(deparse(curSQLprefix), pattern = "toupper")
 if(is.null(attr(ch_sql_prefix, 'original'))){
   attr(ch_sql_prefix, 'original') <- curSQLprefix
 }
