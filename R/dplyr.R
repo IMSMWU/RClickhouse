@@ -34,12 +34,17 @@ ch_sql_prefix <- function(f) {
 # Overwrite sql_prefix
 # Adapted from R.utils' "reassignInPackage" function
 curSQLprefix <- dbplyr::sql_prefix
+whereToUpper <- grep(deparse(curSQLprefix), pattern = "toupper")
+if(is.null(attr(ch_sql_prefix, 'original'))){
+  attr(ch_sql_prefix, 'original') <- curSQLprefix
+}
 dbpenv <- environment(dbplyr::build_sql)
 base::unlockBinding("sql_prefix", dbpenv)
 utils::assignInNamespace("sql_prefix", ch_sql_prefix,
                   ns = "dbplyr", envir = dbpenv)
 assign("sql_prefix", ch_sql_prefix, envir = dbpenv)
 base::lockBinding("sql_prefix", dbpenv)
+origSQLprefix <- attr(dbplyr::sql_prefix, 'original')
 
 #' @export
 #' @importFrom dplyr db_explain
