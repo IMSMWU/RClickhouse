@@ -19,3 +19,14 @@ sql_aggregate_2 <- function(f) {
     dbplyr::build_sql(dbplyr::sql(f), list(x, y))
   }
 }
+
+#' Since Clickhouse functions are case sensitive dbplyr
+#' behavior was altered to reflect that. This function
+#' will set dbplyr back to its original state of converting
+#' unknown functions to upper case.
+#' @rdname fix_dbplyr
+fix_dbplyr <- function(){
+
+  utils::assignInNamespace("sql_prefix", curSQLprefix,
+                           ns = "dbplyr", envir = dbpenv)
+}

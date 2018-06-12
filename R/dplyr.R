@@ -33,6 +33,7 @@ ch_sql_prefix <- function(f) {
 
 # Overwrite sql_prefix
 # Adapted from R.utils' "reassignInPackage" function
+curSQLprefix <- dbplyr::sql_prefix
 dbpenv <- environment(dbplyr::sql_prefix)
 unlockBinding("sql_prefix", dbpenv)
 assignInNamespace("sql_prefix", ch_sql_prefix,
