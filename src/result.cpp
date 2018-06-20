@@ -237,7 +237,7 @@ std::unique_ptr<Converter> Result::buildConverter(std::string name, ch::TypeRef 
       return std::unique_ptr<ScalarConverter<ch::ColumnInt32, Rcpp::IntegerVector>>(new ScalarConverter<ch::ColumnInt32, Rcpp::IntegerVector>);
     case TC::Int64:
       warn("column "+name+" converted from Int64 to Numeric");
-      return std::unique_ptr<ScalarConverter<ch::ColumnInt64, Rcpp::NumericVector>>(new ScalarConverter<ch::ColumnInt64, Rcpp::NumericVector>);
+      return std::unique_ptr<ScalarConverter<ch::ColumnInt64, Rcpp::CharacterVector>>(new ScalarConverter<ch::ColumnInt64, Rcpp::CharacterVector>);
     case TC::UInt8:
       return std::unique_ptr<ScalarConverter<ch::ColumnUInt8, Rcpp::IntegerVector>>(new ScalarConverter<ch::ColumnUInt8, Rcpp::IntegerVector>);
     case TC::UInt16:
@@ -248,7 +248,7 @@ std::unique_ptr<Converter> Result::buildConverter(std::string name, ch::TypeRef 
     }
     case TC::UInt64: {
       warn("column "+name+" converted from UInt64 to Numeric");
-      return std::unique_ptr<ScalarConverter<ch::ColumnUInt64, Rcpp::NumericVector>>(new ScalarConverter<ch::ColumnUInt64, Rcpp::NumericVector>);
+      return std::unique_ptr<ScalarConverter<ch::ColumnUInt64, Rcpp::CharacterVector>>(new ScalarConverter<ch::ColumnUInt64, Rcpp::CharacterVector>);
     }
     case TC::UUID:
       return std::unique_ptr<ScalarConverter<ch::ColumnUUID, Rcpp::StringVector>>(new ScalarConverter<ch::ColumnUUID, Rcpp::StringVector>);
