@@ -61,6 +61,34 @@ void convertEntries(std::shared_ptr<const CT> in, NullCol nullCol, RT &out,
   }
 }
 
+
+template<>
+void convertEntries<ch::ColumnInt64, Rcpp::StringVector>(std::shared_ptr<const ch::ColumnInt64> in, NullCol nullCol, Rcpp::StringVector &out,
+                    size_t offset, size_t start, size_t end) {
+  for(size_t j = start; j < end; j++) {
+    // can't use the ternary operator here, since that would require explicit
+    // conversion from the Clickhouse storage type (which is far messier)
+    if(nullCol && nullCol->IsNull(j)) {
+      out[offset+j-start] = Rcpp::StringVector::get_na();
+    } else {
+      out[offset+j-start] = std::to_string(in->At(j));
+    }
+  }
+}
+
+template<>
+void convertEntries<ch::ColumnUInt64, Rcpp::StringVector>(std::shared_ptr<const ch::ColumnUInt64> in, NullCol nullCol, Rcpp::StringVector &out,
+                                                         size_t offset, size_t start, size_t end) {
+  for(size_t j = start; j < end; j++) {
+    // can't use the ternary operator here, since that would require explicit
+    // conversion from the Clickhouse storage type (which is far messier)
+    if(nullCol && nullCol->IsNull(j)) {
+      out[offset+j-start] = Rcpp::StringVector::get_na();
+    } else {
+      out[offset+j-start] = std::to_string(in->At(j));
+    }
+  }
+}
 // Date requires specialization: otherwise causes problems due to type
 // ambiguities in the Rcpp::Date constructor, which expects either int or
 // double, whereas ColumnDate values are uint32_t
@@ -237,7 +265,7 @@ std::unique_ptr<Converter> Result::buildConverter(std::string name, ch::TypeRef 
       return std::unique_ptr<ScalarConverter<ch::ColumnInt32, Rcpp::IntegerVector>>(new ScalarConverter<ch::ColumnInt32, Rcpp::IntegerVector>);
     case TC::Int64:
       warn("column "+name+" converted from Int64 to Numeric");
-      return std::unique_ptr<ScalarConverter<ch::ColumnInt64, Rcpp::CharacterVector>>(new ScalarConverter<ch::ColumnInt64, Rcpp::CharacterVector>);
+      return std::unique_ptr<ScalarConverter<ch::ColumnInt64, Rcpp::StringVector>>(new ScalarConverter<ch::ColumnInt64, Rcpp::StringVector>);
     case TC::UInt8:
       return std::unique_ptr<ScalarConverter<ch::ColumnUInt8, Rcpp::IntegerVector>>(new ScalarConverter<ch::ColumnUInt8, Rcpp::IntegerVector>);
     case TC::UInt16:
@@ -248,7 +276,7 @@ std::unique_ptr<Converter> Result::buildConverter(std::string name, ch::TypeRef 
     }
     case TC::UInt64: {
       warn("column "+name+" converted from UInt64 to Numeric");
-      return std::unique_ptr<ScalarConverter<ch::ColumnUInt64, Rcpp::CharacterVector>>(new ScalarConverter<ch::ColumnUInt64, Rcpp::CharacterVector>);
+      return std::unique_ptr<ScalarConverter<ch::ColumnUInt64, Rcpp::StringVector>>(new ScalarConverter<ch::ColumnUInt64, Rcpp::StringVector>);
     }
     case TC::UUID:
       return std::unique_ptr<ScalarConverter<ch::ColumnUUID, Rcpp::StringVector>>(new ScalarConverter<ch::ColumnUUID, Rcpp::StringVector>);
