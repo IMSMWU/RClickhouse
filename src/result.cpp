@@ -1,5 +1,7 @@
 #include <stdexcept>
-
+#include <sstream>
+#include <string>
+#include <boost/lexical_cast.hpp>
 #include "result.h"
 
 // helper function which emits an R warning without causing a longjmp
@@ -75,6 +77,7 @@ void convertEntries<ch::ColumnInt64, Rcpp::StringVector>(std::shared_ptr<const c
     }
   }
 }
+
 
 template<>
 void convertEntries<ch::ColumnUInt64, Rcpp::StringVector>(std::shared_ptr<const ch::ColumnUInt64> in, NullCol nullCol, Rcpp::StringVector &out,
@@ -364,6 +367,13 @@ Rcpp::DataFrame Result::fetchFrame(ssize_t n) {
     df.attr("row.names") = Rcpp::Range(fetchedRows+1, fetchedRows+nRows);
   }
   df.attr("names") = colNames;
+  std::stringstream dTypesCH;
+  // Rcpp::StringVector retVal;
+  // dTypesCH << colTypes;
+  // dTypesCH >> retVal;
+  Rcpp::StringVector typesR;
+  typesR = boost::lexical_cast<Rcpp::StringVector>(&colTypes);
+  df.attr("data.type") = typesR;
   fetchedRows += nRows;
 
   return df;
