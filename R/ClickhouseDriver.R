@@ -157,6 +157,7 @@ setMethod("dbDataType", signature(dbObj="ClickhouseDriver", obj = "ANY"), defini
     t <- paste0("Array(", dbDataType(dbObj, unlist(obj, recursive=F)), ")")
   } else {
     if (is.factor(obj)) t <- buildEnumType(obj)
+    else if (is.integer64(obj)) t <- "Int64"
     else if (is.logical(obj)) t <- "UInt8"
     else if (is.integer(obj)) t <- "Int32"
     else if (is.numeric(obj)) t <- "Float64"

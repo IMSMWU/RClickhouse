@@ -112,7 +112,13 @@ void toColumn(SEXP v, std::shared_ptr<CT> col, std::shared_ptr<ColumnUInt8> null
 template<typename CT, typename VT>
 std::shared_ptr<CT> vecToScalar(SEXP v, std::shared_ptr<ColumnUInt8> nullCol = nullptr) {
   auto col = std::make_shared<CT>();
-  switch(TYPEOF(v)) {
+
+  int type_of_cor;
+  int type_of = TYPEOF(v);
+
+  type_of_cor = Rf_inherits(v, "integer64") ? INTSXP : type_of;
+
+  switch(type_of_cor) {
     case INTSXP: {
       // the lambda could be a default argument of toColumn, but that
       // appears to trigger a bug in GCC
