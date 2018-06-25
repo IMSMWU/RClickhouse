@@ -1,8 +1,6 @@
 #include <stdexcept>
-#include <sstream>
-#include <string>
-#include <boost/lexical_cast.hpp>
 #include "result.h"
+
 
 // helper function which emits an R warning without causing a longjmp
 // see https://stackoverflow.com/questions/24557711/how-to-generate-an-r-warning-safely-in-rcpp
@@ -267,7 +265,6 @@ std::unique_ptr<Converter> Result::buildConverter(std::string name, ch::TypeRef 
     case TC::Int32:
       return std::unique_ptr<ScalarConverter<ch::ColumnInt32, Rcpp::IntegerVector>>(new ScalarConverter<ch::ColumnInt32, Rcpp::IntegerVector>);
     case TC::Int64:
-      warn("column "+name+" converted from Int64 to Numeric");
       return std::unique_ptr<ScalarConverter<ch::ColumnInt64, Rcpp::StringVector>>(new ScalarConverter<ch::ColumnInt64, Rcpp::StringVector>);
     case TC::UInt8:
       return std::unique_ptr<ScalarConverter<ch::ColumnUInt8, Rcpp::IntegerVector>>(new ScalarConverter<ch::ColumnUInt8, Rcpp::IntegerVector>);
@@ -278,7 +275,6 @@ std::unique_ptr<Converter> Result::buildConverter(std::string name, ch::TypeRef 
       return std::unique_ptr<ScalarConverter<ch::ColumnUInt32, Rcpp::NumericVector>>(new ScalarConverter<ch::ColumnUInt32, Rcpp::NumericVector>);
     }
     case TC::UInt64: {
-      warn("column "+name+" converted from UInt64 to Numeric");
       return std::unique_ptr<ScalarConverter<ch::ColumnUInt64, Rcpp::StringVector>>(new ScalarConverter<ch::ColumnUInt64, Rcpp::StringVector>);
     }
     case TC::UUID:
@@ -313,6 +309,7 @@ void Result::setColInfo(const ch::Block &block) {
   for(ch::Block::Iterator bi(block); bi.IsValid(); bi.Next()) {
     colNames.push_back(Rcpp::String(bi.Name()));
     colTypes.push_back(bi.Type());
+    colTypesString.push_back(bi.Type()->GetName());
   }
 }
 
@@ -367,13 +364,7 @@ Rcpp::DataFrame Result::fetchFrame(ssize_t n) {
     df.attr("row.names") = Rcpp::Range(fetchedRows+1, fetchedRows+nRows);
   }
   df.attr("names") = colNames;
-  std::stringstream dTypesCH;
-  // Rcpp::StringVector retVal;
-  // dTypesCH << colTypes;
-  // dTypesCH >> retVal;
-  Rcpp::StringVector typesR;
-  typesR = boost::lexical_cast<Rcpp::StringVector>(&colTypes);
-  df.attr("data.type") = typesR;
+  df.attr("data.type") = colTypesString;
   fetchedRows += nRows;
 
   return df;
