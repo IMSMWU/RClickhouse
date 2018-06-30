@@ -31,7 +31,7 @@ setMethod("dbFetch", signature = "ClickhouseResult", definition = function(res, 
 
 convert_Int64 <- function(df, Int64) {
   if (Int64 == "character") return(df)
-  int64Types <- c('Int64', 'UInt64')
+  int64Types <- c('Int64', 'UInt64', 'Nullable(Int64)', 'Nullable(UInt64)')
   toConvert <- which(attr(df, 'data.type') %in% int64Types)
   if(length(toConvert) > 0){
   as_Int64 <- switch(Int64,

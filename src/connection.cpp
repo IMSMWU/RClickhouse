@@ -110,12 +110,15 @@ void toColumn(SEXP v, std::shared_ptr<CT> col, std::shared_ptr<ColumnUInt8> null
   }
 }
 
-// write the contents of an R vector into a Clickhouse column
+// write the contents of an R integer64 vector into a Clickhouse column
+
+// Convert to int64_t helper
 int64_t* rec(SEXP x){
   int64_t * res = reinterpret_cast<int64_t*>(REAL(x));
   return res;
 }
 
+// Convert the vector
 std::vector<int64_t> Val(SEXP x){
   if(!Rf_inherits(x, "integer64")){
     warning("Converting to int64_t");
@@ -130,6 +133,7 @@ std::vector<int64_t> Val(SEXP x){
   return res;
 }
 
+// Special template for integer64 columns to circumvent Rcpp
 template<typename CT, typename RT>
 void toColumnN(SEXP v, std::shared_ptr<CT> col, std::shared_ptr<ColumnUInt8> nullCol) {
   std::vector<int64_t> cv = Val(v);
