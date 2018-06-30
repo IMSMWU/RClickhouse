@@ -118,7 +118,7 @@ int64_t* rec(SEXP x){
 
 std::vector<int64_t> Val(SEXP x){
   if(!Rf_inherits(x, "integer64")){
-    warning("Converting to 'long long'");
+    warning("Converting to int64_t");
     std::vector<int64_t> retAlt = as<std::vector<int64_t> >(x);
     return retAlt;
   };
@@ -130,25 +130,9 @@ std::vector<int64_t> Val(SEXP x){
   return res;
 }
 
-template<typename T>
-NumericVector toNum(std::vector<T> res){
-  NumericVector out = wrap(res);
-  return out;
-}
-
-template<typename T>
-void pprint(std::vector<T> x){
-  int i, n = x.size();
-  for(i = 0; i<n; i++){
-    std::cout << x[i] << std::endl;
-  };
-}
-
 template<typename CT, typename RT>
 void toColumnN(SEXP v, std::shared_ptr<CT> col, std::shared_ptr<ColumnUInt8> nullCol) {
-  Rcout << "Using new fun" << "\n";
   std::vector<int64_t> cv = Val(v);
-  pprint(cv);
   if(nullCol) {
     for(size_t i=0; i<cv.size(); i++) {
       bool isNA = (cv[i] == NA_INTEGER64);
