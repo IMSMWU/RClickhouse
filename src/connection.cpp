@@ -1,6 +1,7 @@
 // [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::interfaces(r, cpp)]]
 #define RCPP_NEW_DATE_DATETIME_VECTORS 1
+#define NA_INTEGER64 LLONG_MIN
 #include <Rcpp.h>
 #include <clickhouse/client.h>
 #include "result.h"
@@ -109,6 +110,63 @@ void toColumn(SEXP v, std::shared_ptr<CT> col, std::shared_ptr<ColumnUInt8> null
   }
 }
 
+// write the contents of an R vector into a Clickhouse column
+int64_t* rec(SEXP x){
+  int64_t * res = reinterpret_cast<int64_t*>(REAL(x));
+  return res;
+}
+
+std::vector<int64_t> Val(SEXP x){
+  if(!Rf_inherits(x, "integer64")){
+    warning("Converting to 'long long'");
+    std::vector<int64_t> retAlt = as<std::vector<int64_t> >(x);
+    return retAlt;
+  };
+  size_t i, n = LENGTH(x);
+  std::vector<int64_t> res(n);
+  for(i=0; i<n; i++){
+    res[i] = rec(x)[i];
+  };
+  return res;
+}
+
+template<typename T>
+NumericVector toNum(std::vector<T> res){
+  NumericVector out = wrap(res);
+  return out;
+}
+
+template<typename T>
+void pprint(std::vector<T> x){
+  int i, n = x.size();
+  for(i = 0; i<n; i++){
+    std::cout << x[i] << std::endl;
+  };
+}
+
+template<typename CT, typename RT>
+void toColumnN(SEXP v, std::shared_ptr<CT> col, std::shared_ptr<ColumnUInt8> nullCol) {
+  Rcout << "Using new fun" << "\n";
+  std::vector<int64_t> cv = Val(v);
+  pprint(cv);
+  if(nullCol) {
+    for(size_t i=0; i<cv.size(); i++) {
+      bool isNA = (cv[i] == NA_INTEGER64);
+      col->Append(isNA ? 0 : cv[i]);
+      nullCol->Append(isNA);
+    }
+  } else {
+    for(size_t i=0; i<cv.size(); i++) {
+      if(cv[i] == NA_INTEGER64) {
+        stop("cannot write NA into a non-nullable column of type "+
+          col->Type()->GetName());
+      }
+      col->Append(cv[i]);
+    }
+  }
+}
+
+
 template<typename CT, typename VT>
 std::shared_ptr<CT> vecToScalar(SEXP v, std::shared_ptr<ColumnUInt8> nullCol = nullptr) {
   auto col = std::make_shared<CT>();
@@ -116,9 +174,13 @@ std::shared_ptr<CT> vecToScalar(SEXP v, std::shared_ptr<ColumnUInt8> nullCol = n
   int type_of_cor;
   int type_of = TYPEOF(v);
 
-  type_of_cor = Rf_inherits(v, "integer64") ? INTSXP : type_of;
+  type_of_cor = Rf_inherits(v, "integer64") ? 99 : type_of;
 
   switch(type_of_cor) {
+  case 99: {
+    toColumnN<CT, NumericVector>(v, col, nullCol);
+    break;
+  }
     case INTSXP: {
       // the lambda could be a default argument of toColumn, but that
       // appears to trigger a bug in GCC
