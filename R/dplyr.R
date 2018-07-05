@@ -100,7 +100,7 @@ sql_translate_env.ClickhouseConnection <- function(x) {
 db_copy_to.ClickhouseConnection <- function(con, table, values,
                                      overwrite = FALSE, types = NULL, temporary = TRUE,
                                      unique_indexes = NULL, indexes = NULL,
-                                     analyze = FALSE, ...) {
+                                     analyze = FALSE, all_nullable = FALSE, ...) {
 
   if(analyze == TRUE){
     warning("clickhouse does not support a analyze statement.")
@@ -117,6 +117,11 @@ db_copy_to.ClickhouseConnection <- function(con, table, values,
   }
 
   names(types) <- names(values)
+
+  if(all_nullable == TRUE){
+    to_conv <- !1:length(types) %in% grep(types, pattern = "Nullable", value = FALSE)
+    types[to_conv] <- paste0("Nullable(", types[to_conv], ")")
+  }
 
   tryCatch({
     if (overwrite) {

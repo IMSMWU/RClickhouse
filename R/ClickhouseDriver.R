@@ -165,7 +165,7 @@ setMethod("dbDataType", signature(dbObj="ClickhouseDriver", obj = "ANY"), defini
     else if (inherits(obj, "Date")) t <- "Date"
     else t <- "String"
 
-    if (anyNA(obj)) t <- paste0("Nullable(", t, ")")
+      if (anyNA(obj)) t <- paste0("Nullable(", t, ")")
   }
 
   return(t)
