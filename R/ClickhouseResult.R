@@ -12,7 +12,8 @@ setClass("ClickhouseResult",
     env = "environment",
     conn = "ClickhouseConnection",
     ptr = "externalptr",
-    Int64 = "character"
+    Int64 = "character",
+    to_UTF8 = "logical"
   )
 )
 
@@ -26,6 +27,9 @@ setMethod("dbFetch", signature = "ClickhouseResult", definition = function(res, 
   }
   ret <- fetch(res@ptr, n)
   ret <- convert_Int64(ret, res@Int64)
+
+  if(to_UTF8 == TRUE) ret <- encode_UTF(ret)
+
   return(ret)
 })
 
@@ -43,6 +47,15 @@ convert_Int64 <- function(df, Int64) {
   return(df)}else{
     return(df)
   }
+}
+
+encode_UTF <- function(df){
+  toConvert <- which(attr(df, "data.type") %in% c("String", "FixedString", "Nullable(String)", "Nullable(FixedString)"))
+
+  if(length(toConvert) > 0){
+    df[toConvert] <- suppressWarnings(lapply(df[toConvert], function(x) .Internal(setEncoding(x, "UTF-8"))))
+  }
+  return(df)
 }
 
 

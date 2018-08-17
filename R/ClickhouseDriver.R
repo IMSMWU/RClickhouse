@@ -123,7 +123,7 @@ setMethod("dbConnect", "ClickhouseDriver",
           function(drv, host="localhost", port = 9000, db = "default",
                    user = "default", password = "", compression = "lz4",
                    config_paths = c('./RClickhouse.yaml', '~/.R/RClickhouse.yaml', '/etc/RClickhouse.yaml'),
-                   Int64 = c("integer64", "integer", "numeric", "character"), ...) {
+                   Int64 = c("integer64", "integer", "numeric", "character"), to_UTF8 = TRUE, ...) {
             DEFAULT_PARAMS <- c(host='localhost', port=9000, db='default', user='default', password='', compression='lz4')
             input_params <- c(host=host, port=port, db=db, user=user, password=password, compression=compression)
             default_input_diff <- c(input_params[!(input_params %in% DEFAULT_PARAMS)])
