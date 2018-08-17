@@ -137,7 +137,7 @@ setMethod("dbConnect", "ClickhouseDriver",
               if (validPtr(p))
                 warning("connection was garbage collected without being disconnected")
             })
-            new("ClickhouseConnection", ptr = ptr, port = port, host = host, user = user, Int64 = Int64)
+            new("ClickhouseConnection", ptr = ptr, port = port, host = host, user = user, Int64 = Int64, to_UTF8 = to_UTF8)
           })
 
 buildEnumType <- function(obj) {
