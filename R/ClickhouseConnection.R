@@ -14,7 +14,8 @@ setClass("ClickhouseConnection",
     host = "character",
     port = "numeric",
     user = "character",
-    Int64 = "character"
+    Int64 = "character",
+    to_UTF8 = "logical"
   )
 )
 
@@ -131,7 +132,8 @@ setMethod("dbSendQuery", c("ClickhouseConnection", "character"), function(conn, 
       env = new.env(parent = emptyenv()),   #TODO: set env
       conn = conn,
       ptr = res,
-      Int64 = conn@Int64
+      Int64 = conn@Int64,
+      to_UTF8 = conn@to_UTF8
   ))
 })
 
@@ -189,10 +191,10 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
       class(v)[[1]]
     }))
     for (c in names(classes[classes=="character"])) {
-      value[[c]] <- enc2utf8(value[[c]])
+      value[[c]] <- .Internal(setEncoding(value[[c]], "UTF-8"))
     }
     for (c in names(classes[classes=="factor"])) {
-      levels(value[[c]]) <- enc2utf8(levels(value[[c]]))
+      levels(value[[c]]) <- .Internal(setEncoding(levels(value[[c]]), "UTF-8"))
     }
 
     insert(conn@ptr, qname, value);

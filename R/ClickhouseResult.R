@@ -28,7 +28,7 @@ setMethod("dbFetch", signature = "ClickhouseResult", definition = function(res, 
   ret <- fetch(res@ptr, n)
   ret <- convert_Int64(ret, res@Int64)
 
-  if(to_UTF8 == TRUE) ret <- encode_UTF(ret)
+  if(res@to_UTF8 == TRUE) ret <- encode_UTF(ret)
 
   return(ret)
 })
