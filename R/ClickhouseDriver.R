@@ -114,6 +114,7 @@ loadConfig <- function(CONFIG_PATHS, DEFAULT_PARAMS, pre_config) {
 #' @param Int64 The R type that 64-bit integer types should be mapped to,
 #'   default is [bit64::integer64], which allows the full range of 64 bit
 #'   integers.
+#' @param toUTF8 logical, should character variables be converted to UTF-8. Default is TRUE.
 #' @return A database connection.
 #' @examples
 #' \dontrun{
@@ -123,7 +124,7 @@ setMethod("dbConnect", "ClickhouseDriver",
           function(drv, host="localhost", port = 9000, db = "default",
                    user = "default", password = "", compression = "lz4",
                    config_paths = c('./RClickhouse.yaml', '~/.R/RClickhouse.yaml', '/etc/RClickhouse.yaml'),
-                   Int64 = c("integer64", "integer", "numeric", "character"), to_UTF8 = TRUE, ...) {
+                   Int64 = c("integer64", "integer", "numeric", "character"), toUTF8 = TRUE, ...) {
             DEFAULT_PARAMS <- c(host='localhost', port=9000, db='default', user='default', password='', compression='lz4')
             input_params <- c(host=host, port=port, db=db, user=user, password=password, compression=compression)
             default_input_diff <- c(input_params[!(input_params %in% DEFAULT_PARAMS)])
@@ -137,7 +138,7 @@ setMethod("dbConnect", "ClickhouseDriver",
               if (validPtr(p))
                 warning("connection was garbage collected without being disconnected")
             })
-            new("ClickhouseConnection", ptr = ptr, port = port, host = host, user = user, Int64 = Int64, to_UTF8 = to_UTF8)
+            new("ClickhouseConnection", ptr = ptr, port = port, host = host, user = user, Int64 = Int64, toUTF8 = toUTF8)
           })
 
 buildEnumType <- function(obj) {
