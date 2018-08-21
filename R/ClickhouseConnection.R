@@ -15,7 +15,7 @@ setClass("ClickhouseConnection",
     port = "numeric",
     user = "character",
     Int64 = "character",
-    to_UTF8 = "logical"
+    toUTF8 = "logical"
   )
 )
 
@@ -133,7 +133,7 @@ setMethod("dbSendQuery", c("ClickhouseConnection", "character"), function(conn, 
       conn = conn,
       ptr = res,
       Int64 = conn@Int64,
-      to_UTF8 = conn@to_UTF8
+      toUTF8 = conn@toUTF8
   ))
 })
 
