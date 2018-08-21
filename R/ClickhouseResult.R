@@ -13,7 +13,7 @@ setClass("ClickhouseResult",
     conn = "ClickhouseConnection",
     ptr = "externalptr",
     Int64 = "character",
-    to_UTF8 = "logical"
+    toUTF8 = "logical"
   )
 )
 
@@ -28,7 +28,7 @@ setMethod("dbFetch", signature = "ClickhouseResult", definition = function(res, 
   ret <- fetch(res@ptr, n)
   ret <- convert_Int64(ret, res@Int64)
 
-  if(res@to_UTF8 == TRUE) ret <- encode_UTF(ret)
+  if(res@toUTF8 == TRUE) ret <- encode_UTF(ret)
 
   return(ret)
 })
