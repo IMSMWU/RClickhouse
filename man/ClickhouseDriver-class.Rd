@@ -28,7 +28,8 @@ loadConfig(CONFIG_PATHS, DEFAULT_PARAMS, pre_config)
 \S4method{dbConnect}{ClickhouseDriver}(drv, host = "localhost", port = 9000,
   db = "default", user = "default", password = "", compression = "lz4",
   config_paths = c("./RClickhouse.yaml", "~/.R/RClickhouse.yaml",
-  "/etc/RClickhouse.yaml"), ...)
+  "/etc/RClickhouse.yaml"), Int64 = c("integer64", "integer", "numeric",
+  "character"), ...)
 
 \S4method{dbDataType}{ClickhouseDriver}(dbObj, obj, ...)
 }
@@ -54,6 +55,10 @@ loadConfig(CONFIG_PATHS, DEFAULT_PARAMS, pre_config)
 \item{compression}{the compression method for the connection (lz4 by default).}
 
 \item{config_paths}{paths where config files are searched for; order of paths denotes hierarchy (first string has highest priority etc.).}
+
+\item{Int64}{The R type that 64-bit integer types should be mapped to,
+default is [bit64::integer64], which allows the full range of 64 bit
+integers.}
 }
 \value{
 a merged configuration

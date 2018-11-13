@@ -1,6 +1,6 @@
 #include <stdexcept>
-
 #include "result.h"
+
 
 // helper function which emits an R warning without causing a longjmp
 // see https://stackoverflow.com/questions/24557711/how-to-generate-an-r-warning-safely-in-rcpp
@@ -61,6 +61,35 @@ void convertEntries(std::shared_ptr<const CT> in, NullCol nullCol, RT &out,
   }
 }
 
+
+template<>
+void convertEntries<ch::ColumnInt64, Rcpp::StringVector>(std::shared_ptr<const ch::ColumnInt64> in, NullCol nullCol, Rcpp::StringVector &out,
+                    size_t offset, size_t start, size_t end) {
+  for(size_t j = start; j < end; j++) {
+    // can't use the ternary operator here, since that would require explicit
+    // conversion from the Clickhouse storage type (which is far messier)
+    if(nullCol && nullCol->IsNull(j)) {
+      out[offset+j-start] = Rcpp::StringVector::get_na();
+    } else {
+      out[offset+j-start] = std::to_string(in->At(j));
+    }
+  }
+}
+
+
+template<>
+void convertEntries<ch::ColumnUInt64, Rcpp::StringVector>(std::shared_ptr<const ch::ColumnUInt64> in, NullCol nullCol, Rcpp::StringVector &out,
+                                                         size_t offset, size_t start, size_t end) {
+  for(size_t j = start; j < end; j++) {
+    // can't use the ternary operator here, since that would require explicit
+    // conversion from the Clickhouse storage type (which is far messier)
+    if(nullCol && nullCol->IsNull(j)) {
+      out[offset+j-start] = Rcpp::StringVector::get_na();
+    } else {
+      out[offset+j-start] = std::to_string(in->At(j));
+    }
+  }
+}
 // Date requires specialization: otherwise causes problems due to type
 // ambiguities in the Rcpp::Date constructor, which expects either int or
 // double, whereas ColumnDate values are uint32_t
@@ -236,8 +265,7 @@ std::unique_ptr<Converter> Result::buildConverter(std::string name, ch::TypeRef 
     case TC::Int32:
       return std::unique_ptr<ScalarConverter<ch::ColumnInt32, Rcpp::IntegerVector>>(new ScalarConverter<ch::ColumnInt32, Rcpp::IntegerVector>);
     case TC::Int64:
-      warn("column "+name+" converted from Int64 to Numeric");
-      return std::unique_ptr<ScalarConverter<ch::ColumnInt64, Rcpp::NumericVector>>(new ScalarConverter<ch::ColumnInt64, Rcpp::NumericVector>);
+      return std::unique_ptr<ScalarConverter<ch::ColumnInt64, Rcpp::StringVector>>(new ScalarConverter<ch::ColumnInt64, Rcpp::StringVector>);
     case TC::UInt8:
       return std::unique_ptr<ScalarConverter<ch::ColumnUInt8, Rcpp::IntegerVector>>(new ScalarConverter<ch::ColumnUInt8, Rcpp::IntegerVector>);
     case TC::UInt16:
@@ -247,8 +275,7 @@ std::unique_ptr<Converter> Result::buildConverter(std::string name, ch::TypeRef 
       return std::unique_ptr<ScalarConverter<ch::ColumnUInt32, Rcpp::NumericVector>>(new ScalarConverter<ch::ColumnUInt32, Rcpp::NumericVector>);
     }
     case TC::UInt64: {
-      warn("column "+name+" converted from UInt64 to Numeric");
-      return std::unique_ptr<ScalarConverter<ch::ColumnUInt64, Rcpp::NumericVector>>(new ScalarConverter<ch::ColumnUInt64, Rcpp::NumericVector>);
+      return std::unique_ptr<ScalarConverter<ch::ColumnUInt64, Rcpp::StringVector>>(new ScalarConverter<ch::ColumnUInt64, Rcpp::StringVector>);
     }
     case TC::UUID:
       return std::unique_ptr<ScalarConverter<ch::ColumnUUID, Rcpp::StringVector>>(new ScalarConverter<ch::ColumnUUID, Rcpp::StringVector>);
@@ -282,6 +309,7 @@ void Result::setColInfo(const ch::Block &block) {
   for(ch::Block::Iterator bi(block); bi.IsValid(); bi.Next()) {
     colNames.push_back(Rcpp::String(bi.Name()));
     colTypes.push_back(bi.Type());
+    colTypesString.push_back(bi.Type()->GetName());
   }
 }
 
@@ -336,6 +364,7 @@ Rcpp::DataFrame Result::fetchFrame(ssize_t n) {
     df.attr("row.names") = Rcpp::Range(fetchedRows+1, fetchedRows+nRows);
   }
   df.attr("names") = colNames;
+  df.attr("data.type") = colTypesString;
   fetchedRows += nRows;
 
   return df;

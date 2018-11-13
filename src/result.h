@@ -28,6 +28,7 @@ class Result {
 
   Rcpp::StringVector colNames;
   TypeList colTypes;
+  Rcpp::StringVector colTypesString;
   std::vector<ColBlock> columnBlocks;
 
   void setColInfo(const ch::Block &block);

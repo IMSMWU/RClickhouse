@@ -12,7 +12,7 @@ getRealConnection <- function(){
   # set variables if not set yet
   serveraddr %||=% "localhost"
   user       %||=% "default"
-  password   %||=% ''
+  password   %||=% ""
 
   # TODO: recycle connection by using singleton?
   conn <- dbConnect(RClickhouse::clickhouse(), host=serveraddr, user=user, password=password)

@@ -31,6 +31,20 @@ ch_sql_prefix <- function(f) {
   }
 }
 
+# Overwrite sql_prefix
+# Adapted from R.utils' "reassignInPackage" function
+curSQLprefix <- dbplyr::sql_prefix
+if(is.null(attr(ch_sql_prefix, 'original'))){
+  attr(ch_sql_prefix, 'original') <- curSQLprefix
+}
+dbpenv <- environment(dbplyr::build_sql)
+base::unlockBinding("sql_prefix", dbpenv)
+utils::assignInNamespace("sql_prefix", ch_sql_prefix,
+                  ns = "dbplyr", envir = dbpenv)
+assign("sql_prefix", ch_sql_prefix, envir = dbpenv)
+base::lockBinding("sql_prefix", dbpenv)
+origSQLprefix <- attr(dbplyr::sql_prefix, 'original')
+
 #' @export
 #' @importFrom dplyr db_explain
 db_explain.ClickhouseConnection <- function(con, sql, ...) {
@@ -51,7 +65,7 @@ db_analyze.ClickhouseConnection <- function(con, sql, ...) {
 sql_translate_env.ClickhouseConnection <- function(x) {
   dbplyr::sql_variant(
     dbplyr::sql_translator(.parent = dbplyr::base_scalar,
-      "^" = ch_sql_prefix("pow"),
+      `^` = ch_sql_prefix("pow"),
 
       # Casting
       as.logical = ch_sql_prefix("toUInt8"),
@@ -70,9 +84,10 @@ sql_translate_env.ClickhouseConnection <- function(x) {
     ),
     dbplyr::sql_translator(
       .parent = dbplyr::base_agg,
-      "%||%" = ch_sql_prefix("concat"),
-      var    = ch_sql_prefix("varSamp"),
-      sd     = ch_sql_prefix("stddevSamp")
+      `%||%` = ch_sql_prefix("concat"),
+      #cat     = ch_sql_prefix("concat"),
+      var     = ch_sql_prefix("varSamp"),
+      sd      = ch_sql_prefix("stddevSamp")
     ),
     dbplyr::base_no_win
   )
@@ -84,7 +99,7 @@ sql_translate_env.ClickhouseConnection <- function(x) {
 db_copy_to.ClickhouseConnection <- function(con, table, values,
                                      overwrite = FALSE, types = NULL, temporary = TRUE,
                                      unique_indexes = NULL, indexes = NULL,
-                                     analyze = FALSE, ...) {
+                                     analyze = FALSE, all_nullable = FALSE, ...) {
 
   if(analyze == TRUE){
     warning("clickhouse does not support a analyze statement.")
@@ -101,6 +116,11 @@ db_copy_to.ClickhouseConnection <- function(con, table, values,
   }
 
   names(types) <- names(values)
+
+  if(all_nullable == TRUE){
+    to_conv <- !1:length(types) %in% grep(types, pattern = "Nullable", value = FALSE)
+    types[to_conv] <- paste0("Nullable(", types[to_conv], ")")
+  }
 
   tryCatch({
     if (overwrite) {
