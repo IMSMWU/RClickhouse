@@ -17,7 +17,7 @@ matrix:
             - clickhouse-server-base
             - clickhouse-server-common
           sources:
-          - sourceline: 'deb http://repo.yandex.ru/clickhouse/trusty stable main'
+          - sourceline: 'deb http://repo.yandex.ru/clickhouse/deb/stable/ main/'
 
     # OS X BUILDS
     #
