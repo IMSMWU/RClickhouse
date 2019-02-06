@@ -40,7 +40,8 @@
 
 \S4method{dbListFields}{ClickhouseConnection,character}(conn, name, ...)
 
-\S4method{dbSendQuery}{ClickhouseConnection,character}(conn, statement, ...)
+\S4method{dbSendQuery}{ClickhouseConnection,character}(conn, statement,
+  ...)
 
 \S4method{dbDataType}{ClickhouseConnection}(dbObj, obj, ...)
 
@@ -63,7 +64,5 @@
 \description{
 \code{ClickhouseConnection.} objects are usually created by
 \code{\link[DBI]{dbConnect}}
-
-Close the database connection
 }
 \keyword{internal}

@@ -33,6 +33,7 @@ setMethod("dbFetch", signature = "ClickhouseResult", definition = function(res, 
   return(ret)
 })
 
+#' @importFrom bit64 as.integer64
 convert_Int64 <- function(df, Int64) {
   if (Int64 == "character") return(df)
   int64Types <- c('Int64', 'UInt64', 'Nullable(Int64)', 'Nullable(UInt64)')

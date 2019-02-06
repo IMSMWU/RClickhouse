@@ -144,3 +144,54 @@ sql_escape_logical.ClickhouseConnection <- function(con, x) {
     return(as.character(as.integer(x)))
   }
 }
+
+#' @export
+#' @importFrom dplyr sql sql_join
+#' @importFrom dbplyr build_sql 
+sql_join.ClickhouseConnection <- function (con, x, y, vars, type = "inner", by = NULL, strictness = "all", ...) {
+  stopifnot(strictness %in% c("all", "any"))
+  JOIN <- switch(type,
+    left = sql("LEFT JOIN"),
+    inner = sql("INNER JOIN"),
+    right = sql("RIGHT JOIN"),
+    full = sql("FULL JOIN"),
+    cross = sql("CROSS JOIN"),
+    stop("Unknown join type:", type, call. = FALSE))
+  select <- clickhouse_sql_join_vars(con, vars)
+  on <- clickhouse_sql_join_tbls(con, by)
+  build_sql("SELECT ", select, "\n", "  FROM ", x, "\n", "  ",
+    sql(toupper(strictness)), " ", JOIN, " ", y, "\n", if (!is.null(on)) build_sql("  ON ", on, "\n", con = con) else NULL, con = con)
+}
+
+#' @export
+#' @importFrom dplyr sql_subquery
+#' @importFrom dbplyr build_sql is.ident
+sql_subquery.ClickhouseConnection <- function (con, from, name = "", ...) {
+  if (is.ident(from)) {
+    from
+  } else {
+    build_sql("(", from, ") ", con = con)
+  }
+}
+
+#' @importFrom dplyr sql_escape_ident
+#' @importFrom dbplyr sql_vector 
+clickhouse_sql_join_vars <- function(con, vars) {
+  if (any(duplicated(vars$alias))) {
+    duplicatedVars <- vars$alias[duplicated(vars$alias)]
+    stop("clickhouse only supports JOINs of tables with distinct column names, but the column names ",
+         paste(duplicatedVars, collapse = ','), " occur in both tables. Please rename them.")
+  }
+  sql_vector(sql_escape_ident(con, vars$alias), parens = FALSE, collapse = ", ", con = con)
+}
+
+#' @importFrom dplyr sql_escape_ident
+#' @importFrom dbplyr sql_vector 
+clickhouse_sql_join_tbls <- function(con, by) {
+  on <- NULL
+  if (length(by$x) + length(by$y) > 0) {
+    on <- sql_vector(paste0(sql_escape_ident(con, by$x), " = ", sql_escape_ident(con, by$y)), collapse = " AND ", parens = TRUE)
+  }
+  on
+}
+
