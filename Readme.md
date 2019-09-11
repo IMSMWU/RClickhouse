@@ -29,7 +29,9 @@ devtools::install_github("IMSMWU/RClickhouse")
 ## Usage
 
 #### Create a DBI Connection:
-> *Note:* please be aware that {RClickhouse} doesn't use a HTTP interface in order to communicate with Clickhouse. Thus, You may use the native interface port (by default 9000) instead of the HTTPS interface (8123).
+
+> *Note:* please be aware that {RClickhouse} doesn't use a HTTP interface in order to communicate with Clickhouse. Thus, You may use the native interface port (by default 9000) instead of the HTTP interface (8123).
+
 
 ``` r
 con <- DBI::dbConnect(RClickhouse::clickhouse(), host="example-db.com")
