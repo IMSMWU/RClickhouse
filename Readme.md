@@ -28,13 +28,16 @@ devtools::install_github("IMSMWU/RClickhouse")
 
 ## Usage
 
-You can create a DBI Connection:
+#### Create a DBI Connection:
+
+> *Note:* please be aware that {RClickhouse} doesn't use a HTTP interface in order to communicate with Clickhouse. Thus, You may use the native interface port (by default 9000) instead of the HTTP interface (8123).
+
 
 ``` r
 con <- DBI::dbConnect(RClickhouse::clickhouse(), host="example-db.com")
 ```
 
-Write data to the database:
+#### Write data to the database:
 
 ``` r
 DBI::dbWriteTable(con, "mtcars", mtcars)
@@ -43,18 +46,24 @@ dbListTables(con)
 dbListFields(con, "mtcars") 
 ```
 
-... And query it using [dplyr](https://dplyr.tidyverse.org/):
+#### Query a database using [dplyr](https://dplyr.tidyverse.org/):
 
 ``` r
 library(dplyr)
-tbl(con, "mtcars") %>% group_by(cyl) %>% summarise(smpg=sum(mpg))
-tbl(con, "mtcars") %>% filter(cyl == 8, vs == 0) %>% group_by(am) %>% summarise(mean(qsec))
+tbl(con, "mtcars") %>% 
+  group_by(cyl) %>% 
+  summarise(smpg=sum(mpg))
+  
+tbl(con, "mtcars") %>% 
+  filter(cyl == 8, vs == 0) %>% 
+  group_by(am) %>% 
+  summarise(mean(qsec))
 
 # Close the connection
 dbDisconnect(con)
 ```
 
-... Or using [SQL-style commands](https://www.codecademy.com/articles/sql-commands) with `DBI::dbGetQuery`:
+#### Query a database using [SQL-style commands](https://www.codecademy.com/articles/sql-commands) with `DBI::dbGetQuery`:
 
 ``` r
 DBI::dbGetQuery(con, "SELECT
@@ -76,7 +85,7 @@ mtcars <- dbReadTable(con, mtcars)
 dbDisconnect(con)
 ```
 
-### ... Or using [ClickHouse functions](https://clickhouse.yandex/docs/en/query_language/functions/)
+#### Query a database using [ClickHouse functions](https://clickhouse.yandex/docs/en/query_language/functions/)
 
 ``` r
 # Get the names of all the avaliable databases
