@@ -1,5 +1,6 @@
 ^packrat/
 ^\.Rprofile$
+^\.vscode$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.travis\.yml$
