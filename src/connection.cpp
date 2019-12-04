@@ -300,7 +300,7 @@ std::shared_ptr<CT> vecToString(SEXP v, std::shared_ptr<ColumnUInt8> nullCol = n
 
 template<typename CT, typename VT>
 std::shared_ptr<CT> vecToEnum(SEXP v, TypeRef type, std::shared_ptr<ColumnUInt8> nullCol = nullptr) {
-  ch::EnumType et(type);
+  std::shared_ptr<class EnumType> et = std::static_pointer_cast<EnumType>(type);
   auto iv = as<IntegerVector>(v);
   CharacterVector levels = iv.attr("levels");
 
@@ -309,10 +309,10 @@ std::shared_ptr<CT> vecToEnum(SEXP v, TypeRef type, std::shared_ptr<ColumnUInt8>
   std::vector<VT> levelMap(levels.size());
   for (size_t i = 0; i < levels.size(); i++) {
     std::string name(levels[i]);
-    if (!et.HasEnumName(name)) {
-      stop("entry '"+name+"' does not exist in enum type "+et.GetName());
+    if (!et->HasEnumName(name)) {
+      stop("entry '" + name + "' does not exist in enum type " + et->GetName());
     }
-    levelMap[i] = et.GetEnumValue(name);
+    levelMap[i] = et->GetEnumValue(name);
   }
 
   auto col = std::make_shared<CT>(type);
@@ -329,8 +329,8 @@ std::shared_ptr<CT> vecToEnum(SEXP v, TypeRef type, std::shared_ptr<ColumnUInt8>
       // treated as an empty column
       break;
     default:
-      stop("cannot write factor of type "+std::to_string(TYPEOF(v))+
-          " to column of type "+col->Type()->GetName());
+      stop("cannot write factor of type " + std::to_string(TYPEOF(v)) +
+          " to column of type " + col->Type()->GetName());
   }
   return col;
 }
@@ -367,16 +367,22 @@ ColumnRef vecToColumn(TypeRef t, SEXP v, std::shared_ptr<ColumnUInt8> nullCol = 
     case TC::Date:
       return vecToScalar<ColumnDate, const std::time_t>(v);
     case TC::Nullable: {
+      // downcast to NullableType to access GetItemType member 
+      std::shared_ptr<class NullableType> nullable_t = std::static_pointer_cast<NullableType>(t);
+
       auto nullCtlCol = std::make_shared<ColumnUInt8>();
-      auto valCol = vecToColumn(t->GetNestedType(), v, nullCtlCol);
+      auto valCol = vecToColumn(nullable_t->GetNestedType(), v, nullCtlCol);
       return std::make_shared<ColumnNullable>(valCol, nullCtlCol);
     }
     case TC::Array: {
+      // downcast to ArrayType to access GetItemType member 
+      std::shared_ptr<class ArrayType> arr_t = std::static_pointer_cast<ArrayType>(t);
+
       std::shared_ptr<ColumnArray> arrCol = nullptr;
       Rcpp::List rlist = as<Rcpp::List>(v);
 
       for(typename Rcpp::List::stored_type e : rlist) {
-        auto valCol = vecToColumn(t->GetItemType(), e);
+        auto valCol = vecToColumn(arr_t->GetItemType(), e);
         if (!arrCol) {
           // create a zero-length copy (necessary because the ColumnArray
           // constructor mangles the argument column)
