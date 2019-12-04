@@ -4,6 +4,7 @@
 ^\.Rproj\.user$
 ^\.travis\.yml$
 .*\.o$
+^src/vendor/clickhouse-cpp/.clang-format$
 ^src/vendor/clickhouse-cpp/.buckconfig$
 ^src/vendor/clickhouse-cpp/.travis.yml$
 ^RClickhouse_.*.tar.gz$
