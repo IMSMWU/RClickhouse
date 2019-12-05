@@ -12,6 +12,7 @@ namespace ch = clickhouse;
 class Converter;
 
 using NullCol = std::shared_ptr<ch::ColumnNullable>;
+using EnumItem = std::pair<std::string /* name */, int16_t /* value */>;
 
 class Result {
   public:

@@ -1,10 +1,11 @@
 PKG_CPPFLAGS = $(SYS_FLAGS) -I. -I../inst/include -I./vendor/clickhouse-cpp -I./vendor/clickhouse-cpp/contrib
-CXX_STD = CXX11
+CXX_STD = CXX14
 
 OBJ_FILES = \
 vendor/clickhouse-cpp/clickhouse/columns/string.o \
 vendor/clickhouse-cpp/clickhouse/columns/date.o \
 vendor/clickhouse-cpp/clickhouse/columns/numeric.o \
+vendor/clickhouse-cpp/clickhouse/columns/decimal.o \
 vendor/clickhouse-cpp/clickhouse/columns/tuple.o \
 vendor/clickhouse-cpp/clickhouse/columns/array.o \
 vendor/clickhouse-cpp/clickhouse/columns/factory.o \

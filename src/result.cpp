@@ -224,7 +224,7 @@ class EnumConverter : public Converter {
   }
 
 public:
-  EnumConverter(ch::TypeRef type) : type(type) {
+  EnumConverter(ch::TypeRef type, const std::vector<EnumItem>& items) : type(type->GetCode(), items) {
     genLevelMap(levelMap, levels);
   }
 
@@ -257,6 +257,7 @@ public:
 
 std::unique_ptr<Converter> Result::buildConverter(std::string name, ch::TypeRef type) const {
   using TC = ch::Type::Code;
+
   switch(type->GetCode()) {
     case TC::Int8:
       return std::unique_ptr<ScalarConverter<ch::ColumnInt8, Rcpp::IntegerVector>>(new ScalarConverter<ch::ColumnInt8, Rcpp::IntegerVector>);
@@ -292,13 +293,45 @@ std::unique_ptr<Converter> Result::buildConverter(std::string name, ch::TypeRef 
     case TC::Date:
       return std::unique_ptr<ScalarConverter<ch::ColumnDate, Rcpp::DateVector>>(new ScalarConverter<ch::ColumnDate, Rcpp::DateVector>);
     case TC::Nullable:
-      return std::unique_ptr<NullableConverter>(new NullableConverter(buildConverter(name, type->GetNestedType())));
+      {
+        // downcast to NullableType to access GetNestedType member
+        std::shared_ptr<class ch::NullableType> nullable_t = std::static_pointer_cast<ch::NullableType>(type);
+
+        return std::unique_ptr<NullableConverter>(new NullableConverter(buildConverter(name, nullable_t->GetNestedType())));
+      }
     case TC::Array:
-      return std::unique_ptr<ArrayConverter>(new ArrayConverter(buildConverter(name, type->GetItemType())));
+      {
+        // downcast to ArrayType to access GetItemType member
+        std::shared_ptr<class ch::ArrayType> array_t = std::static_pointer_cast<ch::ArrayType>(type);
+
+        return std::unique_ptr<ArrayConverter>(new ArrayConverter(buildConverter(name, array_t->GetItemType())));
+      }
     case TC::Enum8:
-      return std::unique_ptr<EnumConverter<ch::ColumnEnum8, int8_t, Rcpp::IntegerVector>>(new EnumConverter<ch::ColumnEnum8, int8_t, Rcpp::IntegerVector>(type));
+      {
+        // downcast to EnumType to access items member
+        auto enum_t = std::static_pointer_cast<ch::EnumType>(type);
+        // extract items
+        std::vector<EnumItem> items;
+
+        for (auto iter = enum_t->BeginValueToName(); iter != enum_t->EndValueToName(); iter++ ){
+          items.push_back(EnumItem(iter->second, iter->first));
+        }
+
+        return std::unique_ptr<EnumConverter<ch::ColumnEnum8, int8_t, Rcpp::IntegerVector>>(new EnumConverter<ch::ColumnEnum8, int8_t, Rcpp::IntegerVector>(type, items));
+      }
     case TC::Enum16:
-      return std::unique_ptr<EnumConverter<ch::ColumnEnum16, int16_t, Rcpp::IntegerVector>>(new EnumConverter<ch::ColumnEnum16, int16_t, Rcpp::IntegerVector>(type));
+      {
+        // downcast to EnumType to access items member
+        auto enum_t = std::static_pointer_cast<ch::EnumType>(type);
+        // extract items
+        std::vector<EnumItem> items;
+
+        for (auto iter = enum_t->BeginValueToName(); iter != enum_t->EndValueToName(); iter++ ){
+          items.push_back(EnumItem(iter->second, iter->first));
+        }
+
+        return std::unique_ptr<EnumConverter<ch::ColumnEnum16, int16_t, Rcpp::IntegerVector>>(new EnumConverter<ch::ColumnEnum16, int16_t, Rcpp::IntegerVector>(type, items));
+      }
     default:
       throw std::invalid_argument("cannot read unsupported type: "+type->GetName());
       break;
