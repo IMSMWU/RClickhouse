@@ -78,4 +78,7 @@ public:
   // list at targetIdx
   virtual void processCol(ch::ColumnRef col, Rcpp::List &target, size_t targetIdx,
       NullCol nullCol) = 0;
+
+  // avoid non-virtual destructor for this abstract class
+  virtual ~Converter() {};
 };
