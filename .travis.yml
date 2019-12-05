@@ -6,7 +6,7 @@ warnings_are_errors: false
 matrix:
   include:
     - os: linux
-      dist: trusty
+      dist: bionic
       sudo: required
       before_script:
         - sudo sed -i '/<listen_host>::1/d' /etc/clickhouse-server/config.xml   # don't listen on localhost
