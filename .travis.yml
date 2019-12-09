@@ -8,16 +8,20 @@ matrix:
     - os: linux
       dist: bionic
       sudo: required
+      before_install:
+        - sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv E0C56BD4
+        - sudo apt-get update
+        - sudo apt-get install clickhouse-client clickhouse-server
       before_script:
         - sudo sed -i '/<listen_host>::1/d' /etc/clickhouse-server/config.xml   # don't listen on localhost
         - sudo service clickhouse-server start    # not using builtin service directive, so that the steps are executed in the correct order
-      addons:
-        apt:
-          packages:
-            - clickhouse-server-base
-            - clickhouse-server-common
-          sources:
-          - sourceline: 'deb http://repo.yandex.ru/clickhouse/deb/stable/ main/'
+      #addons:
+      #  apt:
+      #    packages:
+      #      - clickhouse-server-base
+      #      - clickhouse-server-common
+      #    sources:
+      #    - sourceline: 'deb http://repo.yandex.ru/clickhouse/deb/stable/ main/'
 
     # OS X BUILDS
     #
