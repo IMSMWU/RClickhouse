@@ -16,29 +16,6 @@ matrix:
       before_script:
         - sudo sed -i '/<listen_host>::1/d' /etc/clickhouse-server/config.xml   # don't listen on localhost
         - sudo service clickhouse-server start    # not using builtin service directive, so that the steps are executed in the correct order
-      #addons:
-      #  apt:
-      #    packages:
-      #      - clickhouse-server-base
-      #      - clickhouse-server-common
-      #    sources:
-      #    - sourceline: 'deb http://repo.yandex.ru/clickhouse/deb/stable/ main/'
-
-    # OS X BUILDS
-    #
-    # travis supports only 4gb RAM os x instances and
-    # that is not enough for building clickhouse. We
-    # have to wait for bigger instances or pre-build
-    # packages.
-    #
-    #- os: osx
-    #  osx_image: xcode9.2
-    #  before_install:
-    #    - brew tap hatarist/clickhouse
-    #  install:
-    #    - travis_wait 30 brew install clickhouse
-    #  before_script:
-    #    - brew services start clickhouse
 
 # faster builds by exploiting the number of cores
 env:
