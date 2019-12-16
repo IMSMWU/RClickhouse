@@ -54,7 +54,7 @@ encode_UTF <- function(df){
   toConvert <- which(attr(df, "data.type") %in% c("String", "FixedString", "Nullable(String)", "Nullable(FixedString)"))
 
   if(length(toConvert) > 0){
-    df[toConvert] <- suppressWarnings(lapply(df[toConvert], function(x) .Internal(setEncoding(x, "UTF-8"))))
+    df[toConvert] <- suppressWarnings(lapply(df[toConvert], function(x) enc2utf8(x)))
   }
   return(df)
 }
