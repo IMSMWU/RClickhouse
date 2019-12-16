@@ -148,6 +148,7 @@ buildEnumType <- function(obj) {
 }
 
 #' @export
+#' @importFrom bit64 is.integer64
 #' @rdname ClickhouseDriver-class
 setMethod("dbDataType", signature(dbObj="ClickhouseDriver", obj = "ANY"), definition = function(dbObj, obj, ...) {
   if (is.null(obj) || all(is.na(obj))) {
