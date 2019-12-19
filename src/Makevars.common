@@ -12,6 +12,8 @@ vendor/clickhouse-cpp/clickhouse/columns/factory.o \
 vendor/clickhouse-cpp/clickhouse/columns/nullable.o \
 vendor/clickhouse-cpp/clickhouse/columns/enum.o \
 vendor/clickhouse-cpp/clickhouse/columns/uuid.o \
+vendor/clickhouse-cpp/clickhouse/columns/ip4.o \
+vendor/clickhouse-cpp/clickhouse/columns/ip6.o \
 vendor/clickhouse-cpp/clickhouse/query.o \
 vendor/clickhouse-cpp/clickhouse/base/platform.o \
 vendor/clickhouse-cpp/clickhouse/base/socket.o \
