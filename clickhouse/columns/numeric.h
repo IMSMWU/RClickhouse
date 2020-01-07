@@ -1,5 +1,6 @@
 #pragma once
 
+#include <absl/numeric/int128.h>
 #include "column.h"
 
 namespace clickhouse {
@@ -48,7 +49,7 @@ private:
     std::vector<T> data_;
 };
 
-using Int128 = __int128;
+using Int128 = absl::int128;
 
 using ColumnUInt8   = ColumnVector<uint8_t>;
 using ColumnUInt16  = ColumnVector<uint16_t>;
