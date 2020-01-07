@@ -48,16 +48,6 @@ protected:
     Type(const Code code);
 
 public:
-    template <typename Derived>
-    auto* As() {
-        return static_cast<Derived*>(this);
-    }
-
-    template <typename Derived>
-    const auto* As() const {
-        return static_cast<const Derived*>(this);
-    }
-
     /// Type's code.
     Code GetCode() const { return code_; }
 

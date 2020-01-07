@@ -1,6 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0.2)
 
-INCLUDE (cmake/cpp17.cmake)
+INCLUDE (cmake/cpp11.cmake)
 INCLUDE (cmake/subdirs.cmake)
 
 OPTION(BUILD_BENCHMARK "Build benchmark" OFF)
@@ -8,7 +8,7 @@ OPTION(BUILD_TESTS "Build tests" OFF)
 
 PROJECT (CLICKHOUSE-CLIENT)
 
-    USE_CXX17()
+    USE_CXX11()
 
 	IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")
 		set(CMAKE_BUILD_TYPE "Debug")

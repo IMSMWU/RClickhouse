@@ -26,7 +26,7 @@ void ColumnEnum<T>::Append(const T& value, bool checkValue) {
 
 template <typename T>
 void ColumnEnum<T>::Append(const std::string& name) {
-    data_.push_back(type_->As<EnumType>()->GetEnumValue(name));
+    data_.push_back(std::static_pointer_cast<EnumType>(type_)->GetEnumValue(name));
 }
 
 template <typename T>
@@ -41,7 +41,7 @@ const T& ColumnEnum<T>::At(size_t n) const {
 
 template <typename T>
 const std::string ColumnEnum<T>::NameAt(size_t n) const {
-    return type_->As<EnumType>()->GetEnumName(data_.at(n));
+    return std::static_pointer_cast<EnumType>(type_)->GetEnumName(data_.at(n));
 }
 
 template <typename T>
@@ -59,7 +59,7 @@ void ColumnEnum<T>::SetAt(size_t n, const T& value, bool checkValue) {
 
 template <typename T>
 void ColumnEnum<T>::SetNameAt(size_t n, const std::string& name) {
-    data_.at(n) = type_->As<EnumType>()->GetEnumValue(name);
+    data_.at(n) = std::static_pointer_cast<EnumType>(type_)->GetEnumValue(name);
 }
 
 template <typename T>

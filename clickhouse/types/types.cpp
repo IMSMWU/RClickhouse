@@ -38,7 +38,7 @@ std::string Type::GetName() const {
         case String:
             return "String";
         case FixedString:
-            return As<FixedStringType>()->GetName();
+            return static_cast<const FixedStringType*>(this)->GetName();
         case IPv4:
             return "IPv4";
         case IPv6:
@@ -48,19 +48,19 @@ std::string Type::GetName() const {
         case Date:
             return "Date";
         case Array:
-            return As<ArrayType>()->GetName();
+            return static_cast<const ArrayType*>(this)->GetName();
         case Nullable:
-            return As<NullableType>()->GetName();
+            return static_cast<const NullableType*>(this)->GetName();
         case Tuple:
-            return As<TupleType>()->GetName();
+            return static_cast<const TupleType*>(this)->GetName();
         case Enum8:
         case Enum16:
-            return As<EnumType>()->GetName();
+            return static_cast<const EnumType*>(this)->GetName();
         case Decimal:
         case Decimal32:
         case Decimal64:
         case Decimal128:
-            return As<DecimalType>()->GetName();
+            return static_cast<const DecimalType*>(this)->GetName();
     }
 
     // XXX: NOT REACHED!

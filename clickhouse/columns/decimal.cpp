@@ -23,11 +23,14 @@ ColumnDecimal::ColumnDecimal(TypeRef type)
 
 void ColumnDecimal::Append(const Int128& value) {
     if (data_->Type()->GetCode() == Type::Int32) {
-        data_->As<ColumnInt32>()->Append(static_cast<ColumnInt32::DataType>(value));
+        //data_->As<ColumnInt32>()->Append(static_cast<ColumnInt32::DataType>(value));
+        static_cast<std::shared_ptr<ColumnInt32>>(data_->As<ColumnInt32>())->Append(static_cast<ColumnInt32::DataType>(value));
     } else if (data_->Type()->GetCode() == Type::Int64) {
-        data_->As<ColumnInt64>()->Append(static_cast<ColumnInt64::DataType>(value));
+        //data_->As<ColumnInt64>()->Append(static_cast<ColumnInt64::DataType>(value));
+        static_cast<std::shared_ptr<ColumnInt64>>(data_->As<ColumnInt64>())->Append(static_cast<ColumnInt64::DataType>(value));
     } else {
-        data_->As<ColumnInt128>()->Append(static_cast<ColumnInt128::DataType>(value));
+        //data_->As<ColumnInt128>()->Append(static_cast<ColumnInt128::DataType>(value));
+        static_cast<std::shared_ptr<ColumnInt128>>(data_->As<ColumnInt128>())->Append(static_cast<ColumnInt128::DataType>(value));
     }
 }
 
@@ -48,7 +51,7 @@ void ColumnDecimal::Append(const std::string& value) {
             }
         } else if (*c == '.' && !has_dot) {
             size_t distance = std::distance(c, end) - 1;
-            auto scale = type_->As<DecimalType>()->GetScale();
+            auto scale = std::static_pointer_cast<DecimalType>(type_)->GetScale();
 
             if (distance <= scale) {
                 zeros = scale - distance;
