@@ -1,5 +1,6 @@
 #include "decimal.h"
 
+#include <absl/strings/numbers.h>
 #include <iostream>
 
 namespace clickhouse {
@@ -61,10 +62,13 @@ void ColumnDecimal::Append(const std::string& value) {
 
             has_dot = true;
         } else if (*c >= '0' && *c <= '9') {
-            if (__builtin_mul_overflow(int_value, 10, &int_value) ||
-                __builtin_add_overflow(int_value, *c - '0', &int_value)) {
-                throw std::runtime_error("value is too big for 128-bit integer");
-            }
+            int_value *= 10;
+            int_value += *c - '0';
+            // TODO: check overflows
+            //if (__builtin_mul_overflow(int_value, 10, &int_value) ||
+            //    __builtin_add_overflow(int_value, *c - '0', &int_value)) {
+            //    throw std::runtime_error("value is too big for 128-bit integer");
+            //}
         } else {
             throw std::runtime_error(std::string("unexpected symbol '") + (*c) + "' in decimal value");
         }
@@ -76,9 +80,11 @@ void ColumnDecimal::Append(const std::string& value) {
     }
 
     while (zeros) {
-        if (__builtin_mul_overflow(int_value, 10, &int_value)) {
-            throw std::runtime_error("value is too big for 128-bit integer");
-        }
+        int_value *= 10;
+        // TODO: check overflows
+        //if (__builtin_mul_overflow(int_value, 10, &int_value)) {
+        //    throw std::runtime_error("value is too big for 128-bit integer");
+        //}
         --zeros;
     }
 
