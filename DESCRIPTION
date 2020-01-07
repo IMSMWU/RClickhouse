@@ -23,7 +23,7 @@ Description: 'Yandex Clickhouse' (<https://clickhouse.yandex/>) is a high-perfor
     provided that enable working with 'Yandex Clickhouse' databases via
     'DBI' methods and using 'dplyr'/'dbplyr' idioms.
 License: GPL-2
-SystemRequirements: C++14
+SystemRequirements: C++11
 Imports:
     dplyr (>= 0.7.0),
     dbplyr (>= 1.0.0),
