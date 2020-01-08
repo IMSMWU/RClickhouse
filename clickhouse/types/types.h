@@ -1,6 +1,6 @@
 #pragma once
 
-#include <absl/numeric/int128.h>
+#include <BigInt.hpp>
 
 #include <map>
 #include <memory>
@@ -9,7 +9,6 @@
 
 namespace clickhouse {
 
-using Int128 = absl::int128;
 using TypeRef = std::shared_ptr<class Type>;
 
 class Type {
@@ -203,7 +202,7 @@ inline TypeRef Type::CreateSimple<int64_t>() {
 }
 
 template <>
-inline TypeRef Type::CreateSimple<Int128>() {
+inline TypeRef Type::CreateSimple<BigInt>() {
     return TypeRef(new Type(Int128));
 }
 

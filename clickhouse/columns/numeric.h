@@ -1,6 +1,5 @@
 #pragma once
 
-#include <absl/numeric/int128.h>
 #include "column.h"
 
 namespace clickhouse {
@@ -49,8 +48,6 @@ private:
     std::vector<T> data_;
 };
 
-using Int128 = absl::int128;
-
 using ColumnUInt8   = ColumnVector<uint8_t>;
 using ColumnUInt16  = ColumnVector<uint16_t>;
 using ColumnUInt32  = ColumnVector<uint32_t>;
@@ -60,7 +57,7 @@ using ColumnInt8    = ColumnVector<int8_t>;
 using ColumnInt16   = ColumnVector<int16_t>;
 using ColumnInt32   = ColumnVector<int32_t>;
 using ColumnInt64   = ColumnVector<int64_t>;
-using ColumnInt128  = ColumnVector<Int128>;
+using ColumnInt128  = ColumnVector<BigInt>;
 
 using ColumnFloat32 = ColumnVector<float>;
 using ColumnFloat64 = ColumnVector<double>;

@@ -29,8 +29,8 @@ PROJECT (CLICKHOUSE-CLIENT)
     SUBDIRS (
         clickhouse
         contrib/cityhash
-        contrib/abseil-cpp
         contrib/lz4
+        contrib/bigint
     )
 
     IF (BUILD_BENCHMARK)

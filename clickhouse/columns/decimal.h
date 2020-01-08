@@ -12,10 +12,10 @@ class ColumnDecimal : public Column {
 public:
     ColumnDecimal(size_t precision, size_t scale);
 
-    void Append(const Int128& value);
+    void Append(const BigInt& value);
     void Append(const std::string& value);
 
-    Int128 At(size_t i) const;
+    BigInt At(size_t i) const;
 
 public:
     void Append(ColumnRef column) override;
