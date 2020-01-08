@@ -1,0 +1,13 @@
+# Binaries
+bin
+
+# Intermediate build files
+build
+
+# Release files
+release
+
+# IDEs' and code editors' files
+.idea
+.vscode
+*.swp

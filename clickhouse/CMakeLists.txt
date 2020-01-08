@@ -32,12 +32,14 @@ SET_TARGET_PROPERTIES(clickhouse-cpp-lib PROPERTIES LINKER_LANGUAGE CXX)
 TARGET_LINK_LIBRARIES (clickhouse-cpp-lib
     cityhash-lib
     lz4-lib
+    bigint-lib
 )
 
 ADD_LIBRARY (clickhouse-cpp-lib-static STATIC ${clickhouse-cpp-lib-src})
 TARGET_LINK_LIBRARIES (clickhouse-cpp-lib-static
     cityhash-lib
     lz4-lib
+    bigint-lib
 )
 
 IF (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")

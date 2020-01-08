@@ -1,0 +1,147 @@
+language: cpp
+sudo: false
+
+common_sources: &all_sources
+  - ubuntu-toolchain-r-test
+  - llvm-toolchain-trusty
+  - llvm-toolchain-trusty-4.0
+  - llvm-toolchain-trusty-5.0
+  - llvm-toolchain-trusty-6.0
+
+matrix:
+  include:
+    # Linux GCC 5 build
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources: *all_sources
+          packages:
+            - g++-5
+      env:
+        - COMPILER='g++-5'
+
+    # Linux GCC 6 build
+    - os: linux
+      compiler: gcc
+      addons: &gcc6
+        apt:
+          sources: *all_sources
+          packages:
+            - g++-6
+      env:
+        - COMPILER='g++-6'
+
+    # Linux GCC 7 build
+    - os: linux
+      compiler: gcc
+      addons: &gcc7
+        apt:
+          sources: *all_sources
+          packages:
+            - g++-7
+      env:
+        - COMPILER='g++-7'
+
+    # Linux GCC 8 build (with coverage)
+    - os: linux
+      compiler: gcc
+      addons: &gcc8
+        apt:
+          sources: *all_sources
+          packages:
+            - g++-8
+            # - lcov
+      env:
+        - COMPILER='g++-8'
+        # disable coverage analysis for now
+        # - COVERAGE=1
+
+    # Linux Clang 4 build
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources: *all_sources
+          packages:
+            - clang-4.0
+      env:
+        - COMPILER='clang++-4.0'
+
+    # Linux Clang 5 build
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources: *all_sources
+          packages:
+            - clang-5.0
+      env:
+        - COMPILER='clang++-5.0'
+
+    # Linux Clang 6 build
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources: *all_sources
+          packages:
+            - clang-6.0
+            - libstdc++-6-dev
+      env:
+        - COMPILER='clang++-6.0'
+
+    # OS X Xcode8 GCC build
+    - os: osx
+      osx_image: xcode8.3
+      compiler: gcc
+      env:
+        - COMPILER='g++'
+
+    # OS X Xcode9 GCC build
+    - os: osx
+      osx_image: xcode9.2
+      compiler: gcc
+      env:
+        - COMPILER='g++'
+
+    # OS X Xcode8 Clang build
+    - os: osx
+      osx_image: xcode8.3
+      compiler: clang
+      env:
+        - COMPILER='clang++'
+
+    # OS X Xcode9 Clang build
+    - os: osx
+      osx_image: xcode9.2
+      compiler: clang
+      env:
+        - COMPILER='clang++'
+
+install:
+  - mkdir -p tmp && cd tmp
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]
+    then
+      CMAKE_URL="https://cmake.org/files/v3.10/cmake-3.10.1-Linux-x86_64.tar.gz"
+      mkdir cmake && travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
+      export PATH=tmp/cmake/bin:${PATH}
+    elif [[ "${TRAVIS_OS_NAME}" == "osx" ]]
+    then
+        which cmake || brew install cmake;
+    fi
+
+before_script:
+  - export CXX=${COMPILER}
+  - cd ${TRAVIS_BUILD_DIR}
+
+script:
+  - make
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ "${COVERAGE}" == "1" ]]
+    then
+      make coverage && bash <(curl -s https://codecov.io/bash) -X gcov
+    else
+      make test
+    fi
