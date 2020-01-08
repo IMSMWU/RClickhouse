@@ -1,6 +1,5 @@
 #include "decimal.h"
 
-#include <absl/strings/numbers.h>
 #include <iostream>
 
 namespace clickhouse {
@@ -22,13 +21,13 @@ ColumnDecimal::ColumnDecimal(TypeRef type)
 {
 }
 
-void ColumnDecimal::Append(const Int128& value) {
+void ColumnDecimal::Append(const BigInt& value) {
     if (data_->Type()->GetCode() == Type::Int32) {
         //data_->As<ColumnInt32>()->Append(static_cast<ColumnInt32::DataType>(value));
-        static_cast<std::shared_ptr<ColumnInt32>>(data_->As<ColumnInt32>())->Append(static_cast<ColumnInt32::DataType>(value));
+        static_cast<std::shared_ptr<ColumnInt32>>(data_->As<ColumnInt32>())->Append(static_cast<ColumnInt32::DataType>(value.to_long()));
     } else if (data_->Type()->GetCode() == Type::Int64) {
         //data_->As<ColumnInt64>()->Append(static_cast<ColumnInt64::DataType>(value));
-        static_cast<std::shared_ptr<ColumnInt64>>(data_->As<ColumnInt64>())->Append(static_cast<ColumnInt64::DataType>(value));
+        static_cast<std::shared_ptr<ColumnInt64>>(data_->As<ColumnInt64>())->Append(static_cast<ColumnInt64::DataType>(value.to_long_long()));
     } else {
         //data_->As<ColumnInt128>()->Append(static_cast<ColumnInt128::DataType>(value));
         static_cast<std::shared_ptr<ColumnInt128>>(data_->As<ColumnInt128>())->Append(static_cast<ColumnInt128::DataType>(value));
@@ -36,7 +35,7 @@ void ColumnDecimal::Append(const Int128& value) {
 }
 
 void ColumnDecimal::Append(const std::string& value) {
-    Int128 int_value = 0;
+    BigInt int_value = 0; 
     auto c = value.begin();
     auto end = value.end();
     bool sign = true;
@@ -64,11 +63,6 @@ void ColumnDecimal::Append(const std::string& value) {
         } else if (*c >= '0' && *c <= '9') {
             int_value *= 10;
             int_value += *c - '0';
-            // TODO: check overflows
-            //if (__builtin_mul_overflow(int_value, 10, &int_value) ||
-            //    __builtin_add_overflow(int_value, *c - '0', &int_value)) {
-            //    throw std::runtime_error("value is too big for 128-bit integer");
-            //}
         } else {
             throw std::runtime_error(std::string("unexpected symbol '") + (*c) + "' in decimal value");
         }
@@ -81,21 +75,17 @@ void ColumnDecimal::Append(const std::string& value) {
 
     while (zeros) {
         int_value *= 10;
-        // TODO: check overflows
-        //if (__builtin_mul_overflow(int_value, 10, &int_value)) {
-        //    throw std::runtime_error("value is too big for 128-bit integer");
-        //}
         --zeros;
     }
 
     Append(sign ? int_value : -int_value);
 }
 
-Int128 ColumnDecimal::At(size_t i) const {
+BigInt ColumnDecimal::At(size_t i) const {
     if (data_->Type()->GetCode() == Type::Int32) {
-        return static_cast<Int128>(data_->As<ColumnInt32>()->At(i));
+        return static_cast<BigInt>(data_->As<ColumnInt32>()->At(i));
     } else if (data_->Type()->GetCode() == Type::Int64) {
-        return static_cast<Int128>(data_->As<ColumnInt64>()->At(i));
+        return static_cast<BigInt>(data_->As<ColumnInt64>()->At(i));
     } else {
         return data_->As<ColumnInt128>()->At(i);
     }
