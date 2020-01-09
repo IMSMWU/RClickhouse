@@ -1,4 +1,0 @@
-coverage:
-  ignore:
-    - include/third_party
-    - test

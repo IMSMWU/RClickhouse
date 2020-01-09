@@ -1,4 +1,5 @@
-PKG_CPPFLAGS = $(SYS_FLAGS) -I. -I../inst/include -I./vendor/clickhouse-cpp -I./vendor/clickhouse-cpp/contrib
+PKG_CPPFLAGS = $(SYS_FLAGS) -I. -I../inst/include -I./vendor/clickhouse-cpp -I./vendor/clickhouse-cpp/contrib -I./vendor/clickhouse-cpp/contrib/bigerint
+
 CXX_STD = CXX11
 
 OBJ_FILES = \
