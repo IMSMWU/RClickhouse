@@ -1,4 +1,9 @@
 SYS_FLAGS = -D_WIN32_WINNT=0x0600
+
+## pragma comment is ignored by g++
 SYS_LIBS = -lws2_32
 
 include Makevars.common
+
+## avoid conflict with macro redefinitions
+PKG_CPPFLAGS += -DSTRICT_R_HEADERS
