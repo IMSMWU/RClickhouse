@@ -1,3 +1,9 @@
+RClickhouse v0.5.1
+==============
+
+ * fixes solaris build
+
+
 RClickhouse v0.5
 ==============
 
