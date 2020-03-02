@@ -82,10 +82,18 @@ removequotes <- function(parsedline) {
 
 configparser <- function(filepath) {
   con <- file(filepath, "r")
+  counter <- 0
   parsedConfig <- list()
   while ( TRUE ) {
     line <- readLines(con, n <- 1)
+    counter <- counter + 1
     if ( length(line) == 0 ) {
+      break
+    } else if ( nchar(line) == 0 ) {
+      next
+    }
+    if (!grepl(":", line, fixed=TRUE)) {
+      print(sprintf("Error in line %d: NOT VALID YAML", counter))
       break
     }
     splitUp <- strsplit(line, ":", fixed = TRUE)
