@@ -147,7 +147,7 @@ sql_escape_logical.ClickhouseConnection <- function(con, x) {
 
 #' @export
 #' @importFrom dplyr sql sql_join
-#' @importFrom dbplyr build_sql 
+#' @importFrom dbplyr build_sql
 sql_join.ClickhouseConnection <- function (con, x, y, vars, type = "inner", by = NULL, strictness = "all", ...) {
   stopifnot(strictness %in% c("all", "any"))
   JOIN <- switch(type,
@@ -175,7 +175,7 @@ sql_subquery.ClickhouseConnection <- function (con, from, name = "", ...) {
 }
 
 #' @importFrom dplyr sql_escape_ident
-#' @importFrom dbplyr sql_vector 
+#' @importFrom dbplyr sql_vector
 clickhouse_sql_join_vars <- function(con, vars) {
   if (any(duplicated(vars$alias))) {
     duplicatedVars <- vars$alias[duplicated(vars$alias)]
@@ -186,11 +186,11 @@ clickhouse_sql_join_vars <- function(con, vars) {
 }
 
 #' @importFrom dplyr sql_escape_ident
-#' @importFrom dbplyr sql_vector 
+#' @importFrom dbplyr sql_vector
 clickhouse_sql_join_tbls <- function(con, by) {
   on <- NULL
   if (length(by$x) + length(by$y) > 0) {
-    on <- sql_vector(paste0(sql_escape_ident(con, by$x), " = ", sql_escape_ident(con, by$y)), collapse = " AND ", parens = TRUE)
+    on <- sql_vector(paste0(sql_escape_ident(con, by$x), " = ", sql_escape_ident(con, by$y)), collapse = " AND ", parens = TRUE, con = con)
   }
   on
 }
