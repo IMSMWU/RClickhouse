@@ -30,7 +30,6 @@ Imports:
     methods (>= 3.3.2),
     DBI (>= 0.6.0),
     Rcpp (>= 0.11.0),
-    yaml (>= 2.1.14),
     bit64
 LazyData: true
 RoxygenNote: 7.0.1
