@@ -113,7 +113,6 @@ configparser <- function(filepath) {
 #' @param DEFAULT_PARAMS a list of configuration defaults
 #' @param pre_config initialization set
 #' @return a merged configuration
-#' @importFrom yaml read_yaml
 loadConfig <- function(CONFIG_PATHS, DEFAULT_PARAMS, pre_config) {
   config = pre_config
   config_found <- FALSE
