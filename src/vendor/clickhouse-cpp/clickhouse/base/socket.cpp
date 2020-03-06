@@ -274,7 +274,7 @@ SOCKET SocketConnect(const NetworkAddress& addr) {
         SetNonBlock(s, true);
         int cret = connect(s, res->ai_addr, (int)res->ai_addrlen);
 
-        #if !defined(_win_)
+        #if defined(_win_)
           // poll to avoid WSAEWOULDBLOCK error
           for(size_t i = 0; i < 10; i++) {
             if(WSAGetLastError() == 0) {
