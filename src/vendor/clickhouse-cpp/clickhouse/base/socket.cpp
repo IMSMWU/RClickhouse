@@ -1,20 +1,23 @@
+#include <errno.h>
+
 #include "socket.h"
 #include "singleton.h"
-
 #include <assert.h>
 #include <stdexcept>
 #include <system_error>
 #include <unordered_set>
 #include <memory.h>
 
+
 #if !defined(_win_)
-#   include <errno.h>
 #   include <fcntl.h>
 #   include <netdb.h>
 #   include <netinet/tcp.h>
 #   include <signal.h>
 #   include <unistd.h>
-#   include <netinet/tcp.h>
+#elif
+#   include<thread>
+#   include<chrono>
 #endif
 
 namespace clickhouse {
@@ -256,17 +259,37 @@ NetrworkInitializer::NetrworkInitializer() {
 
 SOCKET SocketConnect(const NetworkAddress& addr) {
     int last_err = 0;
+
     for (auto res = addr.Info(); res != nullptr; res = res->ai_next) {
-        SOCKET s(socket(res->ai_family, res->ai_socktype, res->ai_protocol));
+        int reuse = 1;
+        int sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const char*) &reuse, sizeof(int));
+
+        SOCKET s(sockfd);
 
         if (s == -1) {
             continue;
         }
 
         SetNonBlock(s, true);
+        int cret = connect(s, res->ai_addr, (int)res->ai_addrlen);
 
-        if (connect(s, res->ai_addr, (int)res->ai_addrlen) != 0) {
+        #if !defined(_win_)
+          // poll to avoid WSAEWOULDBLOCK error
+          for(size_t i = 0; i < 10; i++) {
+            if(WSAGetLastError() == 0) {
+               cret = 0;
+               continue;
+            }
+
+             std::this_thread::sleep_for(std::chrono::seconds(1));
+          }
+        #endif
+
+
+        if (cret != 0) {
             int err = errno;
+
             if (err == EINPROGRESS || err == EAGAIN || err == EWOULDBLOCK) {
                 pollfd fd;
                 fd.fd = s;
