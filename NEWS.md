@@ -1,6 +1,7 @@
-RClickhouse v0.5.2 (in development)
+RClickhouse v0.5.2
 ==============
 
+ * fix windows connection
  * replace yaml dependencies by R code (reduce dependencies)
  * update clickhouse-cpp dependencies
 
