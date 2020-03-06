@@ -1,3 +1,10 @@
+RClickhouse v0.5.2 (in development)
+==============
+
+ * replace yaml dependencies by R code (reduce dependencies)
+ * update clickhouse-cpp dependencies
+
+
 RClickhouse v0.5.1
 ==============
 
