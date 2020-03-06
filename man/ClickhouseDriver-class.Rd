@@ -25,12 +25,20 @@ clickhouse()
 
 loadConfig(CONFIG_PATHS, DEFAULT_PARAMS, pre_config)
 
-\S4method{dbConnect}{ClickhouseDriver}(drv, host = "localhost",
-  port = 9000, db = "default", user = "default", password = "",
-  compression = "lz4", config_paths = c("./RClickhouse.yaml",
-  "~/.R/RClickhouse.yaml", "/etc/RClickhouse.yaml"),
+\S4method{dbConnect}{ClickhouseDriver}(
+  drv,
+  host = "localhost",
+  port = 9000,
+  db = "default",
+  user = "default",
+  password = "",
+  compression = "lz4",
+  config_paths = c("./RClickhouse.yaml", "~/.R/RClickhouse.yaml",
+    "/etc/RClickhouse.yaml"),
   Int64 = c("integer64", "integer", "numeric", "character"),
-  toUTF8 = TRUE, ...)
+  toUTF8 = TRUE,
+  ...
+)
 
 \S4method{dbDataType}{ClickhouseDriver}(dbObj, obj, ...)
 }
