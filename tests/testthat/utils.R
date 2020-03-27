@@ -34,6 +34,14 @@ writeReadTest <- function(input, result = input, types = NULL) {
 
   dbWriteTable(conn, tblname, input, overwrite=T, field.types=types)
   r <- dbReadTable(conn, tblname)
+
+#  doesn't check types if they weren't specified in writeReadTest()
+  if(is.null(types)){
+    attr(r, "data.type") <- NULL
+  } else {
+    # TODO: implement missing test cases to verify that all types match
+  }
+
   expect_equal(r, result)
   dbDisconnect(conn)
 }
