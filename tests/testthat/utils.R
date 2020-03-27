@@ -33,15 +33,19 @@ writeReadTest <- function(input, result = input, types = NULL) {
   conn <- getRealConnection()
 
   dbWriteTable(conn, tblname, input, overwrite=T, field.types=types)
-  r <- dbReadTable(conn, tblname)
+  afterReadWrite <- dbReadTable(conn, tblname)
 
-#  doesn't check types if they weren't specified in writeReadTest()
-  if(is.null(types)){
-    attr(r, "data.type") <- NULL
-  } else {
-    # TODO: implement missing test cases to verify that all types match
+  #  checks consistency of dataTypes before and after ReadWrite
+  if(!is.null(types)){
+    afterReadWriteType <- attr(afterReadWrite, "data.type")
+    resultType <- types
+    expect_equal(resultType, afterReadWriteType)
   }
 
-  expect_equal(r, result)
+  #  checks consistency of data before and after ReadWrite
+  attr(afterReadWrite, "data.type") <- NULL
+  attr(result, "data.type") <- NULL
+  expect_equal(afterReadWrite, result)
+
   dbDisconnect(conn)
 }
