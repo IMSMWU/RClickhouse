@@ -1,6 +1,8 @@
 #include "uuid.h"
 #include "utils.h"
 
+#include <stdexcept>
+
 namespace clickhouse {
 
 ColumnUUID::ColumnUUID()
@@ -13,7 +15,7 @@ ColumnUUID::ColumnUUID(ColumnRef data)
     : Column(Type::CreateUUID())
     , data_(data->As<ColumnUInt64>())
 {
-    if (data_->Size()%2 != 0) {
+    if (data_->Size() % 2 != 0) {
         throw std::runtime_error("number of entries must be even (two 64-bit numbers for each UUID)");
     }
 }
@@ -21,6 +23,10 @@ ColumnUUID::ColumnUUID(ColumnRef data)
 void ColumnUUID::Append(const UInt128& value) {
     data_->Append(value.first);
     data_->Append(value.second);
+}
+
+void ColumnUUID::Clear() {
+    data_->Clear();
 }
 
 const UInt128 ColumnUUID::At(size_t n) const {
@@ -33,7 +39,7 @@ const UInt128 ColumnUUID::operator [] (size_t n) const {
 
 void ColumnUUID::Append(ColumnRef column) {
     if (auto col = column->As<ColumnUUID>()) {
-        data_->Append(data_);
+        data_->Append(col->data_);
     }
 }
 

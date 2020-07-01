@@ -33,8 +33,7 @@
 
 \S4method{dbExistsTable}{ClickhouseConnection,character}(conn, name, ...)
 
-\S4method{dbReadTable}{ClickhouseConnection,character}(conn, name,
-  row.names = NA, ...)
+\S4method{dbReadTable}{ClickhouseConnection,character}(conn, name, row.names = NA, ...)
 
 \S4method{dbRemoveTable}{ClickhouseConnection,character}(conn, name, ...)
 
@@ -63,7 +62,5 @@
 \description{
 \code{ClickhouseConnection.} objects are usually created by
 \code{\link[DBI]{dbConnect}}
-
-Close the database connection
 }
 \keyword{internal}

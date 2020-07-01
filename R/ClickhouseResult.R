@@ -11,7 +11,9 @@ setClass("ClickhouseResult",
     sql = "character",
     env = "environment",
     conn = "ClickhouseConnection",
-    ptr = "externalptr"
+    ptr = "externalptr",
+    Int64 = "character",
+    toUTF8 = "logical"
   )
 )
 
@@ -23,8 +25,40 @@ setMethod("dbFetch", signature = "ClickhouseResult", definition = function(res, 
   if (n != as.integer(n) || (n < 0 && n != -1)) {
     stop("n must be a positive integer, -1 or Inf")
   }
-  return(fetch(res@ptr, n))
+  ret <- fetch(res@ptr, n)
+  ret <- convert_Int64(ret, res@Int64)
+
+  if(res@toUTF8 == TRUE) ret <- encode_UTF(ret)
+
+  return(ret)
 })
+
+#' @importFrom bit64 as.integer64
+convert_Int64 <- function(df, Int64) {
+  if (Int64 == "character") return(df)
+  int64Types <- c('Int64', 'UInt64', 'Nullable(Int64)', 'Nullable(UInt64)')
+  toConvert <- which(attr(df, 'data.type') %in% int64Types)
+  if(length(toConvert) > 0){
+  as_Int64 <- switch(Int64,
+                      integer = as.integer,
+                      numeric = as.numeric,
+                      integer64 = as.integer64
+                     )
+  df[toConvert] <- suppressWarnings(lapply(df[toConvert], as_Int64))
+  return(df)}else{
+    return(df)
+  }
+}
+
+encode_UTF <- function(df){
+  toConvert <- which(attr(df, "data.type") %in% c("String", "FixedString", "Nullable(String)", "Nullable(FixedString)"))
+
+  if(length(toConvert) > 0){
+    df[toConvert] <- suppressWarnings(lapply(df[toConvert], function(x) enc2utf8(x)))
+  }
+  return(df)
+}
+
 
 #' @rdname ClickhouseResult-class
 #' @export

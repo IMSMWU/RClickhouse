@@ -12,11 +12,17 @@ class ColumnNullable : public Column {
 public:
     ColumnNullable(ColumnRef nested, ColumnRef nulls);
 
+    /// Appends one null flag to the end of the column
+    void Append(bool isnull);
+
     /// Returns null flag at given row number.
     bool IsNull(size_t n) const;
 
     /// Returns nested column.
     ColumnRef Nested() const;
+
+    /// Returns nulls column.
+    ColumnRef Nulls() const;
 
 public:
     /// Appends content of given column to the end of current one.
@@ -28,6 +34,9 @@ public:
     /// Saves column data to output stream.
     void Save(CodedOutputStream* output) override;
 
+    /// Clear column data .
+    void Clear() override;
+    
     /// Returns count of rows in the column.
     size_t Size() const override;
 

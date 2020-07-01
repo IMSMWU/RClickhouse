@@ -1,38 +1,82 @@
+#include <errno.h>
+
 #include "socket.h"
 #include "singleton.h"
-
 #include <assert.h>
 #include <stdexcept>
 #include <system_error>
 #include <unordered_set>
 #include <memory.h>
 
+
 #if !defined(_win_)
-#   include <errno.h>
+#   include <fcntl.h>
 #   include <netdb.h>
+#   include <netinet/tcp.h>
 #   include <signal.h>
 #   include <unistd.h>
+#else
+#   include<thread>
+#   include<chrono>
 #endif
 
 namespace clickhouse {
 namespace {
 
-    class LocalNames : public std::unordered_set<std::string> {
-    public:
-        LocalNames() {
-            emplace("localhost");
-            emplace("localhost.localdomain");
-            emplace("localhost6");
-            emplace("localhost6.localdomain6");
-            emplace("::1");
-            emplace("127.0.0.1");
-        }
+class LocalNames : public std::unordered_set<std::string> {
+public:
+    LocalNames() {
+        emplace("localhost");
+        emplace("localhost.localdomain");
+        emplace("localhost6");
+        emplace("localhost6.localdomain6");
+        emplace("::1");
+        emplace("127.0.0.1");
+    }
 
-        inline bool IsLocalName(const std::string& name) const noexcept {
-            return find(name) != end();
+    inline bool IsLocalName(const std::string& name) const noexcept {
+        return find(name) != end();
+    }
+};
+
+void SetNonBlock(SOCKET fd, bool value) {
+#if defined(_unix_)
+    int flags;
+    int ret;
+    #if defined(O_NONBLOCK)
+        if ((flags = fcntl(fd, F_GETFL, 0)) == -1)
+            flags = 0;
+        if (value) {
+            flags |= O_NONBLOCK;
+        } else {
+            flags &= ~O_NONBLOCK;
         }
-    };
+        ret = fcntl(fd, F_SETFL, flags);
+    #else
+        flags = value;
+        return ioctl(fd, FIOBIO, &flags);
+    #endif
+    if (ret == -1) {
+        throw std::system_error(
+            errno, std::system_category(), "fail to set nonblocking mode");
+    }
+#elif defined(_win_)
+    unsigned long inbuf = value;
+    unsigned long outbuf = 0;
+    DWORD written = 0;
+
+    if (!inbuf) {
+        WSAEventSelect(fd, nullptr, 0);
+    }
+
+    if (WSAIoctl(fd, FIONBIO, &inbuf, sizeof(inbuf), &outbuf, sizeof(outbuf), &written, 0, 0) == SOCKET_ERROR) {
+        throw std::system_error(
+            errno, std::system_category(), "fail to set nonblocking mode");
+    }
+#endif
 }
+
+} // namespace
 
 NetworkAddress::NetworkAddress(const std::string& host, const std::string& port)
     : info_(nullptr)
@@ -83,7 +127,7 @@ SocketHolder::SocketHolder(SOCKET s)
 {
 }
 
-SocketHolder::SocketHolder(SocketHolder&& other)
+SocketHolder::SocketHolder(SocketHolder&& other) noexcept
     : handle_(other.handle_)
 {
     other.handle_ = -1;
@@ -106,6 +150,26 @@ void SocketHolder::Close() noexcept {
 
 bool SocketHolder::Closed() const noexcept {
     return handle_ == -1;
+}
+
+void SocketHolder::SetTcpKeepAlive(int idle, int intvl, int cnt) noexcept {
+    int val = 1;
+
+#if defined(_unix_)
+    setsockopt(handle_, SOL_SOCKET, SO_KEEPALIVE, &val, sizeof(val));
+#   if defined(_linux_)
+        setsockopt(handle_, IPPROTO_TCP, TCP_KEEPIDLE, &idle, sizeof(idle));
+#   elif defined(_darwin_)
+        setsockopt(handle_, IPPROTO_TCP, TCP_KEEPALIVE, &idle, sizeof(idle));
+#   else
+#       error "platform is not supported"
+#   endif
+    setsockopt(handle_, IPPROTO_TCP, TCP_KEEPINTVL, &intvl, sizeof(intvl));
+    setsockopt(handle_, IPPROTO_TCP, TCP_KEEPCNT, &cnt, sizeof(cnt));
+#else
+    setsockopt(handle_, SOL_SOCKET, SO_KEEPALIVE, (const char*)&val, sizeof(val));
+    std::ignore = idle = intvl = cnt;
+#endif
 }
 
 SocketHolder& SocketHolder::operator = (SocketHolder&& other) noexcept {
@@ -164,7 +228,7 @@ void SocketOutput::DoWrite(const void* data, size_t len) {
     static const int flags = 0;
 #endif
 
-    if (::send(s_, (const char*)data, len, flags) != (int)len) {
+    if (::send(s_, (const char*)data, (int)len, flags) != (int)len) {
         throw std::system_error(
             errno, std::system_category(), "fail to send data"
         );
@@ -194,38 +258,67 @@ NetrworkInitializer::NetrworkInitializer() {
 
 
 SOCKET SocketConnect(const NetworkAddress& addr) {
+    int last_err = 0;
+
     for (auto res = addr.Info(); res != nullptr; res = res->ai_next) {
-        SOCKET s(socket(res->ai_family, res->ai_socktype, res->ai_protocol));
+        int reuse = 1;
+        int sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const char*) &reuse, sizeof(int));
+
+        SOCKET s(sockfd);
 
         if (s == -1) {
             continue;
         }
 
-        if (connect(s, res->ai_addr, (int)res->ai_addrlen)) {
-            if (errno == EINPROGRESS ||
-                errno == EAGAIN ||
-                errno == EWOULDBLOCK)
-            {
+        SetNonBlock(s, true);
+        int cret = connect(s, res->ai_addr, (int)res->ai_addrlen);
+
+        #if defined(_win_)
+          // poll to avoid WSAEWOULDBLOCK error
+          for(size_t i = 0; i < 10; i++) {
+            if(WSAGetLastError() == 0) {
+               cret = 0;
+               continue;
+            }
+
+             std::this_thread::sleep_for(std::chrono::seconds(1));
+          }
+        #endif
+
+
+        if (cret != 0) {
+            int err = errno;
+
+            if (err == EINPROGRESS || err == EAGAIN || err == EWOULDBLOCK) {
                 pollfd fd;
                 fd.fd = s;
                 fd.events = POLLOUT;
-                int rval = Poll(&fd, 1, 1000);
+                fd.revents = 0;
+                ssize_t rval = Poll(&fd, 1, 5000);
 
+                if (rval == -1) {
+                    throw std::system_error(errno, std::system_category(), "fail to connect");
+                }
                 if (rval > 0) {
-                    int opt;
-                    socklen_t len = sizeof(opt);
-                    getsockopt(s, SOL_SOCKET, SO_ERROR, (char*)&opt, &len);
+                    socklen_t len = sizeof(err);
+                    getsockopt(s, SOL_SOCKET, SO_ERROR, (char*)&err, &len);
 
-                    return opt;
-                } else {
-                    continue;
+                    if (!err) {
+                        SetNonBlock(s, false);
+                        return s;
+                    }
+                   last_err = err;
                 }
             }
         } else {
+            SetNonBlock(s, false);
             return s;
         }
     }
-
+    if (last_err > 0) {
+        throw std::system_error(last_err, std::system_category(), "fail to connect");
+    }
     throw std::system_error(
         errno, std::system_category(), "fail to connect"
     );

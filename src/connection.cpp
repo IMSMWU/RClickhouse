@@ -1,6 +1,7 @@
 // [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::interfaces(r, cpp)]]
 #define RCPP_NEW_DATE_DATETIME_VECTORS 1
+#define NA_INTEGER64 LLONG_MIN
 #include <Rcpp.h>
 #include <clickhouse/client.h>
 #include "result.h"
@@ -91,7 +92,7 @@ XPtr<Result> select(XPtr<Client> conn, String query) {
 template<typename CT, typename RT, typename VT>
 void toColumn(SEXP v, std::shared_ptr<CT> col, std::shared_ptr<ColumnUInt8> nullCol,
     std::function<VT(typename RT::stored_type)> convertFn) {
-  RT cv = as<RT>(v);
+  RT cv = Rcpp::as<RT>(v);
   if(nullCol) {
     for(typename RT::stored_type e : cv) {
       bool isNA = RT::is_na(e);
@@ -109,10 +110,65 @@ void toColumn(SEXP v, std::shared_ptr<CT> col, std::shared_ptr<ColumnUInt8> null
   }
 }
 
+// write the contents of an R integer64 vector into a Clickhouse column
+
+// Convert to int64_t helper
+int64_t* rec(SEXP x){
+  int64_t * res = reinterpret_cast<int64_t*>(REAL(x));
+  return res;
+}
+
+// Convert the vector
+std::vector<int64_t> Val(SEXP x){
+  if(!Rf_inherits(x, "integer64")){
+    warning("Converting to int64_t");
+    std::vector<int64_t> retAlt = Rcpp::as<std::vector<int64_t>>(x);
+    return retAlt;
+  };
+  size_t i, n = LENGTH(x);
+  std::vector<int64_t> res(n);
+  for(i=0; i<n; i++){
+    res[i] = rec(x)[i];
+  };
+  return res;
+}
+
+// Special template for integer64 columns to circumvent Rcpp
+template<typename CT, typename RT>
+void toColumnN(SEXP v, std::shared_ptr<CT> col, std::shared_ptr<ColumnUInt8> nullCol) {
+  std::vector<int64_t> cv = Val(v);
+  if(nullCol) {
+    for(size_t i=0; i<cv.size(); i++) {
+      bool isNA = (cv[i] == NA_INTEGER64);
+      col->Append(isNA ? 0 : cv[i]);
+      nullCol->Append(isNA);
+    }
+  } else {
+    for(size_t i=0; i<cv.size(); i++) {
+      if(cv[i] == NA_INTEGER64) {
+        stop("cannot write NA into a non-nullable column of type "+
+          col->Type()->GetName());
+      }
+      col->Append(cv[i]);
+    }
+  }
+}
+
+
 template<typename CT, typename VT>
 std::shared_ptr<CT> vecToScalar(SEXP v, std::shared_ptr<ColumnUInt8> nullCol = nullptr) {
   auto col = std::make_shared<CT>();
-  switch(TYPEOF(v)) {
+
+  int type_of_cor;
+  int type_of = TYPEOF(v);
+
+  type_of_cor = Rf_inherits(v, "integer64") ? 99 : type_of;
+
+  switch(type_of_cor) {
+  case 99: {
+    toColumnN<CT, NumericVector>(v, col, nullCol);
+    break;
+  }
     case INTSXP: {
       // the lambda could be a default argument of toColumn, but that
       // appears to trigger a bug in GCC
@@ -181,7 +237,7 @@ std::shared_ptr<ColumnUUID> vecToScalar<ColumnUUID, UInt128>(SEXP v,
   switch(TYPEOF(v)) {
     case INTSXP:
     case STRSXP: {
-      auto sv = as<StringVector>(v);
+      auto sv = Rcpp::as<StringVector>(v);
       if(nullCol) {
         for(auto e : sv) {
           bool isNA = StringVector::is_na(e);
@@ -215,7 +271,7 @@ std::shared_ptr<CT> vecToString(SEXP v, std::shared_ptr<ColumnUInt8> nullCol = n
   switch(TYPEOF(v)) {
     case INTSXP:
     case STRSXP: {
-      auto sv = as<StringVector>(v);
+      auto sv = Rcpp::as<StringVector>(v);
       if(nullCol) {
         for(auto e : sv) {
           col->Append(std::string(e));
@@ -244,8 +300,8 @@ std::shared_ptr<CT> vecToString(SEXP v, std::shared_ptr<ColumnUInt8> nullCol = n
 
 template<typename CT, typename VT>
 std::shared_ptr<CT> vecToEnum(SEXP v, TypeRef type, std::shared_ptr<ColumnUInt8> nullCol = nullptr) {
-  ch::EnumType et(type);
-  auto iv = as<IntegerVector>(v);
+  std::shared_ptr<class EnumType> et = std::static_pointer_cast<EnumType>(type);
+  auto iv = Rcpp::as<IntegerVector>(v);
   CharacterVector levels = iv.attr("levels");
 
   // build a mapping from R factor levels to the enum values in the column type
@@ -253,10 +309,10 @@ std::shared_ptr<CT> vecToEnum(SEXP v, TypeRef type, std::shared_ptr<ColumnUInt8>
   std::vector<VT> levelMap(levels.size());
   for (size_t i = 0; i < levels.size(); i++) {
     std::string name(levels[i]);
-    if (!et.HasEnumName(name)) {
-      stop("entry '"+name+"' does not exist in enum type "+et.GetName());
+    if (!et->HasEnumName(name)) {
+      stop("entry '" + name + "' does not exist in enum type " + et->GetName());
     }
-    levelMap[i] = et.GetEnumValue(name);
+    levelMap[i] = et->GetEnumValue(name);
   }
 
   auto col = std::make_shared<CT>(type);
@@ -273,8 +329,8 @@ std::shared_ptr<CT> vecToEnum(SEXP v, TypeRef type, std::shared_ptr<ColumnUInt8>
       // treated as an empty column
       break;
     default:
-      stop("cannot write factor of type "+std::to_string(TYPEOF(v))+
-          " to column of type "+col->Type()->GetName());
+      stop("cannot write factor of type " + std::to_string(TYPEOF(v)) +
+          " to column of type " + col->Type()->GetName());
   }
   return col;
 }
@@ -311,16 +367,22 @@ ColumnRef vecToColumn(TypeRef t, SEXP v, std::shared_ptr<ColumnUInt8> nullCol = 
     case TC::Date:
       return vecToScalar<ColumnDate, const std::time_t>(v);
     case TC::Nullable: {
+      // downcast to NullableType to access GetItemType member
+      std::shared_ptr<class NullableType> nullable_t = std::static_pointer_cast<NullableType>(t);
+
       auto nullCtlCol = std::make_shared<ColumnUInt8>();
-      auto valCol = vecToColumn(t->GetNestedType(), v, nullCtlCol);
+      auto valCol = vecToColumn(nullable_t->GetNestedType(), v, nullCtlCol);
       return std::make_shared<ColumnNullable>(valCol, nullCtlCol);
     }
     case TC::Array: {
+      // downcast to ArrayType to access GetItemType member
+      std::shared_ptr<class ArrayType> arr_t = std::static_pointer_cast<ArrayType>(t);
+
       std::shared_ptr<ColumnArray> arrCol = nullptr;
-      Rcpp::List rlist = as<Rcpp::List>(v);
+      Rcpp::List rlist = Rcpp::as<Rcpp::List>(v);
 
       for(typename Rcpp::List::stored_type e : rlist) {
-        auto valCol = vecToColumn(t->GetItemType(), e);
+        auto valCol = vecToColumn(arr_t->GetItemType(), e);
         if (!arrCol) {
           // create a zero-length copy (necessary because the ColumnArray
           // constructor mangles the argument column)

@@ -1,6 +1,8 @@
 #include "type_parser.h"
 #include "../base/string_utils.h"
 
+#include <map>
+#include <mutex>
 #include <unordered_map>
 
 namespace clickhouse {
@@ -26,6 +28,12 @@ static const std::unordered_map<std::string, Type::Code> kTypeCode = {
     { "Enum8",       Type::Enum8 },
     { "Enum16",      Type::Enum16 },
     { "UUID",        Type::UUID },
+    { "IPv4",        Type::IPv4 },
+    { "IPv6",        Type::IPv6 },
+    { "Decimal",     Type::Decimal },
+    { "Decimal32",   Type::Decimal32 },
+    { "Decimal64",   Type::Decimal64 },
+    { "Decimal128",  Type::Decimal128 },
 };
 
 static Type::Code GetTypeCode(const std::string& name) {
@@ -167,8 +175,10 @@ const TypeAst* ParseTypeName(const std::string& type_name) {
     // Cache for type_name.
     // Usually we won't have too many type names in the cache, so do not try to
     // limit cache size.
-    static std::unordered_map<std::string, TypeAst> ast_cache;
+    static std::map<std::string, TypeAst> ast_cache;
+    static std::mutex lock;
 
+    std::lock_guard<std::mutex> guard(lock);
     auto it = ast_cache.find(type_name);
     if (it != ast_cache.end()) {
         return &it->second;

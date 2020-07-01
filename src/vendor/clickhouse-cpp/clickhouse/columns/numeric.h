@@ -10,6 +10,8 @@ namespace clickhouse {
 template <typename T>
 class ColumnVector : public Column {
 public:
+    using DataType = T;
+
     ColumnVector();
 
     explicit ColumnVector(const std::vector<T>& data);
@@ -33,6 +35,9 @@ public:
     /// Saves column data to output stream.
     void Save(CodedOutputStream* output) override;
 
+    /// Clear column data .
+    void Clear() override;
+
     /// Returns count of rows in the column.
     size_t Size() const override;
 
@@ -52,6 +57,7 @@ using ColumnInt8    = ColumnVector<int8_t>;
 using ColumnInt16   = ColumnVector<int16_t>;
 using ColumnInt32   = ColumnVector<int32_t>;
 using ColumnInt64   = ColumnVector<int64_t>;
+using ColumnInt128  = ColumnVector<BigInt>;
 
 using ColumnFloat32 = ColumnVector<float>;
 using ColumnFloat64 = ColumnVector<double>;

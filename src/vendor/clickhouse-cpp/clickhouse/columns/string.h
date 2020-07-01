@@ -20,6 +20,9 @@ public:
     /// Returns element at given row number.
     const std::string& operator [] (size_t n) const;
 
+    /// Returns the max size of the fixed string
+    size_t FixedSize() const;
+
 public:
     /// Appends content of given column to the end of current one.
     void Append(ColumnRef column) override;
@@ -29,6 +32,9 @@ public:
 
     /// Saves column data to output stream.
     void Save(CodedOutputStream* output) override;
+
+    /// Clear column data .
+    void Clear() override;
 
     /// Returns count of rows in the column.
     size_t Size() const override;
@@ -40,7 +46,6 @@ private:
     const size_t string_size_;
     std::vector<std::string> data_;
 };
-
 
 /**
  * Represents column of variable-length strings.
@@ -68,6 +73,9 @@ public:
 
     /// Saves column data to output stream.
     void Save(CodedOutputStream* output) override;
+
+    /// Clear column data .
+    void Clear() override;
 
     /// Returns count of rows in the column.
     size_t Size() const override;

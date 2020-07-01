@@ -16,6 +16,8 @@
 #include <system_error>
 #include <thread>
 #include <vector>
+#include <sstream>
+#include <stdexcept>
 
 #define DBMS_NAME                                       "ClickHouse"
 #define DBMS_VERSION_MAJOR                              1
@@ -104,10 +106,6 @@ private:
     void WriteBlock(const Block& block, CodedOutputStream* output);
 
 private:
-    void Disconnect() {
-        socket_.Close();
-    }
-
     /// In case of network errors tries to reconnect to server and
     /// call fuc several times.
     void RetryGuard(std::function<void()> fuc);
@@ -164,6 +162,8 @@ Client::Impl::Impl(const ClientOptions& opts)
     , buffered_output_(&socket_output_)
     , output_(&buffered_output_)
 {
+    // TODO: throw on big-endianness of platform
+
     for (int i = 0; ; ) {
         try {
             ResetConnection();
@@ -182,9 +182,8 @@ Client::Impl::Impl(const ClientOptions& opts)
     }
 }
 
-Client::Impl::~Impl() {
-    Disconnect();
-}
+Client::Impl::~Impl()
+{ }
 
 void Client::Impl::ExecuteQuery(Query query) {
     EnsureNull en(static_cast<QueryEvents*>(&query), &events_);
@@ -205,7 +204,25 @@ void Client::Impl::Insert(const std::string& table_name, const Block& block) {
         RetryGuard([this]() { Ping(); });
     }
 
-    SendQuery("INSERT INTO " + table_name + " VALUES");
+    std::vector<std::string> fields;
+    fields.reserve(block.GetColumnCount());
+
+    // Enumerate all fields
+    for (unsigned int i = 0; i < block.GetColumnCount(); i++) {
+        fields.push_back(block.GetColumnName(i));
+    }
+
+    std::stringstream fields_section;
+
+    for (auto elem = fields.begin(); elem != fields.end(); ++elem) {
+        if (std::distance(elem, fields.end()) == 1) {
+            fields_section << *elem;
+        } else {
+            fields_section << *elem << ",";
+        }
+    }
+
+    SendQuery("INSERT INTO " + table_name + " ( " + fields_section.str() + " ) VALUES");
 
     uint64_t server_packet;
     // Receive data packet.
@@ -252,6 +269,12 @@ void Client::Impl::ResetConnection() {
 
     if (s.Closed()) {
         throw std::system_error(errno, std::system_category());
+    }
+
+    if (options_.tcp_keepalive) {
+        s.SetTcpKeepAlive(options_.tcp_keepalive_idle.count(),
+                          options_.tcp_keepalive_intvl.count(),
+                          options_.tcp_keepalive_cnt);
     }
 
     socket_ = std::move(s);

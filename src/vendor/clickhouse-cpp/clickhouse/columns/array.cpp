@@ -1,5 +1,4 @@
 #include "array.h"
-
 #include <stdexcept>
 
 namespace clickhouse {
@@ -31,6 +30,18 @@ ColumnRef ColumnArray::GetAsColumn(size_t n) const {
     return data_->Slice(GetOffset(n), GetSize(n));
 }
 
+ColumnRef ColumnArray::Slice(size_t begin, size_t size) {
+    auto result = std::make_shared<ColumnArray>(GetAsColumn(begin));
+    result->OffsetsIncrease(1);
+
+    for (size_t i = 1; i < size; i++)
+    {
+        result->Append(std::make_shared<ColumnArray>(GetAsColumn(begin + i)));
+    }
+
+    return result;
+}
+
 void ColumnArray::Append(ColumnRef column) {
     if (auto col = column->As<ColumnArray>()) {
         if (!col->data_->Type()->IsEqual(data_->Type())) {
@@ -58,8 +69,17 @@ void ColumnArray::Save(CodedOutputStream* output) {
     data_->Save(output);
 }
 
+void ColumnArray::Clear() {
+    offsets_->Clear();
+    data_->Clear();
+}
+
 size_t ColumnArray::Size() const {
     return offsets_->Size();
+}
+
+void ColumnArray::OffsetsIncrease(size_t n) {
+    offsets_->Append(n);
 }
 
 size_t ColumnArray::GetOffset(size_t n) const {

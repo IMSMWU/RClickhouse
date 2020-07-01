@@ -1,6 +1,7 @@
 #include "nullable.h"
 
 #include <assert.h>
+#include <stdexcept>
 
 namespace clickhouse {
 
@@ -14,12 +15,23 @@ ColumnNullable::ColumnNullable(ColumnRef nested, ColumnRef nulls)
     }
 }
 
+void ColumnNullable::Append(bool isnull)
+{
+    nulls_->Append(isnull ? 1 : 0);
+}
+
+
 bool ColumnNullable::IsNull(size_t n) const {
     return nulls_->At(n) != 0;
 }
 
 ColumnRef ColumnNullable::Nested() const {
     return nested_;
+}
+
+ColumnRef ColumnNullable::Nulls() const
+{
+       return nulls_;
 }
 
 void ColumnNullable::Append(ColumnRef column) {
@@ -31,6 +43,11 @@ void ColumnNullable::Append(ColumnRef column) {
         nested_->Append(col->nested_);
         nulls_->Append(col->nulls_);
     }
+}
+
+void ColumnNullable::Clear() {
+    nested_->Clear();
+    nulls_->Clear();
 }
 
 bool ColumnNullable::Load(CodedInputStream* input, size_t rows) {

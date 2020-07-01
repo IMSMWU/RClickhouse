@@ -12,7 +12,7 @@ getRealConnection <- function(){
   # set variables if not set yet
   serveraddr %||=% "localhost"
   user       %||=% "default"
-  password   %||=% ''
+  password   %||=% ""
 
   # TODO: recycle connection by using singleton?
   conn <- dbConnect(RClickhouse::clickhouse(), host=serveraddr, user=user, password=password)
@@ -33,7 +33,19 @@ writeReadTest <- function(input, result = input, types = NULL) {
   conn <- getRealConnection()
 
   dbWriteTable(conn, tblname, input, overwrite=T, field.types=types)
-  r <- dbReadTable(conn, tblname)
-  expect_equal(r, result)
+  afterReadWrite <- dbReadTable(conn, tblname)
+
+  #  checks consistency of dataTypes before and after ReadWrite
+  if(!is.null(types)){
+    afterReadWriteType <- attr(afterReadWrite, "data.type")
+    resultType <- types
+    expect_equal(resultType, afterReadWriteType)
+  }
+
+  #  checks consistency of data before and after ReadWrite
+  attr(afterReadWrite, "data.type") <- NULL
+  attr(result, "data.type") <- NULL
+  expect_equal(afterReadWrite, result)
+
   dbDisconnect(conn)
 }

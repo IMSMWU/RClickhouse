@@ -6,13 +6,16 @@
 #' @export
 #' @keywords internal
 #' @import methods DBI
+#' @importFrom bit64 integer64
 setClass("ClickhouseConnection",
   contains = "DBIConnection",
   slots = list(
     ptr  = "externalptr",
     host = "character",
     port = "numeric",
-    user = "character"
+    user = "character",
+    Int64 = "character",
+    toUTF8 = "logical"
   )
 )
 
@@ -128,7 +131,9 @@ setMethod("dbSendQuery", c("ClickhouseConnection", "character"), function(conn, 
       sql = statement,
       env = new.env(parent = emptyenv()),   #TODO: set env
       conn = conn,
-      ptr = res
+      ptr = res,
+      Int64 = conn@Int64,
+      toUTF8 = conn@toUTF8
   ))
 })
 
@@ -186,10 +191,10 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
       class(v)[[1]]
     }))
     for (c in names(classes[classes=="character"])) {
-      value[[c]] <- enc2utf8(value[[c]])
+      value[[c]] <- .Internal(setEncoding(value[[c]], "UTF-8"))
     }
     for (c in names(classes[classes=="factor"])) {
-      levels(value[[c]]) <- enc2utf8(levels(value[[c]]))
+      levels(value[[c]]) <- .Internal(setEncoding(levels(value[[c]]), "UTF-8"))
     }
 
     insert(conn@ptr, qname, value);

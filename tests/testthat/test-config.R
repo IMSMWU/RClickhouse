@@ -1,6 +1,5 @@
 context("config")
 
-library(yaml, warn.conflicts = F)
 
 
 test_that("correct computation of difference of parameter sets", {

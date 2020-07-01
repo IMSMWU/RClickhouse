@@ -1,12 +1,13 @@
 Package: RClickhouse
 Type: Package
 Title: A 'DBI' Interface to the 'Yandex Clickhouse' Database Providing Basic 'dplyr' Support
-Version: 0.4.0
+Version: 0.5.2
 Encoding: UTF-8
 Authors@R: c(
     person("Christian", "Hotz-Behofsits", email = "christian.hotz-behofsits@wu.ac.at", role = c("aut", "cre")),
-    person("Peter", "Knaus", email = "peter.knaus@wu.ac.at", role = c("aut")),
     person("Daniel", "Winkler", email = "daniel.winkler@wu.ac.at", role = c("aut")),
+    person("Luca", "Rauchenberger", email = "luca.rauchenberger@wu.ac.at", role = c("aut")),
+    person("Peter", "Knaus", email = "peter.knaus@wu.ac.at", role = c("aut")),
     person("Clemens", "Danninger", email="cran@b8000h.org", role = c("aut")),
     person("Simon", "Stiebellehner", email="simon.stiebellehner@gmail.com", role = c("aut")),
     person("Dan", "Egnor", role = c("aut")),
@@ -14,6 +15,7 @@ Authors@R: c(
     person("Keith", "Ray", email = "keith.ray@gmail.com", role = c("aut")),
     person("Zhanyong", "Wan", email = "wan@google.com", role = c("aut")),
     person("Markus", "Heule", email = "mheule@google.com", role = c("aut")),
+    person("Oliver", "Flasch", email = "oflasch@gmail.com", role = c("aut")),
     person(family = "Google", role = c("cph")),
     person("Yann", "Collet", role = c("cph"))
     )
@@ -29,9 +31,9 @@ Imports:
     methods (>= 3.3.2),
     DBI (>= 0.6.0),
     Rcpp (>= 0.11.0),
-    yaml (>= 2.1.14)
+    bit64
 LazyData: true
-RoxygenNote: 6.0.1
+RoxygenNote: 7.0.2
 NeedsCompilation: yes
 Depends:
     R (>= 3.3)

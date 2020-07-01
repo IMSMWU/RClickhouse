@@ -12,6 +12,7 @@ namespace ch = clickhouse;
 class Converter;
 
 using NullCol = std::shared_ptr<ch::ColumnNullable>;
+using EnumItem = std::pair<std::string /* name */, int16_t /* value */>;
 
 class Result {
   public:
@@ -28,6 +29,7 @@ class Result {
 
   Rcpp::StringVector colNames;
   TypeList colTypes;
+  Rcpp::StringVector colTypesString;
   std::vector<ColBlock> columnBlocks;
 
   void setColInfo(const ch::Block &block);
@@ -76,4 +78,7 @@ public:
   // list at targetIdx
   virtual void processCol(ch::ColumnRef col, Rcpp::List &target, size_t targetIdx,
       NullCol nullCol) = 0;
+
+  // avoid non-virtual destructor for this abstract class
+  virtual ~Converter() {};
 };

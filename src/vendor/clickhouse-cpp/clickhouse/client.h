@@ -5,7 +5,10 @@
 
 #include "columns/array.h"
 #include "columns/date.h"
+#include "columns/decimal.h"
 #include "columns/enum.h"
+#include "columns/ip4.h"
+#include "columns/ip6.h"
 #include "columns/nullable.h"
 #include "columns/numeric.h"
 #include "columns/string.h"
@@ -59,6 +62,12 @@ struct ClientOptions {
 
     /// Compression method.
     DECLARE_FIELD(compression_method, CompressionMethod, SetCompressionMethod, CompressionMethod::None);
+
+    /// TCP Keep alive options
+    DECLARE_FIELD(tcp_keepalive, bool, TcpKeepAlive, false);
+    DECLARE_FIELD(tcp_keepalive_idle, std::chrono::seconds, SetTcpKeepAliveIdle, std::chrono::seconds(60));
+    DECLARE_FIELD(tcp_keepalive_intvl, std::chrono::seconds, SetTcpKeepAliveInterval, std::chrono::seconds(5));
+    DECLARE_FIELD(tcp_keepalive_cnt, int, SetTcpKeepAliveCount, 3);
 
 #undef DECLARE_FIELD
 };

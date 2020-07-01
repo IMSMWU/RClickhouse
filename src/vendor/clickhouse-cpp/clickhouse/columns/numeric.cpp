@@ -22,6 +22,11 @@ void ColumnVector<T>::Append(const T& value) {
 }
 
 template <typename T>
+void ColumnVector<T>::Clear() {
+    data_.clear();
+}
+
+template <typename T>
 const T& ColumnVector<T>::At(size_t n) const {
     return data_.at(n);
 }
@@ -69,9 +74,9 @@ template class ColumnVector<uint8_t>;
 template class ColumnVector<uint16_t>;
 template class ColumnVector<uint32_t>;
 template class ColumnVector<uint64_t>;
+template class ColumnVector<BigInt>;
 
 template class ColumnVector<float>;
 template class ColumnVector<double>;
 
 }
-

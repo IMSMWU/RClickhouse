@@ -1,16 +1,20 @@
-PKG_CPPFLAGS = $(SYS_FLAGS) -I. -I../inst/include -I./vendor/clickhouse-cpp -I./vendor/clickhouse-cpp/contrib
+PKG_CPPFLAGS = $(SYS_FLAGS) -I. -I../inst/include -I./vendor/clickhouse-cpp -I./vendor/clickhouse-cpp/contrib -I./vendor/clickhouse-cpp/contrib/bigerint
+
 CXX_STD = CXX11
 
 OBJ_FILES = \
 vendor/clickhouse-cpp/clickhouse/columns/string.o \
 vendor/clickhouse-cpp/clickhouse/columns/date.o \
 vendor/clickhouse-cpp/clickhouse/columns/numeric.o \
+vendor/clickhouse-cpp/clickhouse/columns/decimal.o \
 vendor/clickhouse-cpp/clickhouse/columns/tuple.o \
 vendor/clickhouse-cpp/clickhouse/columns/array.o \
 vendor/clickhouse-cpp/clickhouse/columns/factory.o \
 vendor/clickhouse-cpp/clickhouse/columns/nullable.o \
 vendor/clickhouse-cpp/clickhouse/columns/enum.o \
 vendor/clickhouse-cpp/clickhouse/columns/uuid.o \
+vendor/clickhouse-cpp/clickhouse/columns/ip4.o \
+vendor/clickhouse-cpp/clickhouse/columns/ip6.o \
 vendor/clickhouse-cpp/clickhouse/query.o \
 vendor/clickhouse-cpp/clickhouse/base/platform.o \
 vendor/clickhouse-cpp/clickhouse/base/socket.o \

@@ -70,20 +70,56 @@ checkParameters <- function(add_params, comp_params) {
   return(diff_params)
 }
 
+# helper-function for config-parser
+removequotes <- function(parsedline) {
+  if (grepl('^["](.*["])?$', parsedline)) {
+    return(gsub('^["](.*["])?$', substr(parsedline, 2, nchar(parsedline) -1), parsedline))
+  } else if (grepl("^['](.*['])?$", parsedline)) {
+    return(gsub("^['](.*['])?$", substr(parsedline, 2, nchar(parsedline) -1), parsedline))
+  }
+  return(parsedline)
+}
+
+configparser <- function(filepath) {
+  con <- file(filepath, "r")
+  parsedConfig <- list()
+  while ( TRUE ) {
+    line <- readLines(con, n <- 1)
+    if ( length(line) == 0 ) {
+      break
+    } else if ( nchar(line) == 0 ) {
+      next
+    }
+    splitUp <- strsplit(line, ":", fixed = TRUE)
+    unlistedLine <- unlist(splitUp)
+    key <- removequotes(trimws(unlistedLine[1]))
+    value <- removequotes(trimws(paste(unlistedLine[-1], collapse=":")))
+    if ('true' == value || 'TRUE' == value) {
+      value <- TRUE
+    }else if ('false' == value || 'FALSE' == value) {
+      value <- FALSE
+    }else if (!is.na(strtoi(value))) {
+      value <- strtoi(value)
+    }
+    parsedConfig[[key]] <- value
+  }
+  close(con)
+  return(parsedConfig)
+}
+
 #' @rdname ClickhouseDriver-class
 #' @export
 #' @param CONFIG_PATHS a list of configuration paths
 #' @param DEFAULT_PARAMS a list of configuration defaults
 #' @param pre_config initialization set
 #' @return a merged configuration
-#' @importFrom yaml read_yaml
 loadConfig <- function(CONFIG_PATHS, DEFAULT_PARAMS, pre_config) {
   config = pre_config
   config_found <- FALSE
 
   for (path in CONFIG_PATHS) {
     if (file.exists(path) == TRUE) {
-      config_temp <- yaml::read_yaml(path)
+      config_temp <- configparser(path)
       config <- complementList(config, config_temp)
       config_found <- TRUE
     }
@@ -111,25 +147,35 @@ loadConfig <- function(CONFIG_PATHS, DEFAULT_PARAMS, pre_config) {
 #' @param password the user's password.
 #' @param compression the compression method for the connection (lz4 by default).
 #' @param config_paths paths where config files are searched for; order of paths denotes hierarchy (first string has highest priority etc.).
+#' @param Int64 The R type that 64-bit integer types should be mapped to,
+#'   default is [bit64::integer64], which allows the full range of 64 bit
+#'   integers.
+#' @param toUTF8 logical, should character variables be converted to UTF-8. Default is TRUE.
 #' @return A database connection.
 #' @examples
 #' \dontrun{
 #' conn <- dbConnect(RClickhouse::clickhouse(), host="localhost")
 #' }
-setMethod("dbConnect", "ClickhouseDriver", function(drv, host="localhost", port = 9000, db = "default", user = "default", password = "", compression = "lz4", config_paths = c('./RClickhouse.yaml', '~/.R/RClickhouse.yaml', '/etc/RClickhouse.yaml'), ...) {
-  DEFAULT_PARAMS <- c(host='localhost', port=9000, db='default', user='default', password='', compression='lz4')
-  input_params <- c(host=host, port=port, db=db, user=user, password=password, compression=compression)
-  default_input_diff <- c(input_params[!(input_params %in% DEFAULT_PARAMS)])
+setMethod("dbConnect", "ClickhouseDriver",
+          function(drv, host="localhost", port = 9000, db = "default",
+                   user = "default", password = "", compression = "lz4",
+                   config_paths = c('./RClickhouse.yaml', '~/.R/RClickhouse.yaml', '/etc/RClickhouse.yaml'),
+                   Int64 = c("integer64", "integer", "numeric", "character"), toUTF8 = TRUE, ...) {
+            DEFAULT_PARAMS <- c(host='localhost', port=9000, db='default', user='default', password='', compression='lz4')
+            input_params <- c(host=host, port=port, db=db, user=user, password=password, compression=compression)
+            default_input_diff <- c(input_params[!(input_params %in% DEFAULT_PARAMS)])
 
-  config <- loadConfig(config_paths, DEFAULT_PARAMS, default_input_diff)
+            config <- loadConfig(config_paths, DEFAULT_PARAMS, default_input_diff)
 
-  ptr <- connect(config[['host']], strtoi(config[['port']]), config[['db']], config[['user']], config[['password']], config[['compression']])
-  reg.finalizer(ptr, function(p) {
-    if (validPtr(p))
-      warning("connection was garbage collected without being disconnected")
-  })
-  new("ClickhouseConnection", ptr = ptr, port = port, host = host, user = user)
-})
+            Int64 <- match.arg(Int64)
+
+            ptr <- connect(config[['host']], strtoi(config[['port']]), config[['db']], config[['user']], config[['password']], config[['compression']])
+            reg.finalizer(ptr, function(p) {
+              if (validPtr(p))
+                warning("connection was garbage collected without being disconnected")
+            })
+            new("ClickhouseConnection", ptr = ptr, port = port, host = host, user = user, Int64 = Int64, toUTF8 = toUTF8)
+          })
 
 buildEnumType <- function(obj) {
   lvls <- levels(obj)
@@ -138,6 +184,7 @@ buildEnumType <- function(obj) {
 }
 
 #' @export
+#' @importFrom bit64 is.integer64
 #' @rdname ClickhouseDriver-class
 setMethod("dbDataType", signature(dbObj="ClickhouseDriver", obj = "ANY"), definition = function(dbObj, obj, ...) {
   if (is.null(obj) || all(is.na(obj))) {
@@ -148,6 +195,7 @@ setMethod("dbDataType", signature(dbObj="ClickhouseDriver", obj = "ANY"), defini
     t <- paste0("Array(", dbDataType(dbObj, unlist(obj, recursive=F)), ")")
   } else {
     if (is.factor(obj)) t <- buildEnumType(obj)
+    else if (is.integer64(obj)) t <- "Int64"
     else if (is.logical(obj)) t <- "UInt8"
     else if (is.integer(obj)) t <- "Int32"
     else if (is.numeric(obj)) t <- "Float64"
@@ -155,7 +203,7 @@ setMethod("dbDataType", signature(dbObj="ClickhouseDriver", obj = "ANY"), defini
     else if (inherits(obj, "Date")) t <- "Date"
     else t <- "String"
 
-    if (anyNA(obj)) t <- paste0("Nullable(", t, ")")
+      if (anyNA(obj)) t <- paste0("Nullable(", t, ")")
   }
 
   return(t)

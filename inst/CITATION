@@ -1,10 +1,10 @@
 citEntry(
   entry = "misc",
-  author = c("Christian Hotz-Behofsits", "Clemens Danninger", "Simon Stiebellehner"),
+  author = c("Christian Hotz-Behofsits", "Daniel Winkler", "Luca Rauchenberger", "Peter Knaus", "Clemens Danninger", "Simon Stiebellehner"),
   title = "RClickhouse",
-  year = "2017",
+  year = "2020",
   publisher = "GitHub",
   journal = "GitHub repository",
   howpublished = "\\url{https://github.com/IMSMWU/RClickhouse}",
-  textVersion = "C. Hotz-Behofsits, C. Danninger, S. Stiebellehner. RClickhouse. URL https://github.com/IMSMWU/RClickhouse."
+  textVersion = "C. Hotz-Behofsits, D. Winkler, L. Rauchenberger, P. Knaus, C. Danninger, S. Stiebellehner. RClickhouse. URL https://github.com/IMSMWU/RClickhouse."
 )
