@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom dplyr db_desc
 db_desc.ClickhouseConnection <- function(con) {
   info <- dbGetInfo(con)
 
@@ -10,13 +9,11 @@ db_desc.ClickhouseConnection <- function(con) {
 }
 
 #' @export
-#' @importFrom dplyr sql_escape_string
 sql_escape_string.ClickhouseConnection <- function(con, x) {
   encodeString(x, na.encode = FALSE, quote = "'")
 }
 
 #' @export
-#' @importFrom dplyr sql_escape_ident
 sql_escape_ident.ClickhouseConnection <- function(con, x) {
   encodeString(x, na.encode = FALSE, quote = "`")
 }
@@ -24,7 +21,6 @@ sql_escape_ident.ClickhouseConnection <- function(con, x) {
 # As opposed to the original sql_prefix, do NOT convert the function
 # name to upper case (function names are case-sensitive in
 # Clickhouse)
-#' @importFrom dbplyr sql_prefix
 ch_sql_prefix <- function(f) {
   function(..., na.rm) {
     dbplyr::build_sql(dbplyr::sql(f), list(...))
@@ -46,13 +42,11 @@ base::lockBinding("sql_prefix", dbpenv)
 origSQLprefix <- attr(dbplyr::sql_prefix, 'original')
 
 #' @export
-#' @importFrom dplyr db_explain
 db_explain.ClickhouseConnection <- function(con, sql, ...) {
   stop('clickhouse does not support a plan/explain statement yet.')
 }
 
 #' @export
-#' @importFrom dplyr db_analyze
 db_analyze.ClickhouseConnection <- function(con, sql, ...) {
   # clickhouse does not support a analyze statement.
   TRUE
@@ -60,7 +54,6 @@ db_analyze.ClickhouseConnection <- function(con, sql, ...) {
 
 # SQL translation
 #
-#' @importFrom dplyr sql_translate_env
 #' @export
 sql_translate_env.ClickhouseConnection <- function(x) {
   dbplyr::sql_variant(
@@ -94,7 +87,6 @@ sql_translate_env.ClickhouseConnection <- function(x) {
 }
 
 # DBIConnection fork without transactions
-#' @importFrom dbplyr db_copy_to
 #' @export
 db_copy_to.ClickhouseConnection <- function(con, table, values,
                                      overwrite = FALSE, types = NULL, temporary = TRUE,
@@ -136,41 +128,11 @@ db_copy_to.ClickhouseConnection <- function(con, table, values,
 }
 
 #' @export
-#' @importFrom dbplyr sql_escape_logical
 sql_escape_logical.ClickhouseConnection <- function(con, x) {
   if(is.na(x)) {
     return("NULL")
   } else {
     return(as.character(as.integer(x)))
-  }
-}
-
-#' @export
-#' @importFrom dplyr sql sql_join
-#' @importFrom dbplyr build_sql
-sql_join.ClickhouseConnection <- function (con, x, y, vars, type = "inner", by = NULL, strictness = "all", ...) {
-  stopifnot(strictness %in% c("all", "any"))
-  JOIN <- switch(type,
-    left = sql("LEFT JOIN"),
-    inner = sql("INNER JOIN"),
-    right = sql("RIGHT JOIN"),
-    full = sql("FULL JOIN"),
-    cross = sql("CROSS JOIN"),
-    stop("Unknown join type:", type, call. = FALSE))
-  select <- clickhouse_sql_join_vars(con, vars)
-  on <- clickhouse_sql_join_tbls(con, by)
-  build_sql("SELECT ", select, "\n", "  FROM ", x, "\n", "  ",
-    sql(toupper(strictness)), " ", JOIN, " ", y, "\n", if (!is.null(on)) build_sql("  ON ", on, "\n", con = con) else NULL, con = con)
-}
-
-#' @export
-#' @importFrom dplyr sql_subquery
-#' @importFrom dbplyr build_sql is.ident
-sql_subquery.ClickhouseConnection <- function (con, from, name = "", ...) {
-  if (is.ident(from)) {
-    from
-  } else {
-    build_sql("(", from, ") ", con = con)
   }
 }
 
