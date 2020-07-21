@@ -1,4 +1,4 @@
-context("aggregation")
+context("prefix")
 
 library(DBI, warn.conflicts=F)
 library(dplyr, warn.conflicts=F)
