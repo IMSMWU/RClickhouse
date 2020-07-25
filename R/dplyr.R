@@ -40,7 +40,7 @@ if(is.null(attr(ch_sql_prefix, 'original'))){
 dbpenv <- environment(dbplyr::build_sql)
 base::unlockBinding("sql_prefix", dbpenv)
 utils::assignInNamespace("sql_prefix", ch_sql_prefix,
-                  ns = "dbplyr", envir = dbpenv)
+                         ns = "dbplyr", envir = dbpenv)
 assign("sql_prefix", ch_sql_prefix, envir = dbpenv)
 base::lockBinding("sql_prefix", dbpenv)
 origSQLprefix <- attr(dbplyr::sql_prefix, 'original')
@@ -65,22 +65,22 @@ db_analyze.ClickhouseConnection <- function(con, sql, ...) {
 sql_translate_env.ClickhouseConnection <- function(x) {
   dbplyr::sql_variant(
     dbplyr::sql_translator(.parent = dbplyr::base_scalar,
-      `^` = ch_sql_prefix("pow"),
+                           `^` = ch_sql_prefix("pow"),
 
-      # Casting
-      as.logical = ch_sql_prefix("toUInt8"),
-      as.numeric = ch_sql_prefix("toFloat64"),
-      as.double = ch_sql_prefix("toFloat64"),
-      as.integer = ch_sql_prefix("toInt64"),
-      as.character = ch_sql_prefix("toString"),
+                           # Casting
+                           as.logical = ch_sql_prefix("toUInt8"),
+                           as.numeric = ch_sql_prefix("toFloat64"),
+                           as.double = ch_sql_prefix("toFloat64"),
+                           as.integer = ch_sql_prefix("toInt64"),
+                           as.character = ch_sql_prefix("toString"),
 
-      # Comparison
-      is.null = ch_sql_prefix("isNull"),
-      is.na   = ch_sql_prefix("isNull"),
+                           # Comparison
+                           is.null = ch_sql_prefix("isNull"),
+                           is.na   = ch_sql_prefix("isNull"),
 
-      # Date/time
-      Sys.date = ch_sql_prefix("today"),
-      Sys.time = ch_sql_prefix("now")
+                           # Date/time
+                           Sys.date = ch_sql_prefix("today"),
+                           Sys.time = ch_sql_prefix("now")
     ),
     dbplyr::sql_translator(
       .parent = dbplyr::base_agg,
@@ -97,9 +97,9 @@ sql_translate_env.ClickhouseConnection <- function(x) {
 #' @importFrom dbplyr db_copy_to
 #' @export
 db_copy_to.ClickhouseConnection <- function(con, table, values,
-                                     overwrite = FALSE, types = NULL, temporary = TRUE,
-                                     unique_indexes = NULL, indexes = NULL,
-                                     analyze = FALSE, all_nullable = FALSE, ...) {
+                                            overwrite = FALSE, types = NULL, temporary = TRUE,
+                                            unique_indexes = NULL, indexes = NULL,
+                                            analyze = FALSE, all_nullable = FALSE, ...) {
 
   if(analyze == TRUE){
     warning("clickhouse does not support a analyze statement.")
@@ -145,35 +145,6 @@ sql_escape_logical.ClickhouseConnection <- function(con, x) {
   }
 }
 
-#' @export
-#' @importFrom dplyr sql sql_join
-#' @importFrom dbplyr build_sql
-sql_join.ClickhouseConnection <- function (con, x, y, vars, type = "inner", by = NULL, strictness = "all", ...) {
-  stopifnot(strictness %in% c("all", "any"))
-  JOIN <- switch(type,
-    left = sql("LEFT JOIN"),
-    inner = sql("INNER JOIN"),
-    right = sql("RIGHT JOIN"),
-    full = sql("FULL JOIN"),
-    cross = sql("CROSS JOIN"),
-    stop("Unknown join type:", type, call. = FALSE))
-  select <- clickhouse_sql_join_vars(con, vars)
-  on <- clickhouse_sql_join_tbls(con, by)
-  build_sql("SELECT ", select, "\n", "  FROM ", x, "\n", "  ",
-    sql(toupper(strictness)), " ", JOIN, " ", y, "\n", if (!is.null(on)) build_sql("  ON ", on, "\n", con = con) else NULL, con = con)
-}
-
-#' @export
-#' @importFrom dplyr sql_subquery
-#' @importFrom dbplyr build_sql is.ident
-sql_subquery.ClickhouseConnection <- function (con, from, name = "", ...) {
-  if (is.ident(from)) {
-    from
-  } else {
-    build_sql("(", from, ") ", con = con)
-  }
-}
-
 #' @importFrom dplyr sql_escape_ident
 #' @importFrom dbplyr sql_vector
 clickhouse_sql_join_vars <- function(con, vars) {
@@ -194,4 +165,3 @@ clickhouse_sql_join_tbls <- function(con, by) {
   }
   on
 }
-
