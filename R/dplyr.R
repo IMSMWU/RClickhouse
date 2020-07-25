@@ -1,4 +1,5 @@
 #' @export
+#' @importFrom dplyr db_desc
 db_desc.ClickhouseConnection <- function(con) {
   info <- dbGetInfo(con)
 
@@ -9,11 +10,13 @@ db_desc.ClickhouseConnection <- function(con) {
 }
 
 #' @export
+#' @importFrom dplyr sql_escape_string
 sql_escape_string.ClickhouseConnection <- function(con, x) {
   encodeString(x, na.encode = FALSE, quote = "'")
 }
 
 #' @export
+#' @importFrom dplyr sql_escape_ident
 sql_escape_ident.ClickhouseConnection <- function(con, x) {
   encodeString(x, na.encode = FALSE, quote = "`")
 }
@@ -21,6 +24,7 @@ sql_escape_ident.ClickhouseConnection <- function(con, x) {
 # As opposed to the original sql_prefix, do NOT convert the function
 # name to upper case (function names are case-sensitive in
 # Clickhouse)
+#' @importFrom dbplyr sql_prefix
 ch_sql_prefix <- function(f) {
   function(..., na.rm) {
     dbplyr::build_sql(dbplyr::sql(f), list(...))
@@ -36,17 +40,19 @@ if(is.null(attr(ch_sql_prefix, 'original'))){
 dbpenv <- environment(dbplyr::build_sql)
 base::unlockBinding("sql_prefix", dbpenv)
 utils::assignInNamespace("sql_prefix", ch_sql_prefix,
-                  ns = "dbplyr", envir = dbpenv)
+                         ns = "dbplyr", envir = dbpenv)
 assign("sql_prefix", ch_sql_prefix, envir = dbpenv)
 base::lockBinding("sql_prefix", dbpenv)
 origSQLprefix <- attr(dbplyr::sql_prefix, 'original')
 
 #' @export
+#' @importFrom dplyr db_explain
 db_explain.ClickhouseConnection <- function(con, sql, ...) {
   stop('clickhouse does not support a plan/explain statement yet.')
 }
 
 #' @export
+#' @importFrom dplyr db_analyze
 db_analyze.ClickhouseConnection <- function(con, sql, ...) {
   # clickhouse does not support a analyze statement.
   TRUE
@@ -54,26 +60,27 @@ db_analyze.ClickhouseConnection <- function(con, sql, ...) {
 
 # SQL translation
 #
+#' @importFrom dplyr sql_translate_env
 #' @export
 sql_translate_env.ClickhouseConnection <- function(x) {
   dbplyr::sql_variant(
     dbplyr::sql_translator(.parent = dbplyr::base_scalar,
-      `^` = ch_sql_prefix("pow"),
+                           `^` = ch_sql_prefix("pow"),
 
-      # Casting
-      as.logical = ch_sql_prefix("toUInt8"),
-      as.numeric = ch_sql_prefix("toFloat64"),
-      as.double = ch_sql_prefix("toFloat64"),
-      as.integer = ch_sql_prefix("toInt64"),
-      as.character = ch_sql_prefix("toString"),
+                           # Casting
+                           as.logical = ch_sql_prefix("toUInt8"),
+                           as.numeric = ch_sql_prefix("toFloat64"),
+                           as.double = ch_sql_prefix("toFloat64"),
+                           as.integer = ch_sql_prefix("toInt64"),
+                           as.character = ch_sql_prefix("toString"),
 
-      # Comparison
-      is.null = ch_sql_prefix("isNull"),
-      is.na   = ch_sql_prefix("isNull"),
+                           # Comparison
+                           is.null = ch_sql_prefix("isNull"),
+                           is.na   = ch_sql_prefix("isNull"),
 
-      # Date/time
-      Sys.date = ch_sql_prefix("today"),
-      Sys.time = ch_sql_prefix("now")
+                           # Date/time
+                           Sys.date = ch_sql_prefix("today"),
+                           Sys.time = ch_sql_prefix("now")
     ),
     dbplyr::sql_translator(
       .parent = dbplyr::base_agg,
@@ -87,11 +94,12 @@ sql_translate_env.ClickhouseConnection <- function(x) {
 }
 
 # DBIConnection fork without transactions
+#' @importFrom dbplyr db_copy_to
 #' @export
 db_copy_to.ClickhouseConnection <- function(con, table, values,
-                                     overwrite = FALSE, types = NULL, temporary = TRUE,
-                                     unique_indexes = NULL, indexes = NULL,
-                                     analyze = FALSE, all_nullable = FALSE, ...) {
+                                            overwrite = FALSE, types = NULL, temporary = TRUE,
+                                            unique_indexes = NULL, indexes = NULL,
+                                            analyze = FALSE, all_nullable = FALSE, ...) {
 
   if(analyze == TRUE){
     warning("clickhouse does not support a analyze statement.")
@@ -128,6 +136,7 @@ db_copy_to.ClickhouseConnection <- function(con, table, values,
 }
 
 #' @export
+#' @importFrom dbplyr sql_escape_logical
 sql_escape_logical.ClickhouseConnection <- function(con, x) {
   if(is.na(x)) {
     return("NULL")
@@ -156,4 +165,3 @@ clickhouse_sql_join_tbls <- function(con, by) {
   }
   on
 }
-
