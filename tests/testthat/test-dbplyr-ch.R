@@ -29,6 +29,8 @@ pointerTableA <- tbl(conn, "tableA")
 pointerTableB <- tbl(conn, "tableB")
 pointerTableC <- tbl(conn, "tableC")
 
+
+
 # Left_JOIN_Variations
 test_that("left_join() between two tables WITH a common column", {
   expect_equal(data.frame(left_join(pointerTableA, pointerTableB)), data.frame(ID = c(1, 2), A = c('a1','a2'), B = c('','b2')))
@@ -55,6 +57,26 @@ test_that("example form #61 with two tables in ON-clause", {
 test_that("3 left_joins", {
   expect_equal(data.frame(pointerTableA  %>% dplyr::select(ID, A) %>% left_join(pointerTableB %>% dplyr::select(B,ID)) %>% left_join(left_join(pointerTableA, pointerTableC, by = c('ID'='KEY')))), data.frame(ID = c(1, 2), A = c('a1','a2'), B = c('','b2'), C = c('c1','')))
 })
+
+
+
+# Various_JOINS
+test_that("inner_join() between two tables WITH a common column", {
+  expect_equal(data.frame(inner_join(pointerTableA, pointerTableB)), data.frame(ID = c(2), A = c('a2'), B = c('b2')))
+})
+test_that("right_join() 1/2 between two tables WITH a common column", {
+  expect_equal(data.frame(right_join(pointerTableA, pointerTableB)), data.frame(ID = c(2, 3), A = c('a2', ''), B = c('b2', 'b3')))
+})
+test_that("right_join() 2/2 between two tables WITH a common column", {
+  expect_equal(data.frame(right_join(pointerTableB, pointerTableA)), data.frame(ID = c(2, 1), B = c('b2', ''),  A = c('a2', 'a1')))
+})
+test_that("full_join() between two tables WITH a common column", {
+  expect_equal(data.frame(full_join(pointerTableA, pointerTableB)), data.frame(ID = c(1, 2, 0), A = c('a1', 'a2', ''), B = c('','b2', 'b3')))
+})
+
+
+
+
 
 
 
