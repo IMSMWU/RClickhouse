@@ -45,6 +45,8 @@ writeReadTest <- function(input, result = input, types = NULL) {
   #  checks consistency of data before and after ReadWrite
   attr(afterReadWrite, "data.type") <- NULL
   attr(result, "data.type") <- NULL
+  class(afterReadWrite) <- NULL
+  class(result) <- NULL
   expect_equal(afterReadWrite, result)
 
   dbDisconnect(conn)
