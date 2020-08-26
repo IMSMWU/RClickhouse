@@ -138,7 +138,7 @@ setMethod("dbSendQuery", c("ClickhouseConnection", "character"), function(conn, 
 })
 
 setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "character", value = "ANY"), definition = function(conn, name, value, overwrite=FALSE,
-                                                                                                                             append=FALSE, engine="TinyLog", row.names=NA, field.types=NULL, ...) {
+         append=FALSE, engine="TinyLog", row.names=NA, field.types=NULL, ...) {
   if (is.vector(value) && !is.list(value)) value <- data.frame(x = value, stringsAsFactors = F)
   if (length(value) < 1) stop("value must have at least one column")
   if (is.null(names(value))) names(value) <- paste("V", 1:length(value), sep='')
@@ -158,13 +158,14 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
   }
 
   qname <- dbQuoteIdentifier(conn, name)
-
+  print('Begin Exists Table?')
   if (dbExistsTable(conn, qname)) {
     if (overwrite) dbRemoveTable(conn, qname)
     if (!overwrite && !append) stop("Table ", qname, " already exists. Set overwrite=TRUE if you want
                                     to remove the existing table. Set append=TRUE if you would like to add the new data to the
                                     existing table.")
   }
+  print('After: Exists Table?\n')
 
   rownames.col <- NA
   if ((!is.na(row.names) && row.names == TRUE) || (is.na(row.names) && .row_names_info(value) >= 0)) {
@@ -176,16 +177,20 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
     value[rownames.col] <- as.character(rownames(value))
   }
 
+  print('Begin creates Table if not exists')
   if (!dbExistsTable(conn, qname)) {
     if (is.null(field.types)) {
       field.types <- sapply(value, dbDataType, dbObj=conn)
     } else if (!is.na(rownames.col)) {
       field.types <- append(field.types, "String")
     }
-    fdef <- paste(names(value), field.types, collapse=', ')
+    fdef <- paste(dbQuoteIdentifier(conn,names(value)), field.types, collapse=', ')
     ct <- paste0("CREATE TABLE ", qname, " (", fdef, ") ENGINE=", engine)
+    print(paste("QUERY:",ct))
     dbExecute(conn, ct)
   }
+  print('AFTER creates Table if not exists\n')
+
   if (length(value[[1]])) {
     classes <- unlist(lapply(value, function(v){
       class(v)[[1]]
