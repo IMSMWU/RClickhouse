@@ -6,7 +6,7 @@ warnings_are_errors: false
 matrix:
   include:
     - os: linux
-      dist: bionic
+      dist: xenial
       sudo: required
       before_install:
         - echo "deb http://repo.yandex.ru/clickhouse/deb/stable/ main/" | sudo tee -a /etc/apt/sources.list
