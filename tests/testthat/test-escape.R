@@ -6,8 +6,7 @@ library(dplyr, warn.conflicts=F)
 
 source("utils.R")
 
-# the following code tests the usage of IDENTIFIERS to mark the boundaries of column names
-# --> for the creation of tables
+# tests if IDENTIFIERS are correctly encoded: creation of tables
 noSpaceDoubleQuotes <- data.frame(
   "capitals"=c("Vienna","Washington D.C.", "Paris", "London"),
   "best_sights"=c("Viennese Opera","Lincoln Memorial", "Eiffel Tower", "London Bridge"),
@@ -18,6 +17,7 @@ noSpaceDoubleQuotes <- data.frame(
 test_that("creating noSpaceColumns IDENTIFIED with doubleQuotes", {
   writeReadTest(as.data.frame(noSpaceDoubleQuotes))
 })
+
 
 # currently failing
 # withGapDoubleQuotes <- data.frame(

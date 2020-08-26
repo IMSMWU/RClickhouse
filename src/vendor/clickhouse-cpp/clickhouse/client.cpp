@@ -199,12 +199,8 @@ void Client::Impl::ExecuteQuery(Query query) {
 }
 
 
-
-
-
 std::string NameToQueryString(const std::string &input)
 {
-    std::cout << "hello\n";
     std::string output = "`";
     const char *c = input.c_str();
     while (*c) {
