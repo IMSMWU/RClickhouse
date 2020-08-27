@@ -18,7 +18,8 @@ test_that("array columns with empty entries", {
 })
 
 
-test_that("lucaTest", {
+# adding Data to CH containing columns with spaces
+test_that("columns with spaces", {
   writeReadTest(as.data.frame(data.frame(
     "capitals"=c("Vienna","Washington D.C.", "Paris", "London"),
     "best sights"=c("Viennese Opera","Lincoln Memorial", "Eiffel Tower", "London Bridge"),
@@ -27,3 +28,28 @@ test_that("lucaTest", {
     check.names=FALSE
   )))
 })
+test_that("columns with spaces quoted with backticks", {
+  writeReadTest(as.data.frame(data.frame(
+    "`capitals`"=c("Vienna","Washington D.C.", "Paris", "London"),
+    "`best sights`"=c("Viennese Opera","Lincoln Memorial", "Eiffel Tower", "London Bridge"),
+    "`Col with space`"=1:4,
+    stringsAsFactors=FALSE,
+    check.names=FALSE
+  )))
+})
+test_that("columns with spaces quoted with DoubleQuotes", {
+  writeReadTest(as.data.frame(data.frame(
+    '"capitals"'=c("Vienna","Washington D.C.", "Paris", "London"),
+    '"best sights"'=c("Viennese Opera","Lincoln Memorial", "Eiffel Tower", "London Bridge"),
+    '"Col with space"'=1:4,
+    stringsAsFactors=FALSE,
+    check.names=FALSE
+  )))
+})
+
+
+
+
+
+
+
