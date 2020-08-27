@@ -182,7 +182,7 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
       field.types <- append(field.types, "String")
     }
     cat(names(value))
-    fdef <- paste(sapply(names(value),addBackticks, forsql=TRUE), field.types, collapse=', ')
+    fdef <- paste(sapply(names(value),escapeForInternalUse, forsql=TRUE), field.types, collapse=', ')
     ct <- paste0("CREATE TABLE ", qname, " (", fdef, ") ENGINE=", engine)
     cat(paste("R-QUERY:\n",ct,"\n"))
     dbExecute(conn, ct)
@@ -199,7 +199,7 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
       levels(value[[c]]) <- .Internal(setEncoding(levels(value[[c]]), "UTF-8"))
     }
     print(value)
-    names(value) <- sapply(names(value),addBackticks,forsql=FALSE)
+    names(value) <- sapply(names(value),escapeForInternalUse,forsql=FALSE)
     print(value)
     insert(conn@ptr, qname, value);
   }
@@ -239,7 +239,7 @@ quoteString <- function(x) {
 }
 
 # removes escape characters and then adds backticks for internal handling
-addBackticks <- function(identifier, forsql) {
+escapeForInternalUse <- function(identifier, forsql) {
   print(identifier)
   cat(identifier)
   cat("\n")
