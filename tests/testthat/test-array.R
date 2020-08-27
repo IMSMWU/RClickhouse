@@ -16,3 +16,14 @@ test_that("nullable array columns", {
 test_that("array columns with empty entries", {
   writeReadTest(as.data.frame(data_frame(x=list(c(1,2,3),as.numeric(c()),c(4,5)))))
 })
+
+
+test_that("lucaTest", {
+  writeReadTest(as.data.frame(data.frame(
+    "capitals"=c("Vienna","Washington D.C.", "Paris", "London"),
+    "best sights"=c("Viennese Opera","Lincoln Memorial", "Eiffel Tower", "London Bridge"),
+    "Col with space"=1:4,
+    stringsAsFactors=FALSE,
+    check.names=FALSE
+  )))
+})

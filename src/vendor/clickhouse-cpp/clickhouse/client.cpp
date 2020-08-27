@@ -197,7 +197,20 @@ void Client::Impl::ExecuteQuery(Query query) {
         ;
     }
 }
-
+std::string BeforeNameToQueryString(const std::string &input)
+{
+    std::string output = "";
+    const char *c = input.c_str();
+    while (*c) {
+        switch (*c) {
+        default:
+            output.push_back(*c); break;
+        }
+        ++c;
+    }
+    output += "";
+    return output;
+}
 
 std::string NameToQueryString(const std::string &input)
 {
@@ -205,23 +218,6 @@ std::string NameToQueryString(const std::string &input)
     const char *c = input.c_str();
     while (*c) {
         switch (*c) {
-        // // needs test cases
-        // case '"':
-        //     output.append("\\\""); break;
-        // case '`':
-        //     output.append("\\`"); break;
-        // case '\'':
-        //     output.append("\\'"); break;
-        // case '[':
-        //     output.append("\\["); break;
-        // case ']':
-        //     output.append("\\]"); break;
-        // case '%':
-        //     output.append("\\%"); break;
-        // case '_':
-        //     output.append("\\_"); break;
-        // case '\\':
-        //     output.append("\\\\"); break;
         default:
             output.push_back(*c); break;
         }
@@ -235,6 +231,27 @@ void Client::Impl::Insert(const std::string& table_name, const Block& block) {
     if (options_.ping_before_query) {
         RetryGuard([this]() { Ping(); });
     }
+
+    std::vector<std::string> fieldss;
+    fieldss.reserve(block.GetColumnCount());
+
+    // Enumerate all fields
+    for (unsigned int i = 0; i < block.GetColumnCount(); i++) {
+        fieldss.push_back(BeforeNameToQueryString(block.GetColumnName(i)));
+        // fields.push_back(NameToQueryString(block.GetColumnName(i)));
+    }
+
+    std::stringstream fieldss_section;
+
+    for (auto elem = fieldss.begin(); elem != fieldss.end(); ++elem) {
+        if (std::distance(elem, fieldss.end()) == 1) {
+            fieldss_section << *elem;
+        } else {
+            fieldss_section << *elem << ",";
+        }
+    }
+    std::cout << "CPP-SEMI-QUERY:\n" << "INSERT INTO " << table_name << " ( " << fieldss_section.str() << " ) VALUES";
+
 
     std::vector<std::string> fields;
     fields.reserve(block.GetColumnCount());
@@ -254,8 +271,8 @@ void Client::Impl::Insert(const std::string& table_name, const Block& block) {
             fields_section << *elem << ",";
         }
     }
-    std::cout << "FINAL-QUERY:" << "INSERT INTO " << table_name << " ( " << fields_section.str() << " ) VALUES";
-    SendQuery("INSERT INTO " + table_name + " ( " + fields_section.str() + " ) VALUES");
+    std::cout << "CPP-FINAL-QUERY:\n" << "INSERT INTO " << table_name << " ( " << fields_section.str() << " ) VALUES";
+    SendQuery(" INSERT INTO " + table_name + " ( " + fields_section.str() + " ) VALUES");
 
     uint64_t server_packet;
     // Receive data packet.
