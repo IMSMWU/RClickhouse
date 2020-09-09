@@ -138,7 +138,7 @@ setMethod("dbSendQuery", c("ClickhouseConnection", "character"), function(conn, 
 })
 
 setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "character", value = "ANY"), definition = function(conn, name, value, overwrite=FALSE,
-                                                                                                                             append=FALSE, engine="TinyLog", row.names=NA, field.types=NULL, ...) {
+         append=FALSE, engine="TinyLog", row.names=NA, field.types=NULL, ...) {
   if (is.vector(value) && !is.list(value)) value <- data.frame(x = value, stringsAsFactors = F)
   if (length(value) < 1) stop("value must have at least one column")
   if (is.null(names(value))) names(value) <- paste("V", 1:length(value), sep='')
@@ -158,7 +158,6 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
   }
 
   qname <- dbQuoteIdentifier(conn, name)
-
   if (dbExistsTable(conn, qname)) {
     if (overwrite) dbRemoveTable(conn, qname)
     if (!overwrite && !append) stop("Table ", qname, " already exists. Set overwrite=TRUE if you want
@@ -182,10 +181,11 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
     } else if (!is.na(rownames.col)) {
       field.types <- append(field.types, "String")
     }
-    fdef <- paste(names(value), field.types, collapse=', ')
+    fdef <- paste(sapply(names(value),escapeForInternalUse, forsql=TRUE), field.types, collapse=', ')
     ct <- paste0("CREATE TABLE ", qname, " (", fdef, ") ENGINE=", engine)
     dbExecute(conn, ct)
   }
+
   if (length(value[[1]])) {
     classes <- unlist(lapply(value, function(v){
       class(v)[[1]]
@@ -196,7 +196,7 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
     for (c in names(classes[classes=="factor"])) {
       levels(value[[c]]) <- .Internal(setEncoding(levels(value[[c]]), "UTF-8"))
     }
-
+    names(value) <- sapply(names(value),escapeForInternalUse,forsql=FALSE)
     insert(conn@ptr, qname, value);
   }
 
@@ -232,6 +232,22 @@ quoteString <- function(x) {
   x <- gsub('\\', '\\\\', x, fixed = TRUE)
   x <- gsub("'", "\\'", x, fixed = TRUE)
   return(SQL(ifelse(is.na(x), "NULL", paste0("'", x, "'"))))
+}
+
+# removes escape characters and then adds backticks for internal handling
+escapeForInternalUse <- function(identifier, forsql) {
+  if (grepl('^["](.*["])?$', identifier)) {
+    identifier <- gsub('^["](.*["])?$', substr(identifier, 2, nchar(identifier) -1), identifier)
+  } else if (grepl("^[`](.*[`])?$", identifier)) {
+    identifier <- gsub("^[`](.*[`])?$", substr(identifier, 2, nchar(identifier) -1), identifier)
+
+  }
+  if (forsql) {
+    return(paste0('`', identifier, '`'))
+  }
+  else{
+    return(identifier)
+  }
 }
 
 #' @export
@@ -274,3 +290,4 @@ setMethod("dbDisconnect", "ClickhouseConnection", function(conn, ...) {
   }
   invisible(TRUE)
 })
+

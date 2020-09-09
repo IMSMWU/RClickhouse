@@ -150,7 +150,6 @@ private:
     ServerInfo server_info_;
 };
 
-
 Client::Impl::Impl(const ClientOptions& opts)
     : options_(opts)
     , events_(nullptr)
@@ -199,6 +198,39 @@ void Client::Impl::ExecuteQuery(Query query) {
     }
 }
 
+
+std::string NameToQueryString(const std::string &input)
+{
+    std::string output = "`";
+    const char *c = input.c_str();
+    while (*c) {
+        switch (*c) {
+        // // needs test cases
+        // case '"':
+        //     output.append("\\\""); break;
+        // case '`':
+        //     output.append("\\`"); break;
+        // case '\'':
+        //     output.append("\\'"); break;
+        // case '[':
+        //     output.append("\\["); break;
+        // case ']':
+        //     output.append("\\]"); break;
+        // case '%':
+        //     output.append("\\%"); break;
+        // case '_':
+        //     output.append("\\_"); break;
+        // case '\\':
+        //     output.append("\\\\"); break;
+        default:
+            output.push_back(*c); break;
+        }
+        ++c;
+    }
+    output += "`";
+    return output;
+}
+
 void Client::Impl::Insert(const std::string& table_name, const Block& block) {
     if (options_.ping_before_query) {
         RetryGuard([this]() { Ping(); });
@@ -209,7 +241,7 @@ void Client::Impl::Insert(const std::string& table_name, const Block& block) {
 
     // Enumerate all fields
     for (unsigned int i = 0; i < block.GetColumnCount(); i++) {
-        fields.push_back(block.GetColumnName(i));
+        fields.push_back(NameToQueryString(block.GetColumnName(i)));
     }
 
     std::stringstream fields_section;
@@ -221,7 +253,6 @@ void Client::Impl::Insert(const std::string& table_name, const Block& block) {
             fields_section << *elem << ",";
         }
     }
-
     SendQuery("INSERT INTO " + table_name + " ( " + fields_section.str() + " ) VALUES");
 
     uint64_t server_packet;

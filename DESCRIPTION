@@ -33,7 +33,7 @@ Imports:
     Rcpp (>= 0.11.0),
     bit64
 LazyData: true
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
 NeedsCompilation: yes
 Depends:
     R (>= 3.3)
