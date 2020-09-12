@@ -157,12 +157,17 @@ loadConfig <- function(CONFIG_PATHS, DEFAULT_PARAMS, pre_config) {
 #' conn <- dbConnect(RClickhouse::clickhouse(), host="localhost")
 #' }
 setMethod("dbConnect", "ClickhouseDriver",
-          function(drv, host="localhost", port = 9000, db = "default",
+          function(drv, host="localhost", port = 9000, dbname = "default",
                    user = "default", password = "", compression = "lz4",
                    config_paths = c('./RClickhouse.yaml', '~/.R/RClickhouse.yaml', '/etc/RClickhouse.yaml'),
                    Int64 = c("integer64", "integer", "numeric", "character"), toUTF8 = TRUE, ...) {
+    db <- match.call(expand.dots = TRUE)
+    if("db" %in% names(db)){
+        warning("Parameter 'db' is deprecated and will be removed in the future. Use 'dbname' instead.")
+        dbname <- db$db
+    }
             DEFAULT_PARAMS <- c(host='localhost', port=9000, db='default', user='default', password='', compression='lz4')
-            input_params <- c(host=host, port=port, db=db, user=user, password=password, compression=compression)
+            input_params <- c(host=host, port=port, db=dbname, user=user, password=password, compression=compression)
             default_input_diff <- c(input_params[!(input_params %in% DEFAULT_PARAMS)])
 
             config <- loadConfig(config_paths, DEFAULT_PARAMS, default_input_diff)
