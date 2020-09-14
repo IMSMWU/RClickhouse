@@ -137,10 +137,26 @@ setMethod("dbSendQuery", c("ClickhouseConnection", "character"), function(conn, 
   ))
 })
 
-setMethod("dbAppendTable", signature(conn = "ClickhouseConnection", name = "character", value = "ANY"), definition = function(conn, name, value, overwrite=FALSE,
-         append=TRUE, engine="TinyLog", row.names=NA, field.types=NULL, ...) {
-    dbWriteTable(conn, name, value, overwrite, append, engine, row.names, field.types, ...)
-  })
+setMethod("dbAppendTable", definition = function(conn, name, value, ...) {
+  classes <- unlist(lapply(value, function(v){
+    class(v)[[1]]
+  }))
+  for (c in names(classes[classes=="character"])) {
+    value[[c]] <- .Internal(setEncoding(value[[c]], "UTF-8"))
+  }
+  for (c in names(classes[classes=="factor"])) {
+    levels(value[[c]]) <- .Internal(setEncoding(levels(value[[c]]), "UTF-8"))
+  }
+  names(value) <- sapply(names(value),escapeForInternalUse,forsql=FALSE)
+  insert(conn@ptr, qname, value);
+})
+
+setMethod("dbCreateTable", definition = function(conn, name, fields, engine="TinyLog", ..., row.names=NA, temporary=FALSE) {
+  qname <- dbQuoteIdentifier(conn, name)
+  fdef <- paste(sapply(names(fields),escapeForInternalUse, forsql=TRUE), unname(fields), collapse=', ')
+  ct <- paste0("CREATE TABLE ", qname, " (", fdef, ") ENGINE=", engine)
+  dbExecute(conn, ct)
+})
 
 setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "character", value = "ANY"), definition = function(conn, name, value, overwrite=FALSE,
          append=FALSE, engine="TinyLog", row.names=NA, field.types=NULL, ...) {
@@ -186,23 +202,13 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
     } else if (!is.na(rownames.col)) {
       field.types <- append(field.types, "String")
     }
-    fdef <- paste(sapply(names(value),escapeForInternalUse, forsql=TRUE), field.types, collapse=', ')
-    ct <- paste0("CREATE TABLE ", qname, " (", fdef, ") ENGINE=", engine)
-    dbExecute(conn, ct)
+    fields = field.types
+    names(fields) = names(value)
+    dbCreateTable(conn, name, fields, ...)
   }
 
   if (length(value[[1]])) {
-    classes <- unlist(lapply(value, function(v){
-      class(v)[[1]]
-    }))
-    for (c in names(classes[classes=="character"])) {
-      value[[c]] <- .Internal(setEncoding(value[[c]], "UTF-8"))
-    }
-    for (c in names(classes[classes=="factor"])) {
-      levels(value[[c]]) <- .Internal(setEncoding(levels(value[[c]]), "UTF-8"))
-    }
-    names(value) <- sapply(names(value),escapeForInternalUse,forsql=FALSE)
-    insert(conn@ptr, qname, value);
+    dbAppendTable(conn, name, value, ...)
   }
 
   return(invisible(TRUE))
