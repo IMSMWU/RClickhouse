@@ -137,6 +137,11 @@ setMethod("dbSendQuery", c("ClickhouseConnection", "character"), function(conn, 
   ))
 })
 
+setMethod("dbAppendTable", signature(conn = "ClickhouseConnection", name = "character", value = "ANY"), definition = function(conn, name, value, overwrite=FALSE,
+         append=TRUE, engine="TinyLog", row.names=NA, field.types=NULL, ...) {
+    dbWriteTable(conn, name, value, overwrite, append, engine, row.names, field.types, ...)
+  }
+
 setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "character", value = "ANY"), definition = function(conn, name, value, overwrite=FALSE,
          append=FALSE, engine="TinyLog", row.names=NA, field.types=NULL, ...) {
   if (is.vector(value) && !is.list(value)) value <- data.frame(x = value, stringsAsFactors = F)
