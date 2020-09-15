@@ -137,7 +137,7 @@ setMethod("dbSendQuery", c("ClickhouseConnection", "character"), function(conn, 
   ))
 })
 
-setMethod("dbAppendTable", signature(conn = "ClickhouseConnection", name = "character", value = "ANY"), definition = function(conn, name, value, ..., row.names=NA, field.types=NULL, ...) {
+setMethod("dbAppendTable", signature(conn = "ClickhouseConnection", name = "character", value = "ANY"), definition = function(conn, name, value, ..., row.names=NA) {
   if (is.vector(value) && !is.list(value)) value <- data.frame(x = value, stringsAsFactors = F)
   if (length(value) < 1) stop("value must have at least one column")
   if (is.null(names(value))) names(value) <- paste("V", 1:length(value), sep='')
