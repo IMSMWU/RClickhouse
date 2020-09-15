@@ -150,6 +150,18 @@ setMethod("dbAppendTable", signature(conn = "ClickhouseConnection", name = "char
     stop("row.names must be NA, logical, or a string")
   }
 
+  qname <- dbQuoteIdentifier(conn, name)
+
+  rownames.col <- NA
+  if ((!is.na(row.names) && row.names == TRUE) || (is.na(row.names) && .row_names_info(value) >= 0)) {
+    rownames.col <- "row_names"
+  } else if (is.character(row.names)) {
+    rownames.col <- row.names
+  }
+  if (!is.na(rownames.col)) {
+    value[rownames.col] <- as.character(rownames(value))
+  }
+
   if (length(value[[1]])) {
     classes <- unlist(lapply(value, function(v){
       class(v)[[1]]
