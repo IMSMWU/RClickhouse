@@ -204,7 +204,7 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
     }
     fields = field.types
     names(fields) = names(value)
-    dbCreateTable(conn, name, fields, engine, ...)
+    dbCreateTable(conn, name, fields, engine=engine, ...)
   }
 
   if (length(value[[1]])) {
