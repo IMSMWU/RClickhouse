@@ -137,46 +137,6 @@ setMethod("dbSendQuery", c("ClickhouseConnection", "character"), function(conn, 
   ))
 })
 
-setMethod("dbAppendTable", signature(conn = "ClickhouseConnection", name = "character", value = "ANY"), definition = function(conn, name, value, ..., row.names=NA) {
-  if (is.vector(value) && !is.list(value)) value <- data.frame(x = value, stringsAsFactors = F)
-  if (length(value) < 1) stop("value must have at least one column")
-  if (is.null(names(value))) names(value) <- paste("V", 1:length(value), sep='')
-  if (length(value[[1]])>0) {
-    if (!is.data.frame(value)) value <- as.data.frame(value, row.names=1:length(value[[1]]) , stringsAsFactors=F)
-  } else {
-    if (!is.data.frame(value)) value <- as.data.frame(value, stringsAsFactors=F)
-  }
-  if ((!is.na(row.names) && !is.logical(row.names) && !is.character(row.names)) || length(row.names) != 1) {
-    stop("row.names must be NA, logical, or a string")
-  }
-
-  qname <- dbQuoteIdentifier(conn, name)
-
-  rownames.col <- NA
-  if ((!is.na(row.names) && row.names == TRUE) || (is.na(row.names) && .row_names_info(value) >= 0)) {
-    rownames.col <- "row_names"
-  } else if (is.character(row.names)) {
-    rownames.col <- row.names
-  }
-  if (!is.na(rownames.col)) {
-    value[rownames.col] <- as.character(rownames(value))
-  }
-
-  if (length(value[[1]])) {
-    classes <- unlist(lapply(value, function(v){
-      class(v)[[1]]
-    }))
-    for (c in names(classes[classes=="character"])) {
-      value[[c]] <- .Internal(setEncoding(value[[c]], "UTF-8"))
-    }
-    for (c in names(classes[classes=="factor"])) {
-      levels(value[[c]]) <- .Internal(setEncoding(levels(value[[c]]), "UTF-8"))
-    }
-    names(value) <- sapply(names(value),escapeForInternalUse,forsql=FALSE)
-    insert(conn@ptr, qname, value);
-  }
-})
-
 setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "character", value = "ANY"), definition = function(conn, name, value, overwrite=FALSE,
          append=FALSE, engine="TinyLog", row.names=NA, field.types=NULL, ...) {
   if (is.vector(value) && !is.list(value)) value <- data.frame(x = value, stringsAsFactors = F)
