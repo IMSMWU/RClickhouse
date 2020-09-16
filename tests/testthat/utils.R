@@ -48,5 +48,8 @@ writeReadTest <- function(input, result = input, types = NULL) {
   names(result) <- sapply(names(result),RClickhouse:::escapeForInternalUse,forsql=FALSE)
   expect_equal(afterReadWrite, result)
 
+  RClickhouse::dbRemoveTable(conn,tblname)
+  # Sys.sleep(3)
+  # DBI:::dbExecute(conn, paste0("DROP TABLE ", "test"))
   dbDisconnect(conn)
 }

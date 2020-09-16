@@ -77,6 +77,10 @@ test_that("full_join() between two tables WITH a common column", {
 })
 
 
+RClickhouse::dbRemoveTable(conn,"tableA")
+RClickhouse::dbRemoveTable(conn,"tableB")
+RClickhouse::dbRemoveTable(conn,"tableC")
+
 
 
 
