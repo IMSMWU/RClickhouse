@@ -24,16 +24,16 @@ test_that("show__ClickhouseConnection", {
 # test_that("dbIsValid__ClickhouseConnection", {
 # })
 
-test_that("dbListTables__ClickhouseConnection", {
-  conn <- getRealConnection()
-  dbWriteTable(conn, "tableOne", 1:4, overwrite=T)
-  dbWriteTable(conn, "tableTwo", 1:4, overwrite=T)
-
-  targetString <- '[1] "tableOne" "tableTwo"'
-  expect_equal(paste(capture.output(RClickhouse::dbListTables(conn)), collapse = ''), targetString)
-  RClickhouse::dbRemoveTable(conn,"tableOne")
-  RClickhouse::dbRemoveTable(conn,"tableTwo")
-})
+# test_that("dbListTables__ClickhouseConnection", {
+#   conn <- getRealConnection()
+#   dbWriteTable(conn, "tableOne", 1:4, overwrite=T)
+#   dbWriteTable(conn, "tableTwo", 1:4, overwrite=T)
+#
+#   targetString <- '[1] "tableOne" "tableTwo"'
+#   expect_equal(paste(capture.output(RClickhouse::dbListTables(conn)), collapse = ''), targetString)
+#   RClickhouse::dbRemoveTable(conn,"tableOne")
+#   RClickhouse::dbRemoveTable(conn,"tableTwo")
+# })
 
 # test_that("dbExistsTable__ClickhouseConnection", {
 # })
