@@ -35,7 +35,7 @@ test_that("ISSUE #71 dbAppendTable", {
   values$aName <- "John Smith"
   values$Age <- 25
   values$aName <- "Software Developer"
-  dbAppendTable(conn, tablename, value=values, ..., row.names=NA)
+  dbAppendTable(conn, tablename, value=values, row.names=NA)
 
   # after <- dbReadTable(conn, "PersonalInfo")
 
