@@ -22,6 +22,29 @@ test_that("ISSUE #71", {
   RClickhouse::dbRemoveTable(conn,"PersonalInfo")
 })
 
+test_that("ISSUE #71 dbAppendTable", {
+  conn <- getRealConnection()
+
+  tablename <- "PersonalInfo"
+  columns <- as.data.frame(data.frame('aName','Age','Profession'))
+  types <- c("String","Float64","String")
+
+  dbCreateTable(conn, tablename, fields=columns, overwrite=TRUE, field.types=types)
+
+  values <- columns
+  values$aName <- "John Smith"
+  values$Age <- 25
+  values$aName <- "Software Developer"
+  dbAppendTable(conn, tablename, value=values)
+
+  # after <- dbReadTable(conn, "PersonalInfo")
+
+
+
+  # expect_equal(before, after)
+  RClickhouse::dbRemoveTable(conn,"PersonalInfo")
+})
+
 
 
 
