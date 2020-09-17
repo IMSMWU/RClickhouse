@@ -31,8 +31,8 @@ test_that("ISSUE #71 dbAppendTable", {
 
   dbCreateTable(conn, tablename, fields=columns, overwrite=TRUE, field.types=types)
 
-  values <- data.frame(aName = 'John Smith', Age = 25, aName = 'Software Developer')
-  dbAppendTable(conn, tablename, value=values, row.names=NA)
+  values <- data.frame(aName='John Smith', Age=25, Profession='Software Engineer')
+  dbAppendTable(conn, tablename, value=values, row.names=FALSE)
 
   # after <- dbReadTable(conn, "PersonalInfo")
 
