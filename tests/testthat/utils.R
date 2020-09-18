@@ -49,7 +49,5 @@ writeReadTest <- function(input, result = input, types = NULL) {
   expect_equal(afterReadWrite, result)
 
   RClickhouse::dbRemoveTable(conn,tblname)
-  # Sys.sleep(3)
-  # DBI:::dbExecute(conn, paste0("DROP TABLE ", "test"))
   dbDisconnect(conn)
 }
