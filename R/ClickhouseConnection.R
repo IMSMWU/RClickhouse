@@ -164,7 +164,7 @@ setMethod("dbSendQuery", c("ClickhouseConnection", "character"), function(conn, 
 # }
 
 
-rch_dbCreateTable <- function (conn, name, fields, engine="TinyLogs", overwrite = FALSE, ..., row.names = NULL, temporary = FALSE)
+rch_dbCreateTable <- function (conn, name, fields, engine="TinyLog", overwrite = FALSE, ..., row.names = NULL, temporary = FALSE)
 {
   # removes table if exists and overWrite is true
   qname <- dbQuoteIdentifier(conn, name)
