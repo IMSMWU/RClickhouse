@@ -137,35 +137,8 @@ setMethod("dbSendQuery", c("ClickhouseConnection", "character"), function(conn, 
   ))
 })
 
-### not congruent with vision of DBI
-# rch_create_table_old <- function(conn, name, fields, field.types=NULL, engine="TinyLog", overwrite = FALSE, ..., row.names = NULL, temporary = FALSE) {
-#   if (is.vector(fields) && !is.list(fields)) fields <- data.frame(x = fields, stringsAsFactors = F)
-#
-#   if (length(fields) < 1) stop("value must have at least one column")
-#
-#   if (!is.null(field.types) && (length(field.types) != length(fields) || !is.character(field.types))) {
-#     stop("field.types, if given, must be a string vector with one entry per data columns")
-#   }
-#
-#   qname <- dbQuoteIdentifier(conn, name)
-#   if (dbExistsTable(conn, qname)) {
-#     if (overwrite) dbRemoveTable(conn, qname)
-#   }
-#
-#   if (is.null(field.types)) {
-#     field.types <- sapply(fields, dbDataType, dbObj=conn)
-#   }
-#
-#   fdef <- paste(sapply(fields,escapeForInternalUse, forsql=TRUE), field.types, collapse=', ')
-#   ct <- paste0("CREATE TABLE ", qname, " (", fdef, ") ENGINE=", engine)
-#
-#   dbExecute(conn, ct)
-#   return(invisible(TRUE))
-# }
 
-
-rch_dbCreateTable <- function (conn, name, fields, engine="TinyLog", overwrite = FALSE, ..., row.names = NULL, temporary = FALSE)
-{
+rch_dbCreateTable <- function (conn, name, fields, engine="TinyLog", overwrite = FALSE, ..., row.names = NULL, temporary = FALSE){
   # removes table if exists and overWrite is true
   qname <- dbQuoteIdentifier(conn, name)
   if (overwrite && dbExistsTable(conn, qname)) dbRemoveTable(conn, qname)
@@ -185,7 +158,7 @@ rch_dbCreateTable <- function (conn, name, fields, engine="TinyLog", overwrite =
 setMethod("dbCreateTable", "ClickhouseConnection", rch_dbCreateTable)
 
 
-rch_append_table <- function(conn, name, value, ..., row.names = NULL) {
+rch_dbAppendTable <- function(conn, name, value, ..., row.names = NULL) {
   if (is.vector(value) && !is.list(value)) value <- data.frame(x = value, stringsAsFactors = F)
   if (length(value) < 1) stop("value must have at least one column")
   if (is.null(names(value))) names(value) <- paste("V", 1:length(value), sep='')
@@ -199,6 +172,7 @@ rch_append_table <- function(conn, name, value, ..., row.names = NULL) {
   }
 
   qname <- dbQuoteIdentifier(conn, name)
+  if (!dbExistsTable(conn, qname)) stop("Table ", qname, " doesn't exist. Use dbCreateTable first.")
 
   rownames.col <- NA
   if ((!is.na(row.names) && row.names == TRUE) || (is.na(row.names) && .row_names_info(value) >= 0)) {
@@ -225,9 +199,9 @@ rch_append_table <- function(conn, name, value, ..., row.names = NULL) {
   }
 
   return(invisible(TRUE))
-
 }
-setMethod("dbAppendTable", "ClickhouseConnection", rch_append_table)
+setMethod("dbAppendTable", "ClickhouseConnection", rch_dbAppendTable)
+
 
 setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "character", value = "ANY"), definition = function(conn, name, value, overwrite=FALSE,
          append=FALSE, engine="TinyLog", row.names=NA, field.types=NULL, ...) {

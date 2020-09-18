@@ -50,13 +50,39 @@ test_that("show__ClickhouseConnection", {
 # test_that("dbSendQuery__ClickhouseConnection", {
 # })
 #
-test_that("dbWriteTable__ClickhouseConnection", {
+# test_that("dbWriteTable__ClickhouseConnection", {
+# })
+
+test_that("dbCreateTable", {
+  conn <- getRealConnection()
+
+  tablename <- "PersonalInfo"
+  fields <- c(Name="String",ID="Int32",Age="Int8",Profession="String")
+  dbCreateTable(conn, tablename, fields=fields, overwrite=TRUE)
+
+  expect_equal(tablename,dbListTables(conn))
+  concatenatedOutput = '[1] \"Name\"       \"ID\"         \"Age\"        \"Profession\"'
+  expect_equal(paste(capture.output(RClickhouse::dbListFields(conn,"PersonalInfo")), collapse = ''),concatenatedOutput)
+  RClickhouse::dbRemoveTable(conn,"PersonalInfo")
 })
 
-test_that("dbCreateTable__ClickhouseConnection", {
-})
+test_that("dbAppendTable", {
+  conn <- getRealConnection()
 
-test_that("dbAppendTable__ClickhouseConnection", {
+  tablename <- "PersonalInfo"
+  fields <- c(Name="String",ID="Int32",Age="Int8",Profession="String")
+  dbCreateTable(conn, tablename, fields=fields, overwrite=TRUE)
+
+  NameVALUES=c('John Smith','Peter Norwind',"Alexander Mightsby")
+  IDVALUES=c(1:3)
+  AgeVALUES=c(25,22,26)
+  ProfessionVALUES=c('Software Engineer','Software Engineer','Assistant Software Engineer')
+  appendThis <- data.frame(Name=NameVALUES,ID=IDVALUES,Age=AgeVALUES,Profession=ProfessionVALUES)
+  dbAppendTable(conn, tablename, value=appendThis, row.names=FALSE)
+
+  afterRead <- dbReadTable(conn, "PersonalInfo")
+  expect_true(all(appendThis==afterRead))
+  RClickhouse::dbRemoveTable(conn,"PersonalInfo")
 })
 
 # test_that("dbDataType__ClickhouseConnection", {
