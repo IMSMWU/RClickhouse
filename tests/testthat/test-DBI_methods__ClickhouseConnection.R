@@ -50,9 +50,15 @@ test_that("show__ClickhouseConnection", {
 # test_that("dbSendQuery__ClickhouseConnection", {
 # })
 #
-# test_that("dbWriteTable__ClickhouseConnection", {
-# })
-#
+test_that("dbWriteTable__ClickhouseConnection", {
+})
+
+test_that("dbCreateTable__ClickhouseConnection", {
+})
+
+test_that("dbAppendTable__ClickhouseConnection", {
+})
+
 # test_that("dbDataType__ClickhouseConnection", {
 # })
 #

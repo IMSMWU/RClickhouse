@@ -137,31 +137,53 @@ setMethod("dbSendQuery", c("ClickhouseConnection", "character"), function(conn, 
   ))
 })
 
-rch_create_table <- function(conn, name, fields, field.types=NULL, engine="TinyLog", overwrite = FALSE, ..., row.names = NULL, temporary = FALSE) {
-  if (is.vector(fields) && !is.list(fields)) fields <- data.frame(x = fields, stringsAsFactors = F)
+### not congruent with vision of DBI
+# rch_create_table_old <- function(conn, name, fields, field.types=NULL, engine="TinyLog", overwrite = FALSE, ..., row.names = NULL, temporary = FALSE) {
+#   if (is.vector(fields) && !is.list(fields)) fields <- data.frame(x = fields, stringsAsFactors = F)
+#
+#   if (length(fields) < 1) stop("value must have at least one column")
+#
+#   if (!is.null(field.types) && (length(field.types) != length(fields) || !is.character(field.types))) {
+#     stop("field.types, if given, must be a string vector with one entry per data columns")
+#   }
+#
+#   qname <- dbQuoteIdentifier(conn, name)
+#   if (dbExistsTable(conn, qname)) {
+#     if (overwrite) dbRemoveTable(conn, qname)
+#   }
+#
+#   if (is.null(field.types)) {
+#     field.types <- sapply(fields, dbDataType, dbObj=conn)
+#   }
+#
+#   fdef <- paste(sapply(fields,escapeForInternalUse, forsql=TRUE), field.types, collapse=', ')
+#   ct <- paste0("CREATE TABLE ", qname, " (", fdef, ") ENGINE=", engine)
+#
+#   dbExecute(conn, ct)
+#   return(invisible(TRUE))
+# }
 
-  if (length(fields) < 1) stop("value must have at least one column")
 
-  if (!is.null(field.types) && (length(field.types) != length(fields) || !is.character(field.types))) {
-    stop("field.types, if given, must be a string vector with one entry per data columns")
-  }
-
+rch_dbCreateTable <- function (conn, name, fields, engine="TinyLogs", overwrite = FALSE, ..., row.names = NULL, temporary = FALSE)
+{
+  # removes table if exists and overWrite is true
   qname <- dbQuoteIdentifier(conn, name)
-  if (dbExistsTable(conn, qname)) {
-    if (overwrite) dbRemoveTable(conn, qname)
-  }
+  if (overwrite && dbExistsTable(conn, qname)) dbRemoveTable(conn, qname)
 
-  if (is.null(field.types)) {
-    field.types <- sapply(fields, dbDataType, dbObj=conn)
-  }
+  # copied from DBI::dbCreateTable
+  stopifnot(is.null(row.names))
+  stopifnot(is.logical(temporary), length(temporary) == 1L)
+  query <- sqlCreateTable(con = conn, table = name, fields = fields,
+                          row.names = row.names, temporary = temporary, ...)
 
-  fdef <- paste(sapply(fields,escapeForInternalUse, forsql=TRUE), field.types, collapse=', ')
-  ct <- paste0("CREATE TABLE ", qname, " (", fdef, ") ENGINE=", engine)
+  # specifies engine --> makes it compatible with Clickhouse
+  query <- paste(query, "ENGINE=", engine)
 
-  dbExecute(conn, ct)
-  return(invisible(TRUE))
+  dbExecute(conn, query)
+  invisible(TRUE)
 }
-setMethod("dbCreateTable", "ClickhouseConnection", rch_create_table)
+setMethod("dbCreateTable", "ClickhouseConnection", rch_dbCreateTable)
+
 
 rch_append_table <- function(conn, name, value, ..., row.names = NULL) {
   if (is.vector(value) && !is.list(value)) value <- data.frame(x = value, stringsAsFactors = F)
