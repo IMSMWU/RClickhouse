@@ -40,10 +40,16 @@ test_that("show__ClickhouseConnection", {
 #
 # test_that("dbReadTable__ClickhouseConnection", {
 # })
-#
-# test_that("dbRemoveTable__ClickhouseConnection", {
-# })
-#
+
+test_that("dbRemoveTable__ClickhouseConnection", {
+  conn <- getRealConnection()
+  dbExecute(conn, "CREATE TABLE test_dbRemoveTable (`name` String) ENGINE = TinyLog")
+  assertthat::assert_that(dbExistsTable(conn, 'test_dbRemoveTable'), msg='precondition for test failed, "test_dbRemoveTable" was not created')
+
+  dbRemoveTable(conn, "test_dbRemoveTable")
+  expect_false(dbExistsTable(conn, 'test_dbRemoveTable'))
+})
+
 # test_that("dbListFields__ClickhouseConnection", {
 # })
 #
@@ -63,7 +69,7 @@ test_that("dbCreateTable", {
   expect_equal(tablename,dbListTables(conn))
   concatenatedOutput = '[1] \"Name\"       \"ID\"         \"Age\"        \"Profession\"'
   expect_equal(paste(capture.output(RClickhouse::dbListFields(conn,"PersonalInfo")), collapse = ''),concatenatedOutput)
-  RClickhouse::dbRemoveTable(conn,"PersonalInfo")
+  dbRemoveTable(conn,"PersonalInfo")
 })
 
 test_that("dbAppendTable", {
