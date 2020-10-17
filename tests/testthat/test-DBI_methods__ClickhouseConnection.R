@@ -9,6 +9,9 @@ test_that("show__ClickhouseConnection", {
   conn <- getRealConnection()
   targetString <- '<ClickhouseConnection>  default@localhost:9000'
   expect_equal(paste(capture.output(RClickhouse::show(conn)), collapse = ''), targetString)
+
+  # cleanup
+  dbDisconnect(conn)
 })
 
 # # not sure on how to adequately test this method
@@ -24,22 +27,40 @@ test_that("show__ClickhouseConnection", {
 # test_that("dbIsValid__ClickhouseConnection", {
 # })
 
-# test_that("dbListTables__ClickhouseConnection", {
-#   conn <- getRealConnection()
-#   dbWriteTable(conn, "tableOne", 1:4, overwrite=T)
-#   dbWriteTable(conn, "tableTwo", 1:4, overwrite=T)
-#
-#   targetString <- '[1] "tableOne" "tableTwo"'
-#   expect_equal(paste(capture.output(RClickhouse::dbListTables(conn)), collapse = ''), targetString)
-#   RClickhouse::dbRemoveTable(conn,"tableOne")
-#   RClickhouse::dbRemoveTable(conn,"tableTwo")
-# })
+test_that("dbListTables__ClickhouseConnection", {
+  conn <- getRealConnection()
+  dbWriteTable(conn, "tableOne", 1:4, overwrite=T)
+  dbWriteTable(conn, "tableTwo", 1:4, overwrite=T)
 
-# test_that("dbExistsTable__ClickhouseConnection", {
-# })
-#
-# test_that("dbReadTable__ClickhouseConnection", {
-# })
+  targetString <- '[1] "tableOne" "tableTwo"'
+  expect_equal(paste(capture.output(dbListTables(conn)), collapse = ''), targetString)
+  # cleanup
+  dbRemoveTable(conn,"tableOne")
+  dbRemoveTable(conn,"tableTwo")
+  dbDisconnect(conn)
+})
+
+test_that("dbExistsTable__ClickhouseConnection", {
+  conn <- getRealConnection()
+  # before Table is created should return False
+  expect_false(dbExistsTable(conn, 'test_dbExistsTable'))
+  dbExecute(conn, "CREATE TABLE test_dbExistsTable (`name` String) ENGINE = TinyLog")
+  # after Table is created should return True
+  expect_true(dbExistsTable(conn, 'test_dbExistsTable'))
+  # cleanup...
+  dbRemoveTable(conn, "test_dbExistsTable")
+  dbDisconnect(conn)
+})
+
+test_that("dbReadTable__ClickhouseConnection", {
+  conn <- getRealConnection()
+  dbWriteTable(conn, "test_dbReadTable", 1:4, overwrite=T)
+  # checks if read values same as input values
+  testthat::expect_equivalent(dbReadTable(conn, "test_dbReadTable"), data.frame(x=1:4))
+  # cleanup
+  dbRemoveTable(conn, "test_dbReadTable")
+  dbDisconnect(conn)
+})
 
 test_that("dbRemoveTable__ClickhouseConnection", {
   conn <- getRealConnection()
@@ -48,6 +69,8 @@ test_that("dbRemoveTable__ClickhouseConnection", {
 
   dbRemoveTable(conn, "test_dbRemoveTable")
   expect_false(dbExistsTable(conn, 'test_dbRemoveTable'))
+  # cleanup
+  dbDisconnect(conn)
 })
 
 # test_that("dbListFields__ClickhouseConnection", {
@@ -69,7 +92,9 @@ test_that("dbCreateTable", {
   expect_equal(tablename,dbListTables(conn))
   concatenatedOutput = '[1] \"Name\"       \"ID\"         \"Age\"        \"Profession\"'
   expect_equal(paste(capture.output(RClickhouse::dbListFields(conn,"PersonalInfo")), collapse = ''),concatenatedOutput)
+  # cleanup
   dbRemoveTable(conn,"PersonalInfo")
+  dbDisconnect(conn)
 })
 
 test_that("dbAppendTable", {
@@ -88,7 +113,9 @@ test_that("dbAppendTable", {
 
   afterRead <- dbReadTable(conn, "PersonalInfo")
   expect_true(all(appendThis==afterRead))
+  # cleanup
   RClickhouse::dbRemoveTable(conn,"PersonalInfo")
+  dbDisconnect(conn)
 })
 
 # test_that("dbDataType__ClickhouseConnection", {
