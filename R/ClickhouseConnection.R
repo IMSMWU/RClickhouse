@@ -250,6 +250,23 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
     fdef <- paste(sapply(names(value),escapeForInternalUse, forsql=TRUE), field.types, collapse=', ')
     ct <- paste0("CREATE TABLE ", qname, " (", fdef, ") ENGINE=", engine)
     dbExecute(conn, ct)
+  } else if (is.null(field.types)) {
+    # do it for all in general but paticularly for the ones with all NAs...
+    # see how the datatypes are being interpreted by chcpp...
+    for (i in seq_along(value)) {
+      # print(column)
+      # print('')
+      if (all(is.na(value[i]))) {
+        emptyTable <- dbSendQuery(con, paste0("select * from ", qname, " where 1 != 1"))
+        column.data.types <- dbColumnInfo(emptyTable)$data.type
+        # print('changing it from')
+        # print(class(value[[i]]))
+        # print(value[i])
+        # print('to...')
+        # print(column.data.types[i])
+        class(value[[i]]) <- column.data.types[i]
+      }
+    }
   }
 
   if (length(value[[1]])) {
