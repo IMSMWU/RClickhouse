@@ -365,7 +365,7 @@ ColumnRef vecToColumn(TypeRef t, SEXP v, std::shared_ptr<ColumnUInt8> nullCol = 
     case TC::DateTime:
       return vecToScalar<ColumnDateTime, const std::time_t>(v);
     case TC::Date:
-      return vecToScalar<ColumnDate, const std::time_t>(v);
+      return vecToScalar<ColumnDate, const std::time_t>(v, nullCol);
     case TC::Nullable: {
       // downcast to NullableType to access GetItemType member
       std::shared_ptr<class NullableType> nullable_t = std::static_pointer_cast<NullableType>(t);
