@@ -10,6 +10,8 @@
 using namespace Rcpp;
 using namespace clickhouse;
 
+ColumnRef convertDecimalColumn(SEXP v);
+
 // [[Rcpp::export]]
 DataFrame fetch(XPtr<Result> res, ssize_t n) {
   return res->fetchFrame(n);
@@ -165,10 +167,10 @@ std::shared_ptr<CT> vecToScalar(SEXP v, std::shared_ptr<ColumnUInt8> nullCol = n
   type_of_cor = Rf_inherits(v, "integer64") ? 99 : type_of;
 
   switch(type_of_cor) {
-  case 99: {
-    toColumnN<CT, NumericVector>(v, col, nullCol);
-    break;
-  }
+    case 99: {
+      toColumnN<CT, NumericVector>(v, col, nullCol);
+      break;
+    }
     case INTSXP: {
       // the lambda could be a default argument of toColumn, but that
       // appears to trigger a bug in GCC
@@ -337,7 +339,12 @@ std::shared_ptr<CT> vecToEnum(SEXP v, TypeRef type, std::shared_ptr<ColumnUInt8>
 
 ColumnRef vecToColumn(TypeRef t, SEXP v, std::shared_ptr<ColumnUInt8> nullCol = nullptr) {
   using TC = Type::Code;
+
+  printf("%i insert THIS   !!!\n",t->GetCode());
+
   switch(t->GetCode()) {
+    // case TC::Decimal:
+    //   return vecToScalar<ColumnDecimal, int32_t>(v, nullCol);
     case TC::Int8:
       return vecToScalar<ColumnInt8, int8_t>(v, nullCol);
     case TC::Int16:
@@ -405,10 +412,34 @@ ColumnRef vecToColumn(TypeRef t, SEXP v, std::shared_ptr<ColumnUInt8> nullCol = 
 
 // [[Rcpp::export]]
 void insert(XPtr<Client> conn, String tableName, DataFrame df) {
-  StringVector names(df.names());
-  std::vector<TypeRef> colTypes;
+  // StringVector names(df.names());
+  // std::vector<TypeRef> colTypes;
+  //
+  // // determine actual column types
+  // conn->Select("SELECT * FROM "+std::string(tableName)+" LIMIT 0", [&colTypes] (const Block& block) {
+  //   if(block.GetColumnCount() > 0 && colTypes.empty()) {
+  //     for(ch::Block::Iterator bi(block); bi.IsValid(); bi.Next()) {
+  //       colTypes.push_back(bi.Type());
+  //     }
+  //   }
+  // });
+  //
+  // if(colTypes.size() != static_cast<size_t>(df.size())) {
+  //   stop("input has "+std::to_string(df.size())+" columns, but table "+
+  //       std::string(tableName)+" has "+std::to_string(colTypes.size()));
+  // }
+  //
+  // Block block;
+  // for(size_t i = 0; i < colTypes.size(); i++) {
+  //   ColumnRef ccol = vecToColumn(colTypes[i], df[i]);
+  //   block.AppendColumn(std::string(names[i]), ccol);
+  // }
+  // conn->Insert(tableName, block);
+
 
   // determine actual column types
+  StringVector names(df.names());
+  std::vector<TypeRef> colTypes;
   conn->Select("SELECT * FROM "+std::string(tableName)+" LIMIT 0", [&colTypes] (const Block& block) {
     if(block.GetColumnCount() > 0 && colTypes.empty()) {
       for(ch::Block::Iterator bi(block); bi.IsValid(); bi.Next()) {
@@ -417,19 +448,54 @@ void insert(XPtr<Client> conn, String tableName, DataFrame df) {
     }
   });
 
-  if(colTypes.size() != static_cast<size_t>(df.size())) {
-    stop("input has "+std::to_string(df.size())+" columns, but table "+
-        std::string(tableName)+" has "+std::to_string(colTypes.size()));
-  }
+  // prints out scale and nothing else...
+  // auto decimal = std::static_pointer_cast<DecimalType>(colTypes[0]);
+  // std::cout << colTypes[0]->GetName() << "; - ) \n";
+  // std::cout <<  decimal->GetScale() << "; - ) \n";
+  // std::cout <<  decimal.GetPrecision() << "; - ) \n";
 
+  // creates table
+  // conn->Execute("CREATE TABLE IF NOT EXISTS default.decimalchcpp2_1 (d Decimal64(1)) ENGINE = Memory");
+
+  // this will be inserted, sum of all columns!
   Block block;
-  for(size_t i = 0; i < colTypes.size(); i++) {
-    ColumnRef ccol = vecToColumn(colTypes[i], df[i]);
-    block.AppendColumn(std::string(names[i]), ccol);
+
+  //   // OLD
+  // auto d = std::make_shared<ColumnDecimal>(18, 1);
+  // d->Append(29.21111);
+  // // append and insert finished d column
+  // block.AppendColumn("d", d);
+  // conn->Insert("default.decimalchcpp2_1", block);
+
+  // NEW
+  // for(size_t i = 0; i < colTypes.size(); i++) {
+  //   ColumnRef ccol = vecToColumn(colTypes[i], df[i]);
+  //   block.AppendColumn(std::string(names[i]), ccol);
+  // }
+  block.AppendColumn("d", convertDecimalColumn(df[0]));
+
+  conn->Insert("default.decimalchcpp2_1", block);
+}
+
+
+ColumnRef convertDecimalColumn(SEXP v) {
+  // RESULT: creates sharedPtr to ColumnDecimal with (18,1)
+  std::shared_ptr<ColumnDecimal> col  = std::make_shared<ColumnDecimal>(18, 1);
+
+
+  IntegerVector cv = Rcpp::as<IntegerVector>(v);
+
+  for(typename IntegerVector::stored_type e : cv) {
+    col->Append(e);
   }
 
-  conn->Insert(tableName, block);
+  // d->Append(29);
+
+  return col;
 }
+
+
+
 
 // [[Rcpp::export]]
 bool validPtr(SEXP ptr) {
