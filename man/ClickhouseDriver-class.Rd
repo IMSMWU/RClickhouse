@@ -29,7 +29,7 @@ loadConfig(CONFIG_PATHS, DEFAULT_PARAMS, pre_config)
   drv,
   host = "localhost",
   port = 9000,
-  db = "default",
+  dbname = "default",
   user = "default",
   password = "",
   compression = "lz4",
@@ -55,8 +55,6 @@ loadConfig(CONFIG_PATHS, DEFAULT_PARAMS, pre_config)
 
 \item{port}{port on which the database is listening.}
 
-\item{db}{name of the default database.}
-
 \item{user}{name of the user to connect as.}
 
 \item{password}{the user's password.}
@@ -70,6 +68,8 @@ default is [bit64::integer64], which allows the full range of 64 bit
 integers.}
 
 \item{toUTF8}{logical, should character variables be converted to UTF-8. Default is TRUE.}
+
+\item{db}{name of the default database.}
 }
 \value{
 a merged configuration

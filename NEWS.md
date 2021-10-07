@@ -1,3 +1,12 @@
+RClickhouse v0.6.0
+==============
+
+ * properly nest Date-Types in Nullable
+ * rename db parameter in dbConnect to dbname
+ * fix quotation of identifiers
+ * add test cases
+
+
 RClickhouse v0.5.2
 ==============
 
