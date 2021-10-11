@@ -65,7 +65,8 @@ test_that("dbReadTable__ClickhouseConnection", {
 test_that("dbRemoveTable__ClickhouseConnection", {
   conn <- getRealConnection()
   dbExecute(conn, "CREATE TABLE test_dbRemoveTable (`name` String) ENGINE = TinyLog")
-  assertthat::assert_that(dbExistsTable(conn, 'test_dbRemoveTable'), msg='precondition for test failed, "test_dbRemoveTable" was not created')
+  # precondition for test failed, "test_dbRemoveTable" was not created
+  expect_true(dbExistsTable(conn, 'test_dbRemoveTable'))
 
   dbRemoveTable(conn, "test_dbRemoveTable")
   expect_false(dbExistsTable(conn, 'test_dbRemoveTable'))
