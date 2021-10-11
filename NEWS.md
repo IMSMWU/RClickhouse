@@ -1,10 +1,13 @@
 RClickhouse v0.6.0
 ==============
 
- * properly nest Date-Types in Nullable
- * rename db parameter in dbConnect to dbname
- * fix quotation of identifiers
- * add test cases
+ * implements DBI functions dbCreateTable and dbAppendTable
+ * adds support for table names with spaces or special characters
+ * renames db parameter in dbConnect to dbname
+ * adds test cases
+ * fix: properly nests Date-Types in Nullable
+ * fix: join on the same key when using dplyr is now possible
+ * fix: removed .Internal calls when setting Encoding
 
 
 RClickhouse v0.5.2
