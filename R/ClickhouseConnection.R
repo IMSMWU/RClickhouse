@@ -189,10 +189,12 @@ rch_dbAppendTable <- function(conn, name, value, ..., row.names = NULL) {
       class(v)[[1]]
     }))
     for (c in names(classes[classes=="character"])) {
-      value[[c]] <- .Internal(setEncoding(value[[c]], "UTF-8"))
+      # value[[c]] <- .Internal(setEncoding(value[[c]], "UTF-8"))
+      value[[c]] <- enc2utf8(value[[c]])
     }
     for (c in names(classes[classes=="factor"])) {
-      levels(value[[c]]) <- .Internal(setEncoding(levels(value[[c]]), "UTF-8"))
+      # levels(value[[c]]) <- .Internal(setEncoding(levels(value[[c]]), "UTF-8"))
+      levels(value[[c]]) <- enc2utf8(levels(value[[c]]))
     }
     names(value) <- sapply(names(value),escapeForInternalUse,forsql=FALSE)
     insert(conn@ptr, qname, value);
@@ -274,10 +276,12 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
       class(v)[[1]]
     }))
     for (c in names(classes[classes=="character"])) {
-      value[[c]] <- .Internal(setEncoding(value[[c]], "UTF-8"))
+      # value[[c]] <- .Internal(setEncoding(value[[c]], "UTF-8"))
+      value[[c]] <- enc2utf8(value[[c]])
     }
     for (c in names(classes[classes=="factor"])) {
-      levels(value[[c]]) <- .Internal(setEncoding(levels(value[[c]]), "UTF-8"))
+      # levels(value[[c]]) <- .Internal(setEncoding(levels(value[[c]]), "UTF-8"))
+      levels(value[[c]]) <-  enc2utf8(levels(value[[c]]))
     }
     names(value) <- sapply(names(value),escapeForInternalUse,forsql=FALSE)
     insert(conn@ptr, qname, value);
