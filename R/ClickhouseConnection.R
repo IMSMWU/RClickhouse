@@ -259,7 +259,7 @@ setMethod("dbWriteTable", signature(conn = "ClickhouseConnection", name = "chara
       # print(column)
       # print('')
       if (all(is.na(value[i]))) {
-        emptyTable <- dbSendQuery(con, paste0("select * from ", qname, " where 1 != 1"))
+        emptyTable <- dbSendQuery(conn, paste0("select * from ", qname, " where 1 != 1"))
         column.data.types <- dbColumnInfo(emptyTable)$data.type
         # print('changing it from')
         # print(class(value[[i]]))
