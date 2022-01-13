@@ -9,6 +9,8 @@
 tblname    %||=% "test"
 
 getRealConnection <- function(){
+  skip_on_cran()
+  
   # set variables if not set yet
   serveraddr %||=% "localhost"
   user       %||=% "default"
@@ -29,7 +31,6 @@ simulate_clickhouse <- function(type = NULL) {
 }
 
 writeReadTest <- function(input, result = input, types = NULL) {
-  skip_on_cran()
   conn <- getRealConnection()
 
   dbWriteTable(conn, tblname, input, overwrite=T, field.types=types)

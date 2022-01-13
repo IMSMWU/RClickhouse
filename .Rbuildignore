@@ -13,3 +13,5 @@
 ^cran-comments.md$
 ^NEWS.md$
 ^LICENSE$
+^tests/testthat/test-dbplyr-ch.R$
+.ipynb_checkpoints
