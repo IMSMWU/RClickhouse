@@ -8,6 +8,7 @@
 ^src/vendor/clickhouse-cpp/.clang-format$
 ^src/vendor/clickhouse-cpp/.buckconfig$
 ^src/vendor/clickhouse-cpp/.travis.yml$
+^src/vendor/clickhouse-cpp/contrib/gtest$
 ^RClickhouse_.*.tar.gz$
 ^Readme.md$
 ^cran-comments.md$

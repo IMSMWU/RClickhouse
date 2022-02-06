@@ -1,3 +1,9 @@
+RClickhouse v0.6.1
+==============
+
+ * updated ownership of copyright for 'lz4'
+ * added gtest vendor files to .Rbuildignore
+
 RClickhouse v0.6.0
 ==============
 
