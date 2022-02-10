@@ -1,7 +1,7 @@
 Package: RClickhouse
 Type: Package
 Title: A 'DBI' Interface to the 'Yandex Clickhouse' Database Providing Basic 'dplyr' Support
-Version: 0.6.1
+Version: 0.6.2
 Encoding: UTF-8
 Authors@R: c(
     person("Christian", "Hotz-Behofsits", email = "christian.hotz-behofsits@wu.ac.at", role = c("aut", "cre")),
@@ -17,7 +17,7 @@ Authors@R: c(
     person("Markus", "Heule", email = "mheule@google.com", role = c("aut")),
     person("Oliver", "Flasch", email = "oflasch@gmail.com", role = c("aut")),
     person(family = "Google", role = c("cph")),
-    person("Yann", "Collet", role = c("cph"), comment = "Yann Collet is the author and copyright holder of 'lz4'")
+    person("Yann", "Collet", role = c("cph", "aut"), comment = "Yann Collet is the author and copyright holder of 'lz4'")
     )
 Description: 'Yandex Clickhouse' (<https://clickhouse.com/>) is a high-performance relational column-store database to enable
     big data exploration and 'analytics' scaling to petabytes of data. Methods are

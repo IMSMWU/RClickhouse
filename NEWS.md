@@ -1,3 +1,8 @@
+RClickhouse v0.6.2
+==============
+
+ * updated authorship for 'lz4'
+
 RClickhouse v0.6.1
 ==============
 
