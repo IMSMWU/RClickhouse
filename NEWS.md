@@ -1,3 +1,8 @@
+RClickhouse v0.6.3
+==============
+
+ * reduced title length to less than 65 characters
+
 RClickhouse v0.6.2
 ==============
 
