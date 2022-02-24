@@ -2,7 +2,8 @@ RClickhouse v0.6.3
 ==============
 
  * reduced title length to less than 65 characters
- * used cran approved way to suppress warnings durings tests
+ * removed unsupported aggregate function for translater
+ * removed warning suppression
  * augmented Docs for dbplyr utils-functions
 
 RClickhouse v0.6.2

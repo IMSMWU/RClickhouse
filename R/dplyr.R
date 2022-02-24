@@ -84,7 +84,7 @@ sql_translate_env.ClickhouseConnection <- function(x) {
     ),
     dbplyr::sql_translator(
       .parent = dbplyr::base_agg,
-      `%||%` = ch_sql_prefix("concat"),
+      # `%||%` = ch_sql_prefix("concat"),
       #cat     = ch_sql_prefix("concat"),
       var     = ch_sql_prefix("varSamp"),
       sd      = ch_sql_prefix("stddevSamp")
