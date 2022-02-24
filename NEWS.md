@@ -5,6 +5,7 @@ RClickhouse v0.6.3
  * removed unsupported aggregate function for translater
  * removed warning suppression
  * augmented Docs for dbplyr utils-functions
+ * transitioned from deprecated data_frame() to tibble()
 
 RClickhouse v0.6.2
 ==============
