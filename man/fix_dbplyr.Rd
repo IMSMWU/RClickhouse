@@ -6,6 +6,9 @@
 \usage{
 fix_dbplyr()
 }
+\value{
+No return value, called for side effects.
+}
 \description{
 Since Clickhouse functions are case sensitive dbplyr
 behavior was altered to reflect that. This function

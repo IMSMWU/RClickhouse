@@ -28,6 +28,7 @@ sql_aggregate_2 <- function(f) {
 #' unknown functions to upper case.
 #' @export
 #' @rdname fix_dbplyr
+#' @return No return value, called for side effects.
 fix_dbplyr <- function(){
   utils::assignInNamespace("sql_prefix", origSQLprefix,
                            ns = "dbplyr", envir = dbpenv)
@@ -40,6 +41,7 @@ fix_dbplyr <- function(){
 #' changes that behavior to leave passed functions as they are.
 #' @export
 #' @rdname dbplyr_case_sensitive
+#' @return No return value, called for side effects.
 dbplyr_case_sensitive <- function(){
   base::unlockBinding("sql_prefix", dbpenv)
   utils::assignInNamespace("sql_prefix", ch_sql_prefix,

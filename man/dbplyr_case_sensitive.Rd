@@ -6,6 +6,9 @@
 \usage{
 dbplyr_case_sensitive()
 }
+\value{
+No return value, called for side effects.
+}
 \description{
 Functions passed to Clickhouse are case sensitive. By default dbplyr
 converts functions that are not predefined to upper case. This function
