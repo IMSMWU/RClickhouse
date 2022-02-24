@@ -2,6 +2,7 @@ RClickhouse v0.6.3
 ==============
 
  * reduced title length to less than 65 characters
+ * used cran approved way to suppress warnings durings tests
 
 RClickhouse v0.6.2
 ==============
