@@ -1,7 +1,8 @@
 #include <stdexcept>
+#include <type_traits>
+#include "clickhouse/columns/string.h"
 #include "result.h"
-
-
+  
 // helper function which emits an R warning without causing a longjmp
 // see https://stackoverflow.com/questions/24557711/how-to-generate-an-r-warning-safely-in-rcpp
 void warn(std::string text) {
@@ -62,6 +63,37 @@ void convertEntries(std::shared_ptr<const CT> in, NullCol nullCol, RT &out,
 }
 
 
+// workaround lack of Rcpp::StringVector x; x[i] = std::string_view();
+template<>
+void convertEntries<ch::ColumnString, Rcpp::StringVector>(std::shared_ptr<const ch::ColumnString> in, NullCol nullCol, Rcpp::StringVector &out,
+                    size_t offset, size_t start, size_t end)
+{
+  for(size_t j = start; j < end; j++) {
+    // can't use the ternary operator here, since that would require explicit
+    // conversion from the Clickhouse storage type (which is far messier)
+    if(nullCol && nullCol->IsNull(j)) {
+      out[offset+j-start] = Rcpp::StringVector::get_na();
+    } else {
+      out[offset+j-start] = std::string(in->At(j));
+    }
+  }
+}
+
+template<>
+void convertEntries<ch::ColumnFixedString, Rcpp::StringVector>(std::shared_ptr<const ch::ColumnFixedString> in, NullCol nullCol, Rcpp::StringVector &out,
+                    size_t offset, size_t start, size_t end)
+{
+  for(size_t j = start; j < end; j++) {
+    // can't use the ternary operator here, since that would require explicit
+    // conversion from the Clickhouse storage type (which is far messier)
+    if(nullCol && nullCol->IsNull(j)) {
+      out[offset+j-start] = Rcpp::StringVector::get_na();
+    } else {
+      out[offset+j-start] = std::string(in->At(j));
+    }
+  }
+}
+
 template<>
 void convertEntries<ch::ColumnInt64, Rcpp::StringVector>(std::shared_ptr<const ch::ColumnInt64> in, NullCol nullCol, Rcpp::StringVector &out,
                     size_t offset, size_t start, size_t end) {
@@ -104,7 +136,18 @@ void convertEntries<ch::ColumnDate, Rcpp::DateVector>(std::shared_ptr<const ch::
     }
   }
 }
-
+template<>
+void convertEntries<ch::ColumnDateTime64, Rcpp::DatetimeVector>(std::shared_ptr<const ch::ColumnDateTime64> in,
+    NullCol nullCol, Rcpp::DatetimeVector &out, size_t offset, size_t start, size_t end) {
+  double factor = std::pow(10.,in->GetPrecision());
+  for(size_t j = start; j < end; j++) {
+    if(nullCol && nullCol->IsNull(j)) {
+      out[offset+j-start] = Rcpp::DateVector::get_na();
+    } else {
+      out[offset+j-start] = static_cast<double>(in->At(j)/factor);
+    }
+  }
+}
 std::string formatUUID(const ch::UInt128 &v) {
   const size_t bufsize = 128/4 + 4 + 1;  // 128 bit in hexadecimal + 4 dashes + null terminator
   char buf[bufsize];
@@ -292,6 +335,9 @@ std::unique_ptr<Converter> Result::buildConverter(std::string name, ch::TypeRef 
       return std::unique_ptr<ScalarConverter<ch::ColumnDateTime, Rcpp::DatetimeVector>>(new ScalarConverter<ch::ColumnDateTime, Rcpp::DatetimeVector>);
     case TC::Date:
       return std::unique_ptr<ScalarConverter<ch::ColumnDate, Rcpp::DateVector>>(new ScalarConverter<ch::ColumnDate, Rcpp::DateVector>);
+    case TC::DateTime64:
+      return std::unique_ptr<ScalarConverter<ch::ColumnDateTime64, Rcpp::DatetimeVector>>(new ScalarConverter<ch::ColumnDateTime64, Rcpp::DatetimeVector>);
+
     case TC::Nullable:
       {
         // downcast to NullableType to access GetNestedType member

@@ -1,13 +1,14 @@
-ClickHouse C++ client [![Build Status](https://travis-ci.org/ClickHouse/clickhouse-cpp.svg?branch=master)](https://travis-ci.org/ClickHouse/clickhouse-cpp)
+ClickHouse C++ client [![Linux](https://github.com/ClickHouse/clickhouse-cpp/actions/workflows/linux.yml/badge.svg)](https://github.com/ClickHouse/clickhouse-cpp/actions/workflows/linux.yml) [![macOS](https://github.com/ClickHouse/clickhouse-cpp/actions/workflows/macos.yml/badge.svg)](https://github.com/ClickHouse/clickhouse-cpp/actions/workflows/macos.yml) [![Windows MSVC](https://github.com/ClickHouse/clickhouse-cpp/actions/workflows/windows_msvc.yml/badge.svg)](https://github.com/ClickHouse/clickhouse-cpp/actions/workflows/windows_msvc.yml) [![Windows mingw](https://github.com/ClickHouse/clickhouse-cpp/actions/workflows/windows_mingw.yml/badge.svg)](https://github.com/ClickHouse/clickhouse-cpp/actions/workflows/windows_mingw.yml)
 =====
 
-C++ client for [Yandex ClickHouse](https://clickhouse.yandex/)
+C++ client for [ClickHouse](https://clickhouse.com/).
 
 ## Supported data types
 
 * Array(T)
 * Date
-* DateTime
+* DateTime, DateTime64
+* DateTime([timezone]), DateTime64(N, [timezone])
 * Decimal32, Decimal64, Decimal128
 * Enum8, Enum16
 * FixedString(N)
@@ -15,8 +16,11 @@ C++ client for [Yandex ClickHouse](https://clickhouse.yandex/)
 * IPv4, IPv6
 * Nullable(T)
 * String
+* LowCardinality(String) or LowCardinality(FixedString(N))
 * Tuple
 * UInt8, UInt16, UInt32, UInt64, Int8, Int16, Int32, Int64
+* Int128
+* UUID
 
 ## Building
 
@@ -71,3 +75,7 @@ client.Select("SELECT id, name FROM test.numbers", [] (const Block& block)
 /// Delete table.
 client.Execute("DROP TABLE test.numbers");
 ```
+Please note that `Client` instance is NOT thread-safe. I.e. you must create a separate `Client` for each thread or utilize some synchronization techniques.
+
+
+source code taken from: https://github.com/ClickHouse/clickhouse-cpp/commit/87fc1186063b82b8ddf37b1c70c485bdd7504f8d

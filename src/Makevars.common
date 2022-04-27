@@ -1,35 +1,38 @@
-PKG_CPPFLAGS = $(SYS_FLAGS) -I. -I../inst/include -I./vendor/clickhouse-cpp -I./vendor/clickhouse-cpp/contrib -I./vendor/clickhouse-cpp/contrib/bigerint
-
-CXX_STD = CXX11
+CXX_STD = CXX17
+PKG_CPPFLAGS = $(SYS_FLAGS) -I. -I../inst/include -I./vendor/clickhouse-cpp -I./vendor/clickhouse-cpp/contrib
+# -I./vendor/clickhouse-cpp/contrib/bigerint
 
 OBJ_FILES = \
-vendor/clickhouse-cpp/clickhouse/columns/string.o \
-vendor/clickhouse-cpp/clickhouse/columns/date.o \
-vendor/clickhouse-cpp/clickhouse/columns/numeric.o \
-vendor/clickhouse-cpp/clickhouse/columns/decimal.o \
-vendor/clickhouse-cpp/clickhouse/columns/tuple.o \
-vendor/clickhouse-cpp/clickhouse/columns/array.o \
-vendor/clickhouse-cpp/clickhouse/columns/factory.o \
-vendor/clickhouse-cpp/clickhouse/columns/nullable.o \
-vendor/clickhouse-cpp/clickhouse/columns/enum.o \
-vendor/clickhouse-cpp/clickhouse/columns/uuid.o \
-vendor/clickhouse-cpp/clickhouse/columns/ip4.o \
-vendor/clickhouse-cpp/clickhouse/columns/ip6.o \
-vendor/clickhouse-cpp/clickhouse/query.o \
-vendor/clickhouse-cpp/clickhouse/base/platform.o \
 vendor/clickhouse-cpp/clickhouse/base/socket.o \
+vendor/clickhouse-cpp/clickhouse/base/platform.o \
+vendor/clickhouse-cpp/clickhouse/base/sslsocket.o \
 vendor/clickhouse-cpp/clickhouse/base/input.o \
 vendor/clickhouse-cpp/clickhouse/base/output.o \
-vendor/clickhouse-cpp/clickhouse/base/coded.o \
 vendor/clickhouse-cpp/clickhouse/base/compressed.o \
-vendor/clickhouse-cpp/clickhouse/client.o \
+vendor/clickhouse-cpp/clickhouse/base/wire_format.o \
+vendor/clickhouse-cpp/clickhouse/block.o \
+vendor/clickhouse-cpp/clickhouse/query.o \
 vendor/clickhouse-cpp/clickhouse/types/types.o \
 vendor/clickhouse-cpp/clickhouse/types/type_parser.o \
-vendor/clickhouse-cpp/clickhouse/block.o \
-vendor/clickhouse-cpp/contrib/cityhash/city.o \
+vendor/clickhouse-cpp/clickhouse/client.o \
+vendor/clickhouse-cpp/clickhouse/columns/ip6.o \
+vendor/clickhouse-cpp/clickhouse/columns/ip4.o \
+vendor/clickhouse-cpp/clickhouse/columns/lowcardinality.o \
+vendor/clickhouse-cpp/clickhouse/columns/numeric.o \
+vendor/clickhouse-cpp/clickhouse/columns/decimal.o \
+vendor/clickhouse-cpp/clickhouse/columns/array.o \
+vendor/clickhouse-cpp/clickhouse/columns/factory.o \
+vendor/clickhouse-cpp/clickhouse/columns/date.o \
+vendor/clickhouse-cpp/clickhouse/columns/enum.o \
+vendor/clickhouse-cpp/clickhouse/columns/tuple.o \
+vendor/clickhouse-cpp/clickhouse/columns/itemview.o \
+vendor/clickhouse-cpp/clickhouse/columns/string.o \
+vendor/clickhouse-cpp/clickhouse/columns/nullable.o \
+vendor/clickhouse-cpp/clickhouse/columns/uuid.o \
+vendor/clickhouse-cpp/contrib/lz4/lz4hc.o \
 vendor/clickhouse-cpp/contrib/lz4/lz4.o \
-vendor/clickhouse-cpp/contrib/lz4/lz4hc.o
+vendor/clickhouse-cpp/contrib/cityhash/city.o
 
-PKG_LIBS = $(OBJ_FILES) -lpthread $(SYS_LIBS)
+PKG_LIBS = $(OBJ_FILES) -lpthread -lssl $(SYS_LIBS)
 
 $(SHLIB): $(OBJ_FILES)
