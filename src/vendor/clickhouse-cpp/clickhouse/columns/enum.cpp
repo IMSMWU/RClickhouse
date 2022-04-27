@@ -1,6 +1,10 @@
 #include "enum.h"
 #include "utils.h"
 
+#include "../base/input.h"
+#include "../base/output.h"
+#include "../base/wire_format.h"
+
 namespace clickhouse {
 
 template <typename T>
@@ -26,7 +30,7 @@ void ColumnEnum<T>::Append(const T& value, bool checkValue) {
 
 template <typename T>
 void ColumnEnum<T>::Append(const std::string& name) {
-    data_.push_back(std::static_pointer_cast<EnumType>(type_)->GetEnumValue(name));
+    data_.push_back(type_->As<EnumType>()->GetEnumValue(name));
 }
 
 template <typename T>
@@ -41,7 +45,7 @@ const T& ColumnEnum<T>::At(size_t n) const {
 
 template <typename T>
 const std::string ColumnEnum<T>::NameAt(size_t n) const {
-    return std::static_pointer_cast<EnumType>(type_)->GetEnumName(data_.at(n));
+    return type_->As<EnumType>()->GetEnumName(data_.at(n));
 }
 
 template <typename T>
@@ -59,7 +63,7 @@ void ColumnEnum<T>::SetAt(size_t n, const T& value, bool checkValue) {
 
 template <typename T>
 void ColumnEnum<T>::SetNameAt(size_t n, const std::string& name) {
-    data_.at(n) = std::static_pointer_cast<EnumType>(type_)->GetEnumValue(name);
+    data_.at(n) = type_->As<EnumType>()->GetEnumValue(name);
 }
 
 template <typename T>
@@ -70,14 +74,14 @@ void ColumnEnum<T>::Append(ColumnRef column) {
 }
 
 template <typename T>
-bool ColumnEnum<T>::Load(CodedInputStream* input, size_t rows) {
+bool ColumnEnum<T>::Load(InputStream* input, size_t rows) {
     data_.resize(rows);
-    return input->ReadRaw(data_.data(), data_.size() * sizeof(T));
+    return WireFormat::ReadBytes(*input, data_.data(), data_.size() * sizeof(T));
 }
 
 template <typename T>
-void ColumnEnum<T>::Save(CodedOutputStream* output) {
-    output->WriteRaw(data_.data(), data_.size() * sizeof(T));
+void ColumnEnum<T>::Save(OutputStream* output) {
+    WireFormat::WriteBytes(*output, data_.data(), data_.size() * sizeof(T));
 }
 
 template <typename T>
@@ -86,8 +90,19 @@ size_t ColumnEnum<T>::Size() const {
 }
 
 template <typename T>
-ColumnRef ColumnEnum<T>::Slice(size_t begin, size_t len) {
+ColumnRef ColumnEnum<T>::Slice(size_t begin, size_t len) const {
     return std::make_shared<ColumnEnum<T>>(type_, SliceVector(data_, begin, len));
+}
+
+template <typename T>
+void ColumnEnum<T>::Swap(Column& other) {
+    auto & col = dynamic_cast<ColumnEnum<T> &>(other);
+    data_.swap(col.data_);
+}
+
+template <typename T>
+ItemView ColumnEnum<T>::GetItem(size_t index) const {
+    return ItemView{type_->GetCode(), data_[index]};
 }
 
 template class ColumnEnum<int8_t>;

@@ -1,10 +1,16 @@
 #pragma once
 
-#include "../base/coded.h"
-#include "../base/input.h"
 #include "../types/types.h"
+#include "../columns/itemview.h"
+#include "../exceptions.h"
+
+#include <memory>
+#include <stdexcept>
 
 namespace clickhouse {
+
+class InputStream;
+class OutputStream;
 
 using ColumnRef = std::shared_ptr<class Column>;
 
@@ -31,15 +37,16 @@ public:
 
     /// Get type object of the column.
     inline TypeRef Type() const { return type_; }
+    inline const class Type& GetType() const { return *type_; }
 
     /// Appends content of given column to the end of current one.
     virtual void Append(ColumnRef column) = 0;
 
     /// Loads column data from input stream.
-    virtual bool Load(CodedInputStream* input, size_t rows) = 0;
+    virtual bool Load(InputStream* input, size_t rows) = 0;
 
     /// Saves column data to output stream.
-    virtual void Save(CodedOutputStream* output) = 0;
+    virtual void Save(OutputStream* output) = 0;
 
     /// Clear column data .
     virtual void Clear() = 0;
@@ -48,7 +55,19 @@ public:
     virtual size_t Size() const = 0;
 
     /// Makes slice of the current column.
-    virtual ColumnRef Slice(size_t begin, size_t len) = 0;
+    virtual ColumnRef Slice(size_t begin, size_t len) const = 0;
+
+    virtual void Swap(Column&) = 0;
+
+    /// Get a view on raw item data if it is supported by column, will throw an exception if index is out of range.
+    /// Please note that view is invalidated once column items are added or deleted, column is loaded from strean or destroyed.
+    virtual ItemView GetItem(size_t) const {
+        throw UnimplementedError("GetItem() is not supported for column of " + type_->GetName());
+    }
+
+    friend void swap(Column& left, Column& right) {
+        left.Swap(right);
+    }
 
 protected:
     TypeRef type_;

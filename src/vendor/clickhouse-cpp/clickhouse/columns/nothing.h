@@ -2,8 +2,10 @@
 #pragma once
 
 #include "column.h"
+#include "../base/input.h"
 
 #include <stdexcept>
+#include <utility>
 
 namespace clickhouse {
 
@@ -34,9 +36,11 @@ public:
 	std::nullptr_t operator [] (size_t) const { return nullptr; };
 
     /// Makes slice of the current column.
-    ColumnRef Slice(size_t, size_t len) override {
+    ColumnRef Slice(size_t, size_t len) const override {
 		return std::make_shared<ColumnNothing>(len);
 	}
+
+    ItemView GetItem(size_t /*index*/) const override { return ItemView{}; }
 
 public:
     /// Appends content of given column to the end of current one.
@@ -47,15 +51,15 @@ public:
 	}
 
     /// Loads column data from input stream.
-    bool Load(CodedInputStream* input, size_t rows) override {
+    bool Load(InputStream* input, size_t rows) override {
 		input->Skip(rows);
 		size_ += rows;
 		return true;
 	}
 
     /// Saves column data to output stream.
-    void Save(CodedOutputStream*) override {
-        throw std::runtime_error("method Save is not supported for Nothing column");
+    void Save(OutputStream*) override {
+        throw UnimplementedError("method Save is not supported for Nothing column");
 	}
 
     /// Clear column data .
@@ -63,6 +67,11 @@ public:
 
     /// Returns count of rows in the column.
     size_t Size() const override { return size_; }
+
+    void Swap(Column& other) override {
+        auto & col = dynamic_cast<ColumnNothing &>(other);
+        std::swap(size_, col.size_);
+    }
 
 private:
 	size_t size_;
