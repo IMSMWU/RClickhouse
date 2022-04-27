@@ -1,6 +1,8 @@
 #include "numeric.h"
 #include "utils.h"
 
+#include "../base/wire_format.h"
+
 namespace clickhouse {
 
 template <typename T>
@@ -10,15 +12,30 @@ ColumnVector<T>::ColumnVector()
 }
 
 template <typename T>
-ColumnVector<T>::ColumnVector(const std::vector<T>& data)
+ColumnVector<T>::ColumnVector(const std::vector<T> & data)
     : Column(Type::CreateSimple<T>())
     , data_(data)
 {
 }
 
 template <typename T>
+ColumnVector<T>::ColumnVector(std::vector<T> && data)
+    : Column(Type::CreateSimple<T>())
+    , data_(std::move(data))
+{
+}
+
+template <typename T>
 void ColumnVector<T>::Append(const T& value) {
     data_.push_back(value);
+}
+
+template <typename T>
+void ColumnVector<T>::Erase(size_t pos, size_t count) {
+    const auto begin = std::min(pos, data_.size());
+    const auto last = begin + std::min(data_.size() - begin, count);
+
+    data_.erase(data_.begin() + begin, data_.begin() + last);
 }
 
 template <typename T>
@@ -44,15 +61,15 @@ void ColumnVector<T>::Append(ColumnRef column) {
 }
 
 template <typename T>
-bool ColumnVector<T>::Load(CodedInputStream* input, size_t rows) {
+bool ColumnVector<T>::Load(InputStream* input, size_t rows) {
     data_.resize(rows);
 
-    return input->ReadRaw(data_.data(), data_.size() * sizeof(T));
+    return WireFormat::ReadBytes(*input, data_.data(), data_.size() * sizeof(T));
 }
 
 template <typename T>
-void ColumnVector<T>::Save(CodedOutputStream* output) {
-    output->WriteRaw(data_.data(), data_.size() * sizeof(T));
+void ColumnVector<T>::Save(OutputStream* output) {
+    WireFormat::WriteBytes(*output, data_.data(), data_.size() * sizeof(T));
 }
 
 template <typename T>
@@ -61,8 +78,19 @@ size_t ColumnVector<T>::Size() const {
 }
 
 template <typename T>
-ColumnRef ColumnVector<T>::Slice(size_t begin, size_t len) {
+ColumnRef ColumnVector<T>::Slice(size_t begin, size_t len) const {
     return std::make_shared<ColumnVector<T>>(SliceVector(data_, begin, len));
+}
+
+template <typename T>
+void ColumnVector<T>::Swap(Column& other) {
+    auto & col = dynamic_cast<ColumnVector<T> &>(other);
+    data_.swap(col.data_);
+}
+
+template <typename T>
+ItemView ColumnVector<T>::GetItem(size_t index) const  {
+    return ItemView{type_->GetCode(), data_[index]};
 }
 
 template class ColumnVector<int8_t>;
@@ -74,7 +102,7 @@ template class ColumnVector<uint8_t>;
 template class ColumnVector<uint16_t>;
 template class ColumnVector<uint32_t>;
 template class ColumnVector<uint64_t>;
-template class ColumnVector<BigInt>;
+template class ColumnVector<Int128>;
 
 template class ColumnVector<float>;
 template class ColumnVector<double>;
