@@ -1,3 +1,8 @@
+RClickhouse v0.6.4
+==============
+
+ * declared cli as import
+
 RClickhouse v0.6.3
 ==============
 
