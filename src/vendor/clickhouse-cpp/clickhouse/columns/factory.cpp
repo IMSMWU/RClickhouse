@@ -6,6 +6,8 @@
 #include "enum.h"
 #include "ip4.h"
 #include "ip6.h"
+#include "lowcardinality.h"
+#include "lowcardinalityadaptor.h"
 #include "nothing.h"
 #include "nullable.h"
 #include "numeric.h"
@@ -14,6 +16,8 @@
 #include "uuid.h"
 
 #include "../types/type_parser.h"
+
+#include "../exceptions.h"
 
 #include <stdexcept>
 
@@ -42,6 +46,8 @@ static ColumnRef CreateTerminalColumn(const TypeAst& ast) {
         return std::make_shared<ColumnInt32>();
     case Type::Int64:
         return std::make_shared<ColumnInt64>();
+    case Type::Int128:
+        return std::make_shared<ColumnInt128>();
 
     case Type::Float32:
         return std::make_shared<ColumnFloat32>();
@@ -63,7 +69,20 @@ static ColumnRef CreateTerminalColumn(const TypeAst& ast) {
         return std::make_shared<ColumnFixedString>(ast.elements.front().value);
 
     case Type::DateTime:
-        return std::make_shared<ColumnDateTime>();
+        if (ast.elements.empty()) {
+            return std::make_shared<ColumnDateTime>();
+        } else {
+            return std::make_shared<ColumnDateTime>(ast.elements[0].value_string);
+        }
+    case Type::DateTime64:
+        if (ast.elements.empty()) {
+            return nullptr;
+        }
+        if (ast.elements.size() == 1) {
+            return std::make_shared<ColumnDateTime64>(ast.elements[0].value);
+        } else {
+            return std::make_shared<ColumnDateTime64>(ast.elements[0].value, ast.elements[1].value_string);
+        }
     case Type::Date:
         return std::make_shared<ColumnDate>();
 
@@ -80,17 +99,17 @@ static ColumnRef CreateTerminalColumn(const TypeAst& ast) {
     }
 }
 
-static ColumnRef CreateColumnFromAst(const TypeAst& ast) {
+static ColumnRef CreateColumnFromAst(const TypeAst& ast, CreateColumnByTypeSettings settings) {
     switch (ast.meta) {
         case TypeAst::Array: {
             return std::make_shared<ColumnArray>(
-                CreateColumnFromAst(ast.elements.front())
+                CreateColumnFromAst(ast.elements.front(), settings)
             );
         }
 
         case TypeAst::Nullable: {
             return std::make_shared<ColumnNullable>(
-                CreateColumnFromAst(ast.elements.front()),
+                CreateColumnFromAst(ast.elements.front(), settings),
                 std::make_shared<ColumnUInt8>()
             );
         }
@@ -104,7 +123,7 @@ static ColumnRef CreateColumnFromAst(const TypeAst& ast) {
 
             columns.reserve(ast.elements.size());
             for (const auto& elem : ast.elements) {
-                if (auto col = CreateColumnFromAst(elem)) {
+                if (auto col = CreateColumnFromAst(elem, settings)) {
                     columns.push_back(col);
                 } else {
                     return nullptr;
@@ -117,10 +136,11 @@ static ColumnRef CreateColumnFromAst(const TypeAst& ast) {
         case TypeAst::Enum: {
             std::vector<Type::EnumItem> enum_items;
 
-            enum_items.reserve(ast.elements.size());
-            for (const auto& elem : ast.elements) {
+            enum_items.reserve(ast.elements.size() / 2);
+            for (size_t i = 0; i < ast.elements.size(); i += 2) {
                 enum_items.push_back(
-                    Type::EnumItem{elem.name, (int16_t)elem.value});
+                    Type::EnumItem{ast.elements[i].value_string,
+                                   (int16_t)ast.elements[i + 1].value});
             }
 
             if (ast.code == Type::Enum8) {
@@ -134,9 +154,39 @@ static ColumnRef CreateColumnFromAst(const TypeAst& ast) {
             }
             break;
         }
+        case TypeAst::LowCardinality: {
+            const auto nested = ast.elements.front();
+            if (settings.low_cardinality_as_wrapped_column) {
+                switch (nested.code) {
+                    // TODO (nemkov): update this to maximize code reuse.
+                    case Type::String:
+                        return std::make_shared<LowCardinalitySerializationAdaptor<ColumnString>>();
+                    case Type::FixedString:
+                        return std::make_shared<LowCardinalitySerializationAdaptor<ColumnFixedString>>(nested.elements.front().value);
+                    default:
+                        throw UnimplementedError("LowCardinality(" + nested.name + ") is not supported");
+                }
+            }
+            else {
+                switch (nested.code) {
+                    // TODO (nemkov): update this to maximize code reuse.
+                    case Type::String:
+                        return std::make_shared<ColumnLowCardinalityT<ColumnString>>();
+                    case Type::FixedString:
+                        return std::make_shared<ColumnLowCardinalityT<ColumnFixedString>>(nested.elements.front().value);
+                    default:
+                        throw UnimplementedError("LowCardinality(" + nested.name + ") is not supported");
+                }
+            }
+        }
+        case TypeAst::SimpleAggregateFunction: {
+            return CreateTerminalColumn(ast.elements.back());
+        }
 
+        case TypeAst::Assign:
         case TypeAst::Null:
         case TypeAst::Number:
+        case TypeAst::String:
             break;
     }
 
@@ -146,10 +196,10 @@ static ColumnRef CreateColumnFromAst(const TypeAst& ast) {
 } // namespace
 
 
-ColumnRef CreateColumnByType(const std::string& type_name) {
+ColumnRef CreateColumnByType(const std::string& type_name, CreateColumnByTypeSettings settings) {
     auto ast = ParseTypeName(type_name);
     if (ast != nullptr) {
-        return CreateColumnFromAst(*ast);
+        return CreateColumnFromAst(*ast, settings);
     }
 
     return nullptr;

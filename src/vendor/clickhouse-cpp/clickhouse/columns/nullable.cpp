@@ -11,7 +11,7 @@ ColumnNullable::ColumnNullable(ColumnRef nested, ColumnRef nulls)
     , nulls_(nulls->As<ColumnUInt8>())
 {
     if (nested_->Size() != nulls->Size()) {
-        throw std::runtime_error("count of elements in nested and nulls should be the same");
+        throw ValidationError("count of elements in nested and nulls should be the same");
     }
 }
 
@@ -50,7 +50,7 @@ void ColumnNullable::Clear() {
     nulls_->Clear();
 }
 
-bool ColumnNullable::Load(CodedInputStream* input, size_t rows) {
+bool ColumnNullable::Load(InputStream* input, size_t rows) {
     if (!nulls_->Load(input, rows)) {
         return false;
     }
@@ -60,7 +60,7 @@ bool ColumnNullable::Load(CodedInputStream* input, size_t rows) {
     return true;
 }
 
-void ColumnNullable::Save(CodedOutputStream* output) {
+void ColumnNullable::Save(OutputStream* output) {
     nulls_->Save(output);
     nested_->Save(output);
 }
@@ -70,8 +70,24 @@ size_t ColumnNullable::Size() const {
     return nulls_->Size();
 }
 
-ColumnRef ColumnNullable::Slice(size_t begin, size_t len) {
+ColumnRef ColumnNullable::Slice(size_t begin, size_t len) const {
     return std::make_shared<ColumnNullable>(nested_->Slice(begin, len), nulls_->Slice(begin, len));
+}
+
+void ColumnNullable::Swap(Column& other) {
+    auto & col = dynamic_cast<ColumnNullable &>(other);
+    if (!nested_->Type()->IsEqual(col.nested_->Type()))
+        throw ValidationError("Can't swap() Nullable columns of different types.");
+
+    nested_.swap(col.nested_);
+    nulls_.swap(col.nulls_);
+}
+
+ItemView ColumnNullable::GetItem(size_t index) const  {
+    if (IsNull(index))
+        return ItemView();
+
+    return nested_->GetItem(index);
 }
 
 }
