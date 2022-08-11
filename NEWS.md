@@ -1,3 +1,8 @@
+RClickhouse v0.6.5
+==============
+
+ * fix: now properly nests ColumnDateTime for Nullables
+ 
 RClickhouse v0.6.4
 ==============
 

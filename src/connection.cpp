@@ -363,7 +363,7 @@ ColumnRef vecToColumn(TypeRef t, SEXP v, std::shared_ptr<ColumnUInt8> nullCol = 
     case TC::String:
       return vecToString<ColumnString, const std::string>(v, nullCol);
     case TC::DateTime:
-      return vecToScalar<ColumnDateTime, const std::time_t>(v);
+      return vecToScalar<ColumnDateTime, const std::time_t>(v, nullCol);
     case TC::Date:
       return vecToScalar<ColumnDate, const std::time_t>(v, nullCol);
     case TC::Nullable: {
