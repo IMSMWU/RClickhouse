@@ -6,9 +6,9 @@
 
 ## Overview
 
-[Yandex Clickhouse](https://clickhouse.yandex/) is a high-performance relational column-store database to enable big data exploration and 'analytics' scaling to petabytes of data. Methods are provided that enable working with 'Yandex Clickhouse' databases via 'DBI' methods and using 'dplyr'/'dbplyr' idioms.
+[ClickHouse](https://clickhouse.com/) is a high-performance relational column-store database to enable big data exploration and 'analytics' scaling to petabytes of data. Methods are provided that enable working with 'ClickHouse' databases via 'DBI' methods and using 'dplyr'/'dbplyr' idioms.
 
-This R package is a DBI interface for the Yandex Clickhouse database. It provides basic dplyr support by auto-generating SQL-commands using dbplyr and is based on the official [C++ Clickhouse Client](https://github.com/artpaul/clickhouse-cpp).
+This R package is a DBI interface for the ClickHouse database. It provides basic dplyr support by auto-generating SQL-commands using dbplyr and is based on the official [C++ ClickHouse Client](https://github.com/artpaul/clickhouse-cpp).
 
 To cite this library, please use the BibTeX entry provided in **inst/CITATION**.
 
