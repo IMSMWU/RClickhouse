@@ -25,12 +25,12 @@ PROJECT (CLICKHOUSE-CLIENT)
 
     INCLUDE_DIRECTORIES(.)
     INCLUDE_DIRECTORIES(contrib)
+    INCLUDE_DIRECTORIES(contrib/bigerint)
 
     SUBDIRS (
         clickhouse
         contrib/cityhash
         contrib/lz4
-        contrib/bigint
     )
 
     IF (BUILD_BENCHMARK)
