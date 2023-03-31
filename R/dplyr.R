@@ -45,7 +45,7 @@ sql_table_analyze.ClickhouseConnection <- function(con, table, ...) {
 #
 #' @importFrom dbplyr sql_translation
 #' @export
-sql_translation.ClickhouseConnection <- function(x) {
+sql_translation.ClickhouseConnection <- function(con) {
   dbplyr::sql_variant(
     dbplyr::sql_translator(.parent = dbplyr::base_scalar,
                            `^` = ch_sql_prefix("pow"),
