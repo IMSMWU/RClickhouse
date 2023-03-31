@@ -36,7 +36,7 @@ origSQLprefix <- attr(dbplyr::sql_prefix, 'original')
 
 #' @export
 #' @importFrom dbplyr sql_table_analyze
-sql_table_analyze.ClickhouseConnection <- function(con, table) {
+sql_table_analyze.ClickhouseConnection <- function(con, table, ...) {
   # clickhouse does not support a analyze statement.
   TRUE
 }
