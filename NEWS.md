@@ -1,3 +1,12 @@
+RClickhouse v0.6.6
+==============
+
+ * updated to the latest dbplyr interface
+ * fixed C/C++ compilation warnings
+ * cleaned up the code base
+ * updated dependencies (DBI, dplyr)
+
+
 RClickhouse v0.6.5
 ==============
 
