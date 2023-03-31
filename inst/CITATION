@@ -1,10 +1,16 @@
-citEntry(
-  entry = "misc",
-  author = c("Christian Hotz-Behofsits", "Daniel Winkler", "Luca Rauchenberger", "Peter Knaus", "Clemens Danninger", "Simon Stiebellehner"),
+bibentry(
+  bibtype = "Misc",
+  author = personList(
+    as.person("Christian Hotz-Behofsits"),
+    as.person("Daniel Winkler"),
+    as.person("Luca Rauchenberger"),
+    as.person("Peter Knaus"),
+    as.person("Clemens Danninger"),
+    as.person("Simon Stiebellehner")
+  ),
   title = "RClickhouse",
-  year = "2020",
+  year = "2022",
   publisher = "GitHub",
   journal = "GitHub repository",
-  howpublished = "\\url{https://github.com/IMSMWU/RClickhouse}",
-  textVersion = "C. Hotz-Behofsits, D. Winkler, L. Rauchenberger, P. Knaus, C. Danninger, S. Stiebellehner. RClickhouse. URL https://github.com/IMSMWU/RClickhouse."
+  url = "https://github.com/IMSMWU/RClickhouse"
 )
