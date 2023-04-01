@@ -1,3 +1,12 @@
+RClickhouse v0.6.7
+==============
+
+ * align dbplyr function argument names with prototypes
+ * drop support for <R 3.6 such that C/C++11 is supported by default
+ * use bibentry for CITATION
+ * remove LazyData section from DESCRIPTION
+ * use vector instead of personList in CITATION
+
 RClickhouse v0.6.6
 ==============
 

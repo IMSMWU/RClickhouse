@@ -1,7 +1,7 @@
 Package: RClickhouse
 Type: Package
 Title: 'Yandex Clickhouse' Interface for R with Basic 'dplyr' Support
-Version: 0.6.6
+Version: 0.6.7
 Encoding: UTF-8
 Authors@R: c(
     person("Christian", "Hotz-Behofsits", email = "christian.hotz-behofsits@wu.ac.at", role = c("aut", "cre")),
@@ -33,7 +33,6 @@ Imports:
     Rcpp (>= 0.11.0),
     bit64,
     cli
-LazyData: true
 RoxygenNote: 7.2.3
 NeedsCompilation: yes
 Depends:

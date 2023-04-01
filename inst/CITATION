@@ -1,6 +1,6 @@
 bibentry(
   bibtype = "Misc",
-  author = personList(
+  author = c(
     as.person("Christian Hotz-Behofsits"),
     as.person("Daniel Winkler"),
     as.person("Luca Rauchenberger"),
