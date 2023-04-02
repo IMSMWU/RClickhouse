@@ -20,7 +20,7 @@ extern SEXP _RClickhouse_getRowsAffected(SEXP);
 extern SEXP _RClickhouse_getStatement(SEXP);
 extern SEXP _RClickhouse_hasCompleted(SEXP);
 extern SEXP _RClickhouse_insert(SEXP, SEXP, SEXP);
-extern SEXP _RClickhouse_RcppExport_registerCCallable();
+extern SEXP _RClickhouse_RcppExport_registerCCallable(void);
 extern SEXP _RClickhouse_resultTypes(SEXP);
 extern SEXP _RClickhouse_select(SEXP, SEXP);
 extern SEXP _RClickhouse_validPtr(SEXP);
