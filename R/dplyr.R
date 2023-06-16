@@ -1,6 +1,6 @@
 #' @export
 #' @importFrom dbplyr db_connection_describe
-db_connection_describe.ClickhouseConnection <- function(con) {
+db_connection_describe.ClickhouseConnection <- function(con, ...) {
   info <- dbGetInfo(con)
   
   uptime_days <- round(info$uptime/60/60/24, digits = 2)
