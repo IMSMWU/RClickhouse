@@ -1,6 +1,7 @@
 RClickhouse v0.6.8
 ==============
 
+ * fix NOTE: Documented arguments not in \usage in documentation object 'ClickhouseDriver-class' (dbname)
  * fix broken roxygen2 doctype (https://github.com/r-lib/roxygen2/issues/1491)
  * rename Yandex Clickhouse to ClickHouse
 

@@ -142,7 +142,7 @@ loadConfig <- function(CONFIG_PATHS, DEFAULT_PARAMS, pre_config) {
 #' @param drv ClickHouse database driver.
 #' @param host name of the host on which the database is running.
 #' @param port port on which the database is listening.
-#' @param db name of the default database.
+#' @param dbname name of the default database.
 #' @param user name of the user to connect as.
 #' @param password the user's password.
 #' @param compression the compression method for the connection (lz4 by default).
