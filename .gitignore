@@ -1,3 +1,4 @@
+src/RClickhouse.dylib
 .ipynb_checkpoints
 packrat/lib*/
 .Rproj.user

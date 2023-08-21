@@ -3,6 +3,7 @@
 \docType{package}
 \name{RClickhouse}
 \alias{RClickhouse}
+\alias{RClickhouse-package}
 \title{RClickhouse}
 \description{
 provides access to a clickhouse database

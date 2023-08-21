@@ -51,5 +51,5 @@ validPtr <- function(ptr) {
 
 # Register entry points for exported C++ functions
 methods::setLoadAction(function(ns) {
-    .Call('_RClickhouse_RcppExport_registerCCallable', PACKAGE = 'RClickhouse')
+    .Call(`_RClickhouse_RcppExport_registerCCallable`)
 })

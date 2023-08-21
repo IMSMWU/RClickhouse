@@ -1,3 +1,9 @@
+RClickhouse v0.6.8
+==============
+
+ * fix broken roxygen2 doctype (https://github.com/r-lib/roxygen2/issues/1491)
+ * rename Yandex Clickhouse to ClickHouse
+
 RClickhouse v0.6.7
 ==============
 
