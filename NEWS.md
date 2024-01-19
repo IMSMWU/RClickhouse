@@ -1,3 +1,8 @@
+RClickhouse v0.6.9
+==============
+
+ * fix warning: format string is not a string literal on debian and fedora clang
+
 RClickhouse v0.6.8
 ==============
 
