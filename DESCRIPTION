@@ -36,7 +36,7 @@ Imports:
     Rcpp (>= 0.11.0),
     bit64,
     cli
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 NeedsCompilation: yes
 Depends:
     R (>= 3.6.2)
