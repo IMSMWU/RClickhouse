@@ -17,10 +17,6 @@ constexpr size_t EXTRA_COMPRESS_BUFFER_SIZE = 4096;
 constexpr size_t DBMS_MAX_COMPRESSED_SIZE = 0x40000000ULL;   // 1GB
 }
 
-namespace {
-constexpr size_t HEADER_SIZE = 9;
-}
-
 namespace clickhouse {
 
 CompressedInput::CompressedInput(InputStream* input)
