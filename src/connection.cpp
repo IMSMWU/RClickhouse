@@ -6,6 +6,8 @@
 #include <clickhouse/client.h>
 #include "result.h"
 #include <sstream>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 
 using namespace Rcpp;
 using namespace clickhouse;
@@ -48,8 +50,84 @@ std::vector<std::string> resultTypes(XPtr<Result> res) {
   return r;
 }
 
+// copied from clickhouse-cpp's sslsocket.cpp
+struct SSLInitializer {
+  SSLInitializer() {
+    SSL_library_init();
+    SSLeay_add_ssl_algorithms();
+    SSL_load_error_strings();
+  }
+};
+
+SSL_CTX * prepareSSLContext(const std::string &ca_certs, const std::string &certfile, const std::string &keyfile) {
+    static const SSLInitializer ssl_initializer;
+
+    const SSL_METHOD *method = TLS_client_method();
+    std::unique_ptr<SSL_CTX, decltype(&SSL_CTX_free)> ctx(SSL_CTX_new(method), &SSL_CTX_free);
+
+    if (!ctx)
+      stop("Failed to initialize SSL context");
+
+#define HANDLE_SSL_CTX_ERROR(statement) do { \
+    if (const auto ret_code = (statement); !ret_code) { \
+        const auto detail_error = ERR_get_error(); \
+        auto reason = ERR_reason_error_string(detail_error); \
+        reason = reason ? reason : "Unknown SSL error"; \
+        stop("OpenSSL error: " + std::string(reason));\
+    } \
+} while(false);
+
+    // if no CA certificates are provided, load the default ones
+    if (ca_certs.empty()) {
+      HANDLE_SSL_CTX_ERROR(
+        SSL_CTX_set_default_verify_paths(ctx.get())
+      );
+    } else {
+      HANDLE_SSL_CTX_ERROR(
+        SSL_CTX_load_verify_locations(
+          ctx.get(),
+          ca_certs.c_str(),
+          nullptr)
+      );
+    }
+
+    if (!certfile.empty()) {
+      HANDLE_SSL_CTX_ERROR(
+        SSL_CTX_use_certificate_chain_file(
+          ctx.get(),
+          certfile.c_str()
+        )
+      );
+      HANDLE_SSL_CTX_ERROR(
+        SSL_CTX_use_PrivateKey_file(
+          ctx.get(),
+          keyfile.empty() ? certfile.c_str() : keyfile.c_str(),
+          SSL_FILETYPE_PEM
+        )
+      );
+      HANDLE_SSL_CTX_ERROR(
+        SSL_CTX_check_private_key(ctx.get())
+      );
+    }
+
+    return ctx.release();
+#undef HANDLE_SSL_CTX_ERROR
+}
+
+
 // [[Rcpp::export]]
-XPtr<Client> connect(String host, int port, String db, String user, String password, String compression) {
+XPtr<Client> connect(
+    String host,
+    int port,
+    String db,
+    String user,
+    String password,
+    String compression,
+    bool use_ssl,
+    String ca_certs,
+    String certfile,
+    String keyfile
+  ) {
   CompressionMethod comprMethod = CompressionMethod::None;
   if(compression == "lz4") {
     comprMethod = CompressionMethod::LZ4;
@@ -57,15 +135,24 @@ XPtr<Client> connect(String host, int port, String db, String user, String passw
     stop("unknown or unsupported compression method '"+std::string(compression)+"'");
   }
 
-  Client *client = new Client(ClientOptions()
-            .SetHost(host)
-            .SetPort(port)
-            .SetDefaultDatabase(db)
-            .SetUser(user)
-            .SetPassword(password)
-            .SetCompressionMethod(comprMethod)
-            // (re)throw exceptions, which are then handled automatically by Rcpp
-            .SetRethrowException(true));
+  ClientOptions client_options = ClientOptions()
+    .SetHost(host)
+    .SetPort(port)
+    .SetDefaultDatabase(db)
+    .SetUser(user)
+    .SetPassword(password)
+    .SetCompressionMethod(comprMethod);
+
+  if (use_ssl) {
+    SSL_CTX *ctx = prepareSSLContext(ca_certs, certfile, keyfile);
+    auto ssl_options = ClientOptions::SSLOptions().SetExternalSSLContext(ctx);
+    client_options.SetSSLOptions(ssl_options);
+  }
+
+  Client *client = new Client(client_options
+    // (re)throw exceptions, which are then handled automatically by Rcpp
+    .SetRethrowException(true)
+  );
   XPtr<Client> p(client, true);
   return p;
 }

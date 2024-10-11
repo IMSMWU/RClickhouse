@@ -252,8 +252,8 @@ RcppExport SEXP _RClickhouse_resultTypes(SEXP resSEXP) {
     return rcpp_result_gen;
 }
 // connect
-XPtr<Client> connect(String host, int port, String db, String user, String password, String compression);
-static SEXP _RClickhouse_connect_try(SEXP hostSEXP, SEXP portSEXP, SEXP dbSEXP, SEXP userSEXP, SEXP passwordSEXP, SEXP compressionSEXP) {
+XPtr<Client> connect(String host, int port, String db, String user, String password, String compression, bool use_ssl, String ca_certs, String certfile, String keyfile);
+static SEXP _RClickhouse_connect_try(SEXP hostSEXP, SEXP portSEXP, SEXP dbSEXP, SEXP userSEXP, SEXP passwordSEXP, SEXP compressionSEXP, SEXP use_sslSEXP, SEXP ca_certsSEXP, SEXP certfileSEXP, SEXP keyfileSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< String >::type host(hostSEXP);
@@ -262,15 +262,19 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< String >::type user(userSEXP);
     Rcpp::traits::input_parameter< String >::type password(passwordSEXP);
     Rcpp::traits::input_parameter< String >::type compression(compressionSEXP);
-    rcpp_result_gen = Rcpp::wrap(connect(host, port, db, user, password, compression));
+    Rcpp::traits::input_parameter< bool >::type use_ssl(use_sslSEXP);
+    Rcpp::traits::input_parameter< String >::type ca_certs(ca_certsSEXP);
+    Rcpp::traits::input_parameter< String >::type certfile(certfileSEXP);
+    Rcpp::traits::input_parameter< String >::type keyfile(keyfileSEXP);
+    rcpp_result_gen = Rcpp::wrap(connect(host, port, db, user, password, compression, use_ssl, ca_certs, certfile, keyfile));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _RClickhouse_connect(SEXP hostSEXP, SEXP portSEXP, SEXP dbSEXP, SEXP userSEXP, SEXP passwordSEXP, SEXP compressionSEXP) {
+RcppExport SEXP _RClickhouse_connect(SEXP hostSEXP, SEXP portSEXP, SEXP dbSEXP, SEXP userSEXP, SEXP passwordSEXP, SEXP compressionSEXP, SEXP use_sslSEXP, SEXP ca_certsSEXP, SEXP certfileSEXP, SEXP keyfileSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_RClickhouse_connect_try(hostSEXP, portSEXP, dbSEXP, userSEXP, passwordSEXP, compressionSEXP));
+        rcpp_result_gen = PROTECT(_RClickhouse_connect_try(hostSEXP, portSEXP, dbSEXP, userSEXP, passwordSEXP, compressionSEXP, use_sslSEXP, ca_certsSEXP, certfileSEXP, keyfileSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -439,7 +443,7 @@ static int _RClickhouse_RcppExport_validate(const char* sig) {
         signatures.insert("size_t(*getRowsAffected)(XPtr<Result>)");
         signatures.insert("std::string(*getStatement)(XPtr<Result>)");
         signatures.insert("std::vector<std::string>(*resultTypes)(XPtr<Result>)");
-        signatures.insert("XPtr<Client>(*connect)(String,int,String,String,String,String)");
+        signatures.insert("XPtr<Client>(*connect)(String,int,String,String,String,String,bool,String,String,String)");
         signatures.insert("void(*disconnect)(XPtr<Client>)");
         signatures.insert("XPtr<Result>(*select)(XPtr<Client>,String)");
         signatures.insert("void(*insert)(XPtr<Client>,String,DataFrame)");

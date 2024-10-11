@@ -12,7 +12,7 @@
 
 /* .Call calls */
 extern SEXP _RClickhouse_clearResult(SEXP);
-extern SEXP _RClickhouse_connect(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _RClickhouse_connect(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _RClickhouse_disconnect(SEXP);
 extern SEXP _RClickhouse_fetch(SEXP, SEXP);
 extern SEXP _RClickhouse_getRowCount(SEXP);
@@ -27,7 +27,7 @@ extern SEXP _RClickhouse_validPtr(SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
     {"_RClickhouse_clearResult",                  (DL_FUNC) &_RClickhouse_clearResult,                  1},
-    {"_RClickhouse_connect",                      (DL_FUNC) &_RClickhouse_connect,                      6},
+    {"_RClickhouse_connect",                      (DL_FUNC) &_RClickhouse_connect,                     10},
     {"_RClickhouse_disconnect",                   (DL_FUNC) &_RClickhouse_disconnect,                   1},
     {"_RClickhouse_fetch",                        (DL_FUNC) &_RClickhouse_fetch,                        2},
     {"_RClickhouse_getRowCount",                  (DL_FUNC) &_RClickhouse_getRowCount,                  1},

@@ -33,6 +33,10 @@ loadConfig(CONFIG_PATHS, DEFAULT_PARAMS, pre_config)
   user = "default",
   password = "",
   compression = "lz4",
+  use_ssl = FALSE,
+  ca_certs = "",
+  certfile = "",
+  keyfile = "",
   config_paths = c("./RClickhouse.yaml", "~/.R/RClickhouse.yaml",
     "/etc/RClickhouse.yaml"),
   Int64 = c("integer64", "integer", "numeric", "character"),
@@ -62,6 +66,14 @@ loadConfig(CONFIG_PATHS, DEFAULT_PARAMS, pre_config)
 \item{password}{the user's password.}
 
 \item{compression}{the compression method for the connection (lz4 by default).}
+
+\item{use_ssl}{whether or not the connection should use SSL (FALSE by default).}
+
+\item{ca_certs}{path to a file containing a set of concatenated "certification authority" certificates (requires 'use_ssl' to be TRUE).}
+
+\item{certfile}{path to a file in PEM format containing the certificate as well as any number of CA certificates needed to establish the certificate’s authenticity (requires 'use_ssl' to be TRUE).}
+
+\item{keyfile}{path to a file points to a file containing the private key. If absent then the private key will be taken from the 'certfile' (requires 'use_ssl' to be TRUE).}
 
 \item{config_paths}{paths where config files are searched for; order of paths denotes hierarchy (first string has highest priority etc.).}
 

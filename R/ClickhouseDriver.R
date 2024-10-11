@@ -147,6 +147,10 @@ loadConfig <- function(CONFIG_PATHS, DEFAULT_PARAMS, pre_config) {
 #' @param password the user's password.
 #' @param compression the compression method for the connection (lz4 by default).
 #' @param config_paths paths where config files are searched for; order of paths denotes hierarchy (first string has highest priority etc.).
+#' @param use_ssl whether or not the connection should use SSL (FALSE by default).
+#' @param ca_certs path to a file containing a set of concatenated "certification authority" certificates (requires 'use_ssl' to be TRUE).
+#' @param certfile path to a file in PEM format containing the certificate as well as any number of CA certificates needed to establish the certificate’s authenticity (requires 'use_ssl' to be TRUE).
+#' @param keyfile path to a file points to a file containing the private key. If absent then the private key will be taken from the 'certfile' (requires 'use_ssl' to be TRUE).
 #' @param Int64 The R type that 64-bit integer types should be mapped to,
 #'   default is [bit64::integer64], which allows the full range of 64 bit
 #'   integers.
@@ -159,6 +163,7 @@ loadConfig <- function(CONFIG_PATHS, DEFAULT_PARAMS, pre_config) {
 setMethod("dbConnect", "ClickhouseDriver",
           function(drv, host="localhost", port = 9000, dbname = "default",
                    user = "default", password = "", compression = "lz4",
+                   use_ssl = FALSE, ca_certs = "", certfile = "", keyfile = "", 
                    config_paths = c('./RClickhouse.yaml', '~/.R/RClickhouse.yaml', '/etc/RClickhouse.yaml'),
                    Int64 = c("integer64", "integer", "numeric", "character"), toUTF8 = TRUE, ...) {
     db <- match.call(expand.dots = TRUE)
@@ -166,15 +171,15 @@ setMethod("dbConnect", "ClickhouseDriver",
         warning("Parameter 'db' is deprecated and will be removed in the future. Use 'dbname' instead.")
         dbname <- db$db
     }
-            DEFAULT_PARAMS <- c(host='localhost', port=9000, db='default', user='default', password='', compression='lz4')
-            input_params <- c(host=host, port=port, db=dbname, user=user, password=password, compression=compression)
+            DEFAULT_PARAMS <- c(host='localhost', port=9000, db='default', user='default', password='', compression='lz4', use_ssl = FALSE, ca_certs = "", certfile = "", keyfile = "")
+            input_params <- c(host=host, port=port, db=dbname, user=user, password=password, compression=compression, use_ssl=use_ssl, ca_certs=ca_certs, certfile=certfile, keyfile=keyfile)
             default_input_diff <- c(input_params[!(input_params %in% DEFAULT_PARAMS)])
 
             config <- loadConfig(config_paths, DEFAULT_PARAMS, default_input_diff)
 
             Int64 <- match.arg(Int64)
 
-            ptr <- connect(config[['host']], strtoi(config[['port']]), config[['db']], config[['user']], config[['password']], config[['compression']])
+            ptr <- connect(config[['host']], strtoi(config[['port']]), config[['db']], config[['user']], config[['password']], config[['compression']], strtoi(config[['use_ssl']]), config[['ca_certs']], config[['certfile']], config[['keyfile']])
             reg.finalizer(ptr, function(p) {
               if (validPtr(p))
                 warning("connection was garbage collected without being disconnected")

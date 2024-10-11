@@ -29,8 +29,8 @@ resultTypes <- function(res) {
     .Call(`_RClickhouse_resultTypes`, res)
 }
 
-connect <- function(host, port, db, user, password, compression) {
-    .Call(`_RClickhouse_connect`, host, port, db, user, password, compression)
+connect <- function(host, port, db, user, password, compression, use_ssl, ca_certs, certfile, keyfile) {
+    .Call(`_RClickhouse_connect`, host, port, db, user, password, compression, use_ssl, ca_certs, certfile, keyfile)
 }
 
 disconnect <- function(conn) {
