@@ -1,5 +1,5 @@
 CXX_STD = CXX17
-PKG_CPPFLAGS = $(SYS_FLAGS) -I. -I../inst/include -I./vendor/clickhouse-cpp -I./vendor/clickhouse-cpp/contrib
+PKG_CPPFLAGS = $(SYS_FLAGS) -I. -I../inst/include -I./vendor/clickhouse-cpp -I./vendor/clickhouse-cpp/contrib -I./vendor/clickhouse-cpp/contrib/absl -I./vendor/clickhouse-cpp/contrib/cityhash/cityhash -I./vendor/clickhouse-cpp/contrib/lz4/lz4 -DWITH_OPENSSL=1
 # -I./vendor/clickhouse-cpp/contrib/bigerint
 
 OBJ_FILES = \
@@ -10,6 +10,7 @@ vendor/clickhouse-cpp/clickhouse/base/input.o \
 vendor/clickhouse-cpp/clickhouse/base/output.o \
 vendor/clickhouse-cpp/clickhouse/base/compressed.o \
 vendor/clickhouse-cpp/clickhouse/base/wire_format.o \
+vendor/clickhouse-cpp/clickhouse/base/endpoints_iterator.o \
 vendor/clickhouse-cpp/clickhouse/block.o \
 vendor/clickhouse-cpp/clickhouse/query.o \
 vendor/clickhouse-cpp/clickhouse/types/types.o \
@@ -29,9 +30,12 @@ vendor/clickhouse-cpp/clickhouse/columns/itemview.o \
 vendor/clickhouse-cpp/clickhouse/columns/string.o \
 vendor/clickhouse-cpp/clickhouse/columns/nullable.o \
 vendor/clickhouse-cpp/clickhouse/columns/uuid.o \
-vendor/clickhouse-cpp/contrib/lz4/lz4hc.o \
-vendor/clickhouse-cpp/contrib/lz4/lz4.o \
-vendor/clickhouse-cpp/contrib/cityhash/city.o
+vendor/clickhouse-cpp/clickhouse/columns/column.o \
+vendor/clickhouse-cpp/clickhouse/columns/geo.o \
+vendor/clickhouse-cpp/clickhouse/columns/map.o \
+vendor/clickhouse-cpp/contrib/lz4/lz4/lz4hc.o \
+vendor/clickhouse-cpp/contrib/lz4/lz4/lz4.o \
+vendor/clickhouse-cpp/contrib/cityhash/cityhash/city.o
 
 PKG_LIBS = $(OBJ_FILES) -lpthread -lssl $(SYS_LIBS)
 
