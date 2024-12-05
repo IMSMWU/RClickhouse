@@ -8,3 +8,37 @@
 \description{
 provides access to a clickhouse database
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/IMSMWU/RClickhouse}
+  \item Report bugs at \url{https://github.com/IMSMWU/RClickhouse/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Christian Hotz-Behofsits \email{christian.hotz-behofsits@wu.ac.at}
+
+Authors:
+\itemize{
+  \item Daniel Winkler \email{daniel.winkler@wu.ac.at}
+  \item Luca Rauchenberger \email{luca.rauchenberger@wu.ac.at}
+  \item Peter Knaus \email{peter.knaus@wu.ac.at}
+  \item Clemens Danninger \email{cran@b8000h.org}
+  \item Daria Yudaeva \email{daria.yudaeva@wu.ac.at}
+  \item Simon Stiebellehner \email{simon.stiebellehner@gmail.com}
+  \item Dan Egnor
+  \item Vlad Losev \email{vladl@google.com}
+  \item Keith Ray \email{keith.ray@gmail.com}
+  \item Zhanyong Wan \email{wan@google.com}
+  \item Markus Heule \email{mheule@google.com}
+  \item Oliver Flasch \email{oflasch@gmail.com}
+  \item Yann Collet (Yann Collet is the author and copyright holder of 'lz4') [copyright holder]
+}
+
+Other contributors:
+\itemize{
+  \item  Google [copyright holder]
+}
+
+}
