@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <functional>
+#include <cstdint>
 
 #define RCPP_NEW_DATE_DATETIME_VECTORS 1
 #include <Rcpp.h>
