@@ -38,4 +38,7 @@
 Clickhouse's query results class.  This classes encapsulates the result of an SQL
 statement (either \code{select} or not).
 }
+\seealso{
+\link[DBI]{DBIResult-class}
+}
 \keyword{internal}

@@ -5,6 +5,7 @@
 #'
 #' @export
 #' @keywords internal
+#' @seealso \link[DBI]{DBIResult-class}
 setClass("ClickhouseResult",
   contains = "DBIResult",
   slots = list(
