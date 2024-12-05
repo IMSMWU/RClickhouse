@@ -6,6 +6,7 @@
 #include <clickhouse/client.h>
 #include "result.h"
 #include <sstream>
+#include <cstdint>
 
 using namespace Rcpp;
 using namespace clickhouse;
