@@ -1,3 +1,8 @@
+RClickhouse v0.6.10
+==============
+
+ * fix: add missing cstdint header (in preparation for GCC 15)
+
 RClickhouse v0.6.9
 ==============
 
