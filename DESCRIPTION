@@ -1,7 +1,7 @@
 Package: RClickhouse
 Type: Package
 Title: 'Yandex Clickhouse' Interface for R with Basic 'dplyr' Support
-Version: 0.6.9
+Version: 0.6.10
 Encoding: UTF-8
 Authors@R: c(
     person("Christian", "Hotz-Behofsits", email = "christian.hotz-behofsits@wu.ac.at", role = c("aut", "cre")),
