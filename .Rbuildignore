@@ -16,3 +16,4 @@
 ^LICENSE$
 ^tests/testthat/test-dbplyr-ch.R$
 .ipynb_checkpoints
+^src/vendor/clickhouse-cpp/build

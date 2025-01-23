@@ -1,0 +1,3 @@
+[submodule "src/vendor/clickhouse-cpp"]
+	path = src/vendor/clickhouse-cpp
+	url = git@github.com:ClickHouse/clickhouse-cpp.git
