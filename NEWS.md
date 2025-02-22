@@ -2,7 +2,7 @@ RClickhouse v0.6.10
 ==============
 
  * fix: add missing cstdint header (in preparation for GCC 15)
- * add missing link to DBIResult-class in the docs
+ * remove broken link to DBIResult-class in the docs
 
 RClickhouse v0.6.9
 ==============

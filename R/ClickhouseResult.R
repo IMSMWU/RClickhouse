@@ -2,10 +2,10 @@
 #'
 #' Clickhouse's query results class.  This classes encapsulates the result of an SQL
 #' statement (either \code{select} or not).
+#' It is a superclass of the [DBIResult-class] class.
 #'
 #' @export
 #' @keywords internal
-#' @seealso \link[DBI]{DBIResult-class}
 setClass("ClickhouseResult",
   contains = "DBIResult",
   slots = list(
