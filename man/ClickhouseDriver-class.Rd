@@ -66,7 +66,7 @@ loadConfig(CONFIG_PATHS, DEFAULT_PARAMS, pre_config)
 \item{config_paths}{paths where config files are searched for; order of paths denotes hierarchy (first string has highest priority etc.).}
 
 \item{Int64}{The R type that 64-bit integer types should be mapped to,
-default is [bit64::integer64], which allows the full range of 64 bit
+default is \link[bit64:bit64-package]{bit64::integer64}, which allows the full range of 64 bit
 integers.}
 
 \item{toUTF8}{logical, should character variables be converted to UTF-8. Default is TRUE.}

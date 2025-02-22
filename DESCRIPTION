@@ -33,6 +33,7 @@ Imports:
     Rcpp (>= 0.11.0),
     bit64,
     cli
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 NeedsCompilation: yes
 Depends:
