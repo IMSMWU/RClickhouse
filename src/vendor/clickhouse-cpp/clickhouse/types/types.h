@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <BigInt.hpp>
 
 #include <map>
