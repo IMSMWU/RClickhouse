@@ -6,15 +6,10 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.travis\.yml$
-.*\.o$
-^src/vendor/clickhouse-cpp/.clang-format$
-^src/vendor/clickhouse-cpp/.buckconfig$
-^src/vendor/clickhouse-cpp/.travis.yml$
-^src/vendor/clickhouse-cpp/contrib/gtest$
+^docker-compose\.yml$
+^tools$
 ^RClickhouse_.*.tar.gz$
 ^Readme.md$
 ^cran-comments.md$
-^NEWS.md$
 ^LICENSE$
-^tests/testthat/test-dbplyr-ch.R$
 .ipynb_checkpoints

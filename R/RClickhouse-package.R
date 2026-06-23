@@ -6,7 +6,7 @@
 #' both ends and the package contains no compiled code.
 #'
 #' Two transports are available, selected with the `transport` argument of
-#' [dbConnect()]:
+#' [DBI::dbConnect()]:
 #'
 #' * `"flightsql"` (default): the native
 #'   [Arrow Flight SQL](https://clickhouse.com/docs/interfaces/arrowflight)

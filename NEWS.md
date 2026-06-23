@@ -1,3 +1,27 @@
+RClickhouse v2.0.0
+==============
+
+Ground-up rewrite. RClickhouse now communicates with ClickHouse entirely
+through Apache Arrow and **contains no compiled code**; the bundled C++
+ClickHouse client and the custom Rcpp type-marshalling layer have been removed.
+
+ * new: two Arrow-based transports selected via `dbConnect(transport = )`:
+   * `"flightsql"` (default) — native Arrow Flight SQL via ADBC
+     (`adbcdrivermanager` + `adbcflightsql`).
+   * `"http"` — ClickHouse HTTP interface with the `ArrowStream` format, in
+     pure R (`httr2` + `nanoarrow`); works against any server incl. Cloud.
+ * new: type conversion is handled by Arrow/nanoarrow on both ends. `Int64`/
+   `UInt64` map to `bit64::integer64` via schema-aware conversion.
+ * change: default port now follows the transport (Flight SQL 9090, HTTP
+   8123/8443). The native protocol port 9000 is no longer supported.
+ * deprecated (still accepted with a warning): `dbConnect()` arguments `db`
+   (use `dbname`), `compression`, `Int64`, `toUTF8`.
+ * change: `adbcflightsql` is a Suggested dependency installed from
+   R-multiverse (`Additional_repositories`); the HTTP transport needs no
+   compiled driver.
+ * docs: new "Migrating from 0.6.x" vignette; `docker-compose.yml` for a local
+   ClickHouse exposing both interfaces.
+
 RClickhouse v0.6.11
 ==============
 

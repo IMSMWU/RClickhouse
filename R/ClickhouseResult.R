@@ -2,7 +2,7 @@
 #'
 #' Encapsulates the result of a statement. Because both transports return the
 #' full Arrow result eagerly, a `ClickhouseResult` holds the materialised
-#' data.frame and a cursor; [dbFetch()] slices from it.
+#' data.frame and a cursor; [DBI::dbFetch()] slices from it.
 #'
 #' @export
 #' @keywords internal

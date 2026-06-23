@@ -27,15 +27,14 @@ Depends:
 Imports:
     methods,
     DBI (>= 1.2.0),
-    dplyr (>= 1.1.0),
     dbplyr (>= 2.4.0),
     nanoarrow (>= 0.6.0),
     httr2 (>= 1.0.0),
     bit64,
-    cli,
     rlang (>= 1.1.0),
     lifecycle
 Suggests:
+    dplyr (>= 1.1.0),
     adbcdrivermanager (>= 0.14.0),
     adbcflightsql (>= 0.14.0),
     arrow,

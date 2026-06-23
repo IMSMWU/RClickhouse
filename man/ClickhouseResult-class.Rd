@@ -32,6 +32,6 @@
 \description{
 Encapsulates the result of a statement. Because both transports return the
 full Arrow result eagerly, a \code{ClickhouseResult} holds the materialised
-data.frame and a cursor; \code{\link[=dbFetch]{dbFetch()}} slices from it.
+data.frame and a cursor; \code{\link[DBI:dbFetch]{DBI::dbFetch()}} slices from it.
 }
 \keyword{internal}

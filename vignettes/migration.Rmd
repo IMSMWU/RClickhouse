@@ -1,0 +1,91 @@
+---
+title: "Migrating from RClickhouse 0.6.x to 2.0"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Migrating from RClickhouse 0.6.x to 2.0}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(eval = FALSE, collapse = TRUE, comment = "#>")
+```
+
+RClickhouse 2.0 is a ground-up rewrite. Instead of bundling the C++ ClickHouse
+client and marshalling every value through a custom Rcpp layer, it now speaks to
+ClickHouse entirely through **Apache Arrow** — either the native **Arrow Flight
+SQL** protocol (via ADBC) or the **HTTP** interface with the `ArrowStream`
+format. The package contains no compiled code anymore.
+
+This vignette summarises what changed for existing users.
+
+## The short version
+
+Most code keeps working. The main change is **how you connect**: there is no
+more native binary protocol on port `9000`. Pick a transport instead.
+
+```{r}
+library(DBI)
+
+# Old (0.6.x): native protocol, port 9000
+con <- dbConnect(RClickhouse::clickhouse(), host = "db", port = 9000)
+
+# New (2.0): Arrow Flight SQL (default), port 9090
+con <- dbConnect(RClickhouse::clickhouse(), host = "db")
+
+# New (2.0): HTTP interface, port 8123
+con <- dbConnect(RClickhouse::clickhouse(), host = "db", transport = "http")
+```
+
+Everything downstream — `dbWriteTable()`, `dbGetQuery()`, `dbReadTable()`,
+`tbl()` + dplyr verbs — is unchanged.
+
+## Choosing a transport
+
+| | `"flightsql"` (default) | `"http"` |
+|---|---|---|
+| Protocol | Arrow Flight SQL (ADBC) | HTTP + `ArrowStream` |
+| Default port | 9090 | 8123 (8443 with TLS) |
+| Extra install | `adbcflightsql` (R-multiverse) | none (pure R) |
+| Server requirement | `arrowflight_port` enabled (recent ClickHouse; not on ClickHouse Cloud) | works everywhere |
+
+To use Flight SQL, install the driver once (it is not on CRAN):
+
+```{r}
+install.packages("adbcflightsql", repos = "https://community.r-multiverse.org")
+```
+
+If your server does not expose the Arrow Flight interface (for example
+ClickHouse Cloud), use `transport = "http"`.
+
+## Deprecated connection arguments
+
+These still work but emit a deprecation warning and are otherwise ignored or
+remapped:
+
+| Old argument | Status |
+|---|---|
+| `db = ` | renamed to `dbname = ` |
+| `compression = ` | ignored (Arrow negotiates compression) |
+| `Int64 = ` | ignored (Int64/UInt64 always map to `bit64::integer64`) |
+| `toUTF8 = ` | ignored (strings are always UTF-8) |
+| `port = 9000` | warns; use the Flight SQL (9090) or HTTP (8123) port |
+
+## Types
+
+Type conversion is now done by Arrow/nanoarrow rather than the old hand-written
+mapping. In particular:
+
+* `Int64` / `UInt64` columns come back as `bit64::integer64`.
+* Strings are UTF-8.
+* `Date` / `DateTime` map to `Date` / `POSIXct`.
+
+`dbColumnInfo()` now reports the R type of each result column rather than the
+ClickHouse type string used internally by the old C++ layer.
+
+## dbplyr
+
+The dbplyr backend is unchanged in behaviour: ClickHouse-specific translations
+(`^` to `pow()`, `var()`/`sd()` to `varSamp()`/`stddevSamp()`, case-sensitive
+function names via `dbplyr_case_sensitive()`) are retained.
+```

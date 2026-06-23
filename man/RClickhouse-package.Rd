@@ -13,7 +13,7 @@ both ends and the package contains no compiled code.
 }
 \details{
 Two transports are available, selected with the \code{transport} argument of
-\code{\link[=dbConnect]{dbConnect()}}:
+\code{\link[DBI:dbConnect]{DBI::dbConnect()}}:
 \itemize{
 \item \code{"flightsql"} (default): the native
 \href{https://clickhouse.com/docs/interfaces/arrowflight}{Arrow Flight SQL}

@@ -98,10 +98,9 @@ setMethod("dbConnect", "ClickhouseDriver",
 
     if (is.null(cfg$port)) cfg$port <- default_port(transport, cfg$tls)
     if (identical(as.integer(cfg$port), 9000L)) {
-      cli::cli_warn(c(
-        "Port 9000 is the legacy native protocol port, no longer supported in RClickhouse 2.0.",
-        i = "Use the Arrow Flight SQL port (9090) or the HTTP port (8123)."
-      ))
+      warning("Port 9000 is the legacy native protocol port, no longer ",
+              "supported in RClickhouse 2.0. Use the Arrow Flight SQL port ",
+              "(9090) or the HTTP port (8123).", call. = FALSE)
     }
 
     handle <- do.call(ch_transport_connect, c(
