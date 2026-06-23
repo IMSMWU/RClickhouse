@@ -1,0 +1,27 @@
+# Local ClickHouse for development and integration tests.
+#   HTTP interface:      http://localhost:8123
+#   Arrow Flight SQL:    grpc://localhost:9090   (see config.d/arrowflight.xml)
+#
+#   docker compose up -d
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: rclickhouse-ch
+    environment:
+      # Allow the password-less default user to connect over the network (dev only).
+      CLICKHOUSE_SKIP_USER_SETUP: "1"
+    ports:
+      - "8123:8123"   # HTTP
+      - "9000:9000"   # native (legacy, unused by RClickhouse 2.0)
+      - "9090:9090"   # Arrow Flight SQL
+    volumes:
+      - ./tools/clickhouse/config.d:/etc/clickhouse-server/config.d:ro
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20

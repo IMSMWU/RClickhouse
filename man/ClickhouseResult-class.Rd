@@ -30,7 +30,8 @@
 \S4method{dbColumnInfo}{ClickhouseResult}(res, ...)
 }
 \description{
-Clickhouse's query results class.  This classes encapsulates the result of an SQL
-statement (either \code{select} or not).
+Encapsulates the result of a statement. Because both transports return the
+full Arrow result eagerly, a \code{ClickhouseResult} holds the materialised
+data.frame and a cursor; \code{\link[=dbFetch]{dbFetch()}} slices from it.
 }
 \keyword{internal}

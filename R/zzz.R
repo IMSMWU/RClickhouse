@@ -1,6 +1,6 @@
 .onUnload <- function(libpath) {
-  # Reassign the original 'sql_prefix' function to the dbplyr namespace
-  utils::assignInNamespace("sql_prefix", origSQLprefix,
-                           ns = "dbplyr", envir = dbpenv)
-  gc() # Force garbage collection of connections
+  # Undo the optional dbplyr case-sensitivity patch if it was applied.
+  if (!is.null(.ch_dbplyr$original)) {
+    try(fix_dbplyr(), silent = TRUE)
+  }
 }

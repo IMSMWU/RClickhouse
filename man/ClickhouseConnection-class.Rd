@@ -6,12 +6,19 @@
 \alias{show,ClickhouseConnection-method}
 \alias{dbGetInfo,ClickhouseConnection-method}
 \alias{dbIsValid,ClickhouseConnection-method}
+\alias{dbDisconnect,ClickhouseConnection-method}
+\alias{dbGetQuery,ClickhouseConnection,character-method}
+\alias{dbSendQuery,ClickhouseConnection,character-method}
+\alias{dbSendStatement,ClickhouseConnection,character-method}
+\alias{dbExecute,ClickhouseConnection,character-method}
 \alias{dbListTables,ClickhouseConnection-method}
 \alias{dbExistsTable,ClickhouseConnection,character-method}
+\alias{dbListFields,ClickhouseConnection,character-method}
 \alias{dbReadTable,ClickhouseConnection,character-method}
 \alias{dbRemoveTable,ClickhouseConnection,character-method}
-\alias{dbListFields,ClickhouseConnection,character-method}
-\alias{dbSendQuery,ClickhouseConnection,character-method}
+\alias{dbCreateTable,ClickhouseConnection-method}
+\alias{dbAppendTable,ClickhouseConnection-method}
+\alias{dbWriteTable,ClickhouseConnection,character-method}
 \alias{dbDataType,ClickhouseConnection-method}
 \alias{dbQuoteIdentifier,ClickhouseConnection,character-method}
 \alias{dbQuoteIdentifier,ClickhouseConnection,SQL-method}
@@ -20,7 +27,6 @@
 \alias{dbBegin,ClickhouseConnection-method}
 \alias{dbCommit,ClickhouseConnection-method}
 \alias{dbRollback,ClickhouseConnection-method}
-\alias{dbDisconnect,ClickhouseConnection-method}
 \title{Class ClickhouseConnection}
 \usage{
 \S4method{show}{ClickhouseConnection}(object)
@@ -29,17 +35,49 @@
 
 \S4method{dbIsValid}{ClickhouseConnection}(dbObj, ...)
 
+\S4method{dbDisconnect}{ClickhouseConnection}(conn, ...)
+
+\S4method{dbGetQuery}{ClickhouseConnection,character}(conn, statement, ...)
+
+\S4method{dbSendQuery}{ClickhouseConnection,character}(conn, statement, ...)
+
+\S4method{dbSendStatement}{ClickhouseConnection,character}(conn, statement, ...)
+
+\S4method{dbExecute}{ClickhouseConnection,character}(conn, statement, ...)
+
 \S4method{dbListTables}{ClickhouseConnection}(conn, ...)
 
 \S4method{dbExistsTable}{ClickhouseConnection,character}(conn, name, ...)
 
-\S4method{dbReadTable}{ClickhouseConnection,character}(conn, name, row.names = NA, ...)
+\S4method{dbListFields}{ClickhouseConnection,character}(conn, name, ...)
+
+\S4method{dbReadTable}{ClickhouseConnection,character}(conn, name, ...)
 
 \S4method{dbRemoveTable}{ClickhouseConnection,character}(conn, name, ...)
 
-\S4method{dbListFields}{ClickhouseConnection,character}(conn, name, ...)
+\S4method{dbCreateTable}{ClickhouseConnection}(
+  conn,
+  name,
+  fields,
+  ...,
+  engine = "MergeTree() ORDER BY tuple()",
+  row.names = NULL,
+  temporary = FALSE
+)
 
-\S4method{dbSendQuery}{ClickhouseConnection,character}(conn, statement, ...)
+\S4method{dbAppendTable}{ClickhouseConnection}(conn, name, value, ..., row.names = NULL)
+
+\S4method{dbWriteTable}{ClickhouseConnection,character}(
+  conn,
+  name,
+  value,
+  overwrite = FALSE,
+  append = FALSE,
+  engine = "MergeTree() ORDER BY tuple()",
+  row.names = NA,
+  field.types = NULL,
+  ...
+)
 
 \S4method{dbDataType}{ClickhouseConnection}(dbObj, obj, ...)
 
@@ -56,11 +94,14 @@
 \S4method{dbCommit}{ClickhouseConnection}(conn, ...)
 
 \S4method{dbRollback}{ClickhouseConnection}(conn, ...)
-
-\S4method{dbDisconnect}{ClickhouseConnection}(conn, ...)
+}
+\arguments{
+\item{engine}{the ClickHouse table engine to use when creating a table.}
 }
 \description{
-\code{ClickhouseConnection.} objects are usually created by
-\code{\link[DBI]{dbConnect}}
+\code{ClickhouseConnection} objects are created by \code{\link[DBI:dbConnect]{DBI::dbConnect()}} and wrap a
+transport (Arrow Flight SQL or HTTP). All DBI methods delegate to the
+transport seam (see \code{transport.R}); the class exists so that dbplyr can
+dispatch ClickHouse-specific SQL on it.
 }
 \keyword{internal}

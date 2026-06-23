@@ -2,7 +2,7 @@
 % Please edit documentation in R/dbplyr-helpers.R
 \name{dbplyr_case_sensitive}
 \alias{dbplyr_case_sensitive}
-\title{Get dbplyr to work with Clickhouse}
+\title{Make dbplyr treat unknown functions as case-sensitive.}
 \usage{
 dbplyr_case_sensitive()
 }
@@ -10,7 +10,7 @@ dbplyr_case_sensitive()
 No return value, called for side effects.
 }
 \description{
-Functions passed to Clickhouse are case sensitive. By default dbplyr
-converts functions that are not predefined to upper case. This function
-changes that behavior to leave passed functions as they are.
+By default dbplyr upper-cases unknown SQL function names. ClickHouse function
+names are case-sensitive, so this opt-in helper patches dbplyr to pass them
+through unchanged. Call \code{\link[=fix_dbplyr]{fix_dbplyr()}} to restore the default behaviour.
 }

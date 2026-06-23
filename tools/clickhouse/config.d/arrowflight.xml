@@ -1,0 +1,4 @@
+<clickhouse>
+    <!-- Enable the Arrow Flight SQL server interface. -->
+    <arrowflight_port>9090</arrowflight_port>
+</clickhouse>

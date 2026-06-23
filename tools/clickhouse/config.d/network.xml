@@ -1,0 +1,4 @@
+<clickhouse>
+    <!-- Accept connections from outside the container (dev/test only). -->
+    <listen_host>0.0.0.0</listen_host>
+</clickhouse>

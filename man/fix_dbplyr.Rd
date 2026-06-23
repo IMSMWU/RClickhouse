@@ -2,7 +2,7 @@
 % Please edit documentation in R/dbplyr-helpers.R
 \name{fix_dbplyr}
 \alias{fix_dbplyr}
-\title{Return to dbplyrs original behavior}
+\title{Restore dbplyr's default function-name handling.}
 \usage{
 fix_dbplyr()
 }
@@ -10,8 +10,5 @@ fix_dbplyr()
 No return value, called for side effects.
 }
 \description{
-Since Clickhouse functions are case sensitive dbplyr
-behavior was altered to reflect that. This function
-will set dbplyr back to its original state of converting
-unknown functions to upper case.
+Undoes \code{\link[=dbplyr_case_sensitive]{dbplyr_case_sensitive()}}.
 }

@@ -8,7 +8,6 @@
 \alias{dbGetInfo,ClickhouseDriver-method}
 \alias{dbIsValid,ClickhouseDriver-method}
 \alias{dbUnloadDriver,ClickhouseDriver-method}
-\alias{loadConfig}
 \alias{dbConnect,ClickhouseDriver-method}
 \alias{dbDataType,ClickhouseDriver-method}
 \title{Class ClickhouseDriver}
@@ -23,37 +22,31 @@ clickhouse()
 
 \S4method{dbUnloadDriver}{ClickhouseDriver}(drv, ...)
 
-loadConfig(CONFIG_PATHS, DEFAULT_PARAMS, pre_config)
-
 \S4method{dbConnect}{ClickhouseDriver}(
   drv,
   host = "localhost",
-  port = 9000,
+  port = NULL,
   dbname = "default",
   user = "default",
   password = "",
-  compression = "lz4",
-  config_paths = c("./RClickhouse.yaml", "~/.R/RClickhouse.yaml",
-    "/etc/RClickhouse.yaml"),
-  Int64 = c("integer64", "integer", "numeric", "character"),
-  toUTF8 = TRUE,
+  transport = c("flightsql", "http"),
+  tls = FALSE,
+  config_paths = default_config_paths(),
   ...
 )
 
 \S4method{dbDataType}{ClickhouseDriver}(dbObj, obj, ...)
 }
 \arguments{
-\item{drv}{ClickHouse database driver.}
+\item{...}{passed to the transport. Also accepts deprecated arguments
+(\code{compression}, \code{Int64}, \code{toUTF8}, \code{db}) for backward compatibility.}
 
-\item{CONFIG_PATHS}{a list of configuration paths}
+\item{drv}{a \linkS4class{ClickhouseDriver} object created by \code{\link[=clickhouse]{clickhouse()}}.}
 
-\item{DEFAULT_PARAMS}{a list of configuration defaults}
+\item{host}{host on which the database is running.}
 
-\item{pre_config}{initialization set}
-
-\item{host}{name of the host on which the database is running.}
-
-\item{port}{port on which the database is listening.}
+\item{port}{port to connect to. Defaults to the transport's standard port
+(9090 for Flight SQL, 8123/8443 for HTTP).}
 
 \item{dbname}{name of the default database.}
 
@@ -61,30 +54,29 @@ loadConfig(CONFIG_PATHS, DEFAULT_PARAMS, pre_config)
 
 \item{password}{the user's password.}
 
-\item{compression}{the compression method for the connection (lz4 by default).}
+\item{transport}{communication backend: \code{"flightsql"} (Arrow Flight SQL via
+ADBC, the default) or \code{"http"} (HTTP interface with the ArrowStream
+format). See \link{RClickhouse-package}.}
 
-\item{config_paths}{paths where config files are searched for; order of paths denotes hierarchy (first string has highest priority etc.).}
+\item{tls}{use a TLS-encrypted connection.}
 
-\item{Int64}{The R type that 64-bit integer types should be mapped to,
-default is \link[bit64:bit64-package]{bit64::integer64}, which allows the full range of 64 bit
-integers.}
-
-\item{toUTF8}{logical, should character variables be converted to UTF-8. Default is TRUE.}
+\item{config_paths}{paths searched for YAML configuration files; earlier
+paths take precedence.}
 }
 \value{
-a merged configuration
-
-A database connection.
+A \linkS4class{ClickhouseConnection} object.
 }
 \description{
-This driver never needs to be unloaded and hence \code{dbUnload()} is a
-null-op.
+This driver never needs to be unloaded and hence \code{dbUnloadDriver()} is a
+no-op.
 }
 \examples{
 library(DBI)
 RClickhouse::clickhouse()
 \dontrun{
-conn <- dbConnect(RClickhouse::clickhouse(), host="localhost")
+conn <- dbConnect(RClickhouse::clickhouse(), host = "localhost")
+conn <- dbConnect(RClickhouse::clickhouse(), host = "localhost",
+                  port = 8123, transport = "http")
 }
 }
 \keyword{internal}
