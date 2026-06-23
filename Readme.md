@@ -12,6 +12,14 @@ This R package is a DBI interface for the Yandex Clickhouse database. It provide
 
 To cite this library, please use the BibTeX entry provided in **inst/CITATION**.
 
+### Interfaces
+
+ClickHouse can be reached over several protocols, and different R packages target different ones. Pick the package that matches the interface you want to use:
+
+- **Native TCP interface** — this package, `RClickhouse`. It talks to ClickHouse over the native binary protocol (default port `9000`) via the official [C++ ClickHouse client](https://github.com/ClickHouse/clickhouse-cpp). This is *not* the HTTP interface, so connect to the native port (`9000`) rather than the HTTP port (`8123`).
+- **HTTP(S) interface** — use [`ClickHouseHTTP`](https://github.com/patzaw/ClickHouseHTTP) ([CRAN](https://cran.r-project.org/package=ClickHouseHTTP)), a DBI backend built on the ClickHouse HTTP interface (default port `8123`) with HTTPS/SSL support.
+- **Arrow Flight SQL interface (experimental)** — an experimental rewrite of `RClickhouse` on top of Arrow Flight SQL is being developed on the [`v2-flight-sql` branch](https://github.com/IMSMWU/RClickhouse/tree/v2-flight-sql). Both the rewrite itself and the Arrow Flight SQL interface are experimental, and Arrow Flight is not exposed by default on ClickHouse Cloud. This branch also provides an HTTP fallback, but it is only a fallback — if you want to use the HTTP interface, prefer [`ClickHouseHTTP`](https://github.com/patzaw/ClickHouseHTTP) (see above).
+
 
 ## Installation
 This package is available on CRAN, and thus installable by running:
