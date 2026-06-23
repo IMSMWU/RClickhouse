@@ -1,4 +1,6 @@
 ^packrat/
+^\.git$
+^\.github$
 ^\.Rprofile$
 ^\.vscode$
 ^.*\.Rproj$

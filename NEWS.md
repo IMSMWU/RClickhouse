@@ -1,3 +1,10 @@
+RClickhouse v0.6.11
+==============
+
+ * fix: declare the dbplyr 2nd edition interface (`dbplyr_edition` method) to
+   restore compatibility with current dbplyr versions, which dropped the 1st
+   edition; resolves the CRAN check ERRORs in test-agg.R and test-prefix.R
+
 RClickhouse v0.6.10
 ==============
 

@@ -1,0 +1,59 @@
+name: Build CRAN package
+
+# Builds the CRAN-ready source tarball (RClickhouse_<version>.tar.gz) with
+# `R CMD build`, which respects .Rbuildignore and excludes VCS / CI files.
+# The tarball is uploaded as a workflow artifact and, when triggered by a
+# version tag, published as a release asset that can be uploaded directly
+# to CRAN (https://cran.r-project.org/submit.html).
+
+on:
+  push:
+    tags:
+      - 'v*'        # e.g. push tag v0.6.11 to cut a release
+  workflow_dispatch: # allow building the tarball manually from the Actions tab
+
+permissions:
+  contents: write    # needed to create/update the GitHub release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Build source tarball
+        run: |
+          R CMD build .
+          PKG_FILE="$(ls -1 RClickhouse_*.tar.gz | head -n1)"
+          echo "PKG_FILE=${PKG_FILE}" >> "$GITHUB_ENV"
+          echo "Built ${PKG_FILE}"
+          echo "::group::Tarball contents"
+          tar tzf "${PKG_FILE}"
+          echo "::endgroup::"
+
+      - name: Upload tarball as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cran-package
+          path: RClickhouse_*.tar.gz
+          if-no-files-found: error
+
+      - name: Publish tarball to GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Create the release if it does not exist yet, otherwise just add
+          # the asset (overwriting any previous upload with the same name).
+          if ! gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            gh release create "${GITHUB_REF_NAME}" \
+              --title "${GITHUB_REF_NAME}" \
+              --notes "CRAN source package \`${PKG_FILE}\` — upload this file directly to CRAN."
+          fi
+          gh release upload "${GITHUB_REF_NAME}" "${PKG_FILE}" --clobber

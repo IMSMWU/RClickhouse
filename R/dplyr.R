@@ -1,5 +1,8 @@
 # dbplyr backend --------------------------------------------------------------
 
+# Declare that this backend uses the dbplyr 2nd edition interface. Without
+# this, dbplyr falls back to the 1st edition (the default), which current
+# dbplyr versions no longer support and abort with an error.
 #' @export
 #' @importFrom dbplyr dbplyr_edition
 dbplyr_edition.ClickhouseConnection <- function(con) 2L
