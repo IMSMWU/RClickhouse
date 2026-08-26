@@ -3,6 +3,7 @@
 
 #include <cityhash/city.h>
 #include <lz4/lz4.h>
+#include <exception>
 #include <stdexcept>
 #include <system_error>
 
