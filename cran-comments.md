@@ -2,19 +2,17 @@
 
 ## Summary
 
-This release fixes the ERRORs currently shown on the CRAN check results page
-for RClickhouse. They were caused by the package relying on dbplyr's first
-edition interface, which current dbplyr versions (>= 2.4) no longer support.
-The package now declares the dbplyr second edition via a `dbplyr_edition()`
-method, and the affected tests (test-agg.R, test-prefix.R) pass again.
+This release fixes the clang23 "Additional issues" failure reported by the CRAN team (deadline 2026-09-16). libc++ in LLVM 23 dropped many transitive includes, so `vendor/clickhouse-cpp/clickhouse/base/compressed.cpp` failed to compile: `std::uncaught_exceptions()` was used without a direct `#include <exception>`. The fix adds that include, mirroring the upstream clickhouse-cpp commit a7ae5b0b. No other changes.
+
+The fix was verified locally by compiling with `-D_LIBCPP_REMOVE_TRANSITIVE_INCLUDES` (the libc++ mechanism behind the LLVM 23 change): before the fix this reproduces the reported error, after the fix the package compiles cleanly.
 
 ## Test environments
 
-* local: macOS, R 4.5.3 (with dbplyr 2.6.0, dplyr 1.2.1)
+* local: macOS, R 4.5.3 (Apple clang 21, libc++, also with -D_LIBCPP_REMOVE_TRANSITIVE_INCLUDES)
 
 ## R CMD check results
 
 0 errors | 0 warnings | 0 notes
 
-(In the offline build environment a single NOTE "unable to verify current
-time" is shown; this is an environment artifact unrelated to the package.)
+(Locally a single NOTE about an outdated HTML Tidy binary is shown; this is a
+toolchain artifact of the build machine, unrelated to the package.)
